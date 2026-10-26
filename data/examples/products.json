@@ -1,0 +1,53 @@
+{
+  "disclaimer": "Полностью синтетические продукты и оценки, не данные о реальных SIEM",
+  "products": [
+    {
+      "id": "demo-siem-alpha",
+      "eps": 2500,
+      "on_premise": true,
+      "integrations": [
+        "Windows",
+        "Linux",
+        "NGFW"
+      ],
+      "scores": {
+        "detection_coverage": 85,
+        "integration_quality": 90,
+        "cost_efficiency": 55,
+        "operability": 70
+      }
+    },
+    {
+      "id": "demo-siem-beta",
+      "eps": 5000,
+      "on_premise": true,
+      "integrations": [
+        "Windows",
+        "Linux",
+        "NGFW",
+        "EDR"
+      ],
+      "scores": {
+        "detection_coverage": 78,
+        "integration_quality": 70,
+        "cost_efficiency": 90,
+        "operability": 85
+      }
+    },
+    {
+      "id": "demo-siem-gamma",
+      "eps": 800,
+      "on_premise": true,
+      "integrations": [
+        "Windows",
+        "Linux"
+      ],
+      "scores": {
+        "detection_coverage": 95,
+        "integration_quality": 95,
+        "cost_efficiency": 95,
+        "operability": 90
+      }
+    }
+  ]
+}
