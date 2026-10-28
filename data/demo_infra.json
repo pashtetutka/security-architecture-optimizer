@@ -1,0 +1,35 @@
+{
+  "description": "Тестовый сценарий: демонстрационный, без привязки к реальной организации",
+  "budget_million": 5.0,
+  "critical_infrastructure": false,
+  "fstek_required": false,
+  "peak_multiplier": 1.5,
+  "reserve_pct": 20,
+  "required_sources": [
+    "Windows",
+    "Linux",
+    "NGFW"
+  ],
+  "sources": [
+    {
+      "type": "Windows servers",
+      "count": 60,
+      "eps_per_unit": 3.0
+    },
+    {
+      "type": "Linux servers",
+      "count": 25,
+      "eps_per_unit": 2.5
+    },
+    {
+      "type": "Workstations",
+      "count": 300,
+      "eps_per_unit": 0.4
+    },
+    {
+      "type": "NGFW",
+      "count": 2,
+      "eps_per_unit": 70
+    }
+  ]
+}

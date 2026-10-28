@@ -1,0 +1,9 @@
+{
+  "organization": "Синтетическая компания / тест для ETL",
+  "required_sources": [
+    "1С:ЗУП",
+    "Kaspersky",
+    "Staffcop",
+    "SAP HANA"
+  ]
+}

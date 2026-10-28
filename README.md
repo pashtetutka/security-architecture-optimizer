@@ -26,9 +26,8 @@ python -m siem.etl report --focused-dir $checkDir
 
 - [Команды, входы и результаты ETL](docs/etl.md)
 - [Структура кода и правила расширения](docs/architecture.md)
-- [Правила работы с репозиторием](AGENTS.md)
-- [Разбор исходной таблицы KOMRAD](docs/KOMRAD_TABLE_FIX.md)
-- [Историческое описание приложения выбора SIEM](docs/archive/decision_support.md)
+- [Прототип выбора SIEM для диплома](docs/decision_support.md)
 
-Алгоритмы выбора SIEM, интерфейс `app.py` и исторические оценки существуют отдельно
-от текущей работы над ETL. Их прежнее описание сохранено в архиве документации.
+Прототип выбора SIEM запускается через `python -m siem.cli` или `streamlit run app.py`.
+Для веб-интерфейса дополнительно нужны `streamlit` и `pandas`.
+Исходные исторические оценки находятся в `data/reference_metrics.json`.

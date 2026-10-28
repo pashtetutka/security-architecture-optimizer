@@ -1,0 +1,20 @@
+{
+  "warning": "SYNTHETIC DEMO ONLY. Real rules require verified source and version before approval.",
+  "rules": [
+    {
+      "siem_id": "p11",
+      "product_version": "DEMO-0",
+      "requirement": "kubernetes",
+      "approval_status": "approved",
+      "source_url": "https://example.org/synthetic-training-rule"
+    },
+    {
+      "siem_id": "p03",
+      "product_version": "DEMO-0",
+      "requirement": "additional_server",
+      "min_free_capacity": 2,
+      "approval_status": "approved",
+      "source_url": "https://example.org/synthetic-training-rule"
+    }
+  ]
+}

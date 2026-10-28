@@ -1,1 +1,0 @@
-"""Security Architecture Optimizer MVP."""

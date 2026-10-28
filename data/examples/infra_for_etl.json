@@ -1,0 +1,34 @@
+{
+  "name": "Тестовая организация (синтетические данные)",
+  "budget_rub": 3000000,
+  "default_custom_parser_rub": 180000,
+  "event_sources": [
+    {
+      "name": "Microsoft Windows",
+      "criticality": 5
+    },
+    {
+      "name": "Apache HTTP Server",
+      "criticality": 3
+    },
+    {
+      "name": "Linux",
+      "criticality": 5
+    },
+    {
+      "name": "Atlassian Jira",
+      "criticality": 2
+    },
+    {
+      "name": "Нестандартное приложение X",
+      "criticality": 3,
+      "custom_parser_rub": 350000
+    }
+  ],
+  "environment": {
+    "kubernetes_available": false,
+    "kubernetes_setup_rub": 750000,
+    "available_server_capacity": 1,
+    "additional_server_rub": 320000
+  }
+}
