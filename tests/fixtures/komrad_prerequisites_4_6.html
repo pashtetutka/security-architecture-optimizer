@@ -1,0 +1,174 @@
+<!doctype html><html lang=ru dir=ltr class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-install/prerequisites" data-has-hydrated=false><head><meta charset=UTF-8><meta name=generator content="Docusaurus v3.10.2"><title data-rh=true>Требования к системе | KOMRAD Enterprise SIEM</title><meta data-rh=true name=viewport content="width=device-width, initial-scale=1.0"/><meta data-rh=true name=twitter:card content=summary_large_image /><meta data-rh=true property=og:image content=https://docs.etecs.ru/komrad/img/Komrad-Enterprise-SIEM_icon-961x1024.png /><meta data-rh=true name=twitter:image content=https://docs.etecs.ru/komrad/img/Komrad-Enterprise-SIEM_icon-961x1024.png /><meta data-rh=true property=og:url content=https://docs.etecs.ru/komrad/docs/next/install/prerequisites /><meta data-rh=true property=og:locale content=ru /><meta data-rh=true name=docusaurus_locale content=ru /><meta data-rh=true name=docsearch:language content=ru /><meta data-rh=true name=docusaurus_version content=current /><meta data-rh=true name=docusaurus_tag content=docs-default-current /><meta data-rh=true name=docsearch:version content=current /><meta data-rh=true name=docsearch:docusaurus_tag content=docs-default-current /><meta data-rh=true property=og:title content="Требования к системе | KOMRAD Enterprise SIEM"/><link data-rh=true rel=icon href=/komrad/img/logo.svg /><link data-rh=true rel=canonical href=https://docs.etecs.ru/komrad/docs/next/install/prerequisites /><link data-rh=true rel=alternate href=https://docs.etecs.ru/komrad/docs/next/install/prerequisites hreflang=ru /><link data-rh=true rel=alternate href=https://docs.etecs.ru/komrad/docs/next/install/prerequisites hreflang=x-default /><script data-rh=true type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://docs.etecs.ru/komrad/docs/next/install","name":"Установка","position":1},{"@type":"ListItem","item":"https://docs.etecs.ru/komrad/docs/next/install/prerequisites","name":"Требования к системе","position":2}]}</script><link rel=alternate type=application/rss+xml href=/komrad/blog/rss.xml title="KOMRAD Enterprise SIEM RSS Feed"><link rel=alternate type=application/atom+xml href=/komrad/blog/atom.xml title="KOMRAD Enterprise SIEM Atom Feed"><link rel=alternate type=application/json href=/komrad/blog/feed.json title="KOMRAD Enterprise SIEM JSON Feed"><link rel=stylesheet href=/komrad/assets/css/styles.c7e38cb3.css /><script src=/komrad/assets/js/runtime~main.587f53bf.js defer></script><script src=/komrad/assets/js/main.8f8d5228.js defer></script></head><body><svg style="display: none;"><defs>
+<symbol id=theme-svg-external-link viewBox="0 0 24 24"><path fill=currentColor d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme-899")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{for(var[t,e]of new URLSearchParams(window.location.search).entries())if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id=__docusaurus><link rel=preload as=image href=/komrad/img/logo.svg /><div role=region aria-label="Перейти к основному содержимому"><a class=skipToContent_fXgn href=#__docusaurus_skipToContent_fallback>Перейти к основному содержимому</a></div><nav aria-label=Main class="theme-layout-navbar navbar navbar--fixed-top"><div class=navbar__inner><div class="theme-layout-navbar-left navbar__items"><button aria-label="Переключить навигационную панель" aria-expanded=false class="navbar__toggle clean-btn" type=button><svg width=30 height=30 viewBox="0 0 30 30" aria-hidden=true><path stroke=currentColor stroke-linecap=round stroke-miterlimit=10 stroke-width=2 d="M4 7h22M4 15h22M4 23h22"/></svg></button><a class=navbar__brand href=/komrad/><div class=navbar__logo><img src=/komrad/img/logo.svg alt="KOMRAD Enterprise SIEM" class="themedComponent_mlkZ themedComponent--light_NVdE"/><img src=/komrad/img/logo.svg alt="KOMRAD Enterprise SIEM" class="themedComponent_mlkZ themedComponent--dark_xIcU"/></div><b class="navbar__title text--truncate">KOMRAD Enterprise SIEM</b></a><a aria-current=page class="navbar__item navbar__link navbar__link--active" href=/komrad/docs/next/getting-started>Документация</a><a class="navbar__item navbar__link" href=/komrad/blog>Блог</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a aria-current=page class="navbar__link active" aria-haspopup=true aria-expanded=false role=button href=/komrad/docs/next/install/prerequisites>4.6.X</a><ul class=dropdown__menu><li><a aria-current=page class="dropdown__link dropdown__link--active" href=/komrad/docs/next/install/prerequisites>4.6.X</a><li><a class=dropdown__link href=/komrad/docs/install/prerequisites>4.5.X</a><li><a class=dropdown__link href=/komrad/docs/4.3.58/intro>4.3.58</a></ul></div><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type=button disabled title="system mode" aria-label="Переключение между темным и светлым режимом (сейчас используется system mode)"><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill=currentColor d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill=currentColor d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/></svg><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill=currentColor d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"/></svg></button></div><div class=navbarSearchContainer_Bca1><div class="navbar__search searchBarContainer_NW3z" dir=ltr><svg aria-hidden=true class=searchIcon_T3tP focusable=false viewBox="0 0 16 16"><path fill=currentColor d="M6.02945 10.20327a4.17382 4.17382 0 1 1 4.17382-4.17382 4.15609 4.15609 0 0 1-4.17382 4.17382Zm9.69195 4.2199-4.8225-4.82338A5.88021 5.88021 0 0 0 12.058 6.02856 6.00467 6.00467 0 1 0 9.59979 10.8989l4.82338 4.82338a.89729.89729 0 0 0 1.29912 0 .89749.89749 0 0 0-.00087-1.29909Z"/></svg><input placeholder=Search aria-label=Search class="navbar__search-input searchInput_YFbd" value="" /><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div></div></div><div role=presentation class=navbar-sidebar__backdrop></div></nav><div id=__docusaurus_skipToContent_fallback class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class=docsWrapper_hBAB><button aria-label="Прокрутка к началу" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type=button></button><div class=docRoot_UBD9><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class=sidebarViewport_aRkj><div class=sidebar_njMd><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/getting-started><span class=categoryLinkLabel_W154>Начало работы</span></a><button aria-label="Expand sidebar category 'Начало работы'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/komrad/docs/next/intro><span class=linkLabel_WmDU>Обзор</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--active" href=/komrad/docs/next/install><span class=categoryLinkLabel_W154>Установка</span></a><button aria-label="Collapse sidebar category 'Установка'" aria-expanded=true type=button class="clean-btn menu__caret"></button></div><ul class=menu__list><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current=page tabindex=0 href=/komrad/docs/next/install/prerequisites><span class=linkLabel_WmDU>Требования к системе</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/get-started><span class=linkLabel_WmDU>Подготовка к установке</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/license_activation><span class=linkLabel_WmDU>Активация лицензии</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/installation_schemes><span class=linkLabel_WmDU>Типовые схемы развертывания KOMRAD Enterprise SIEM</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/auto_install><span class=linkLabel_WmDU>Автоматическая установка</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/install_astra><span class=linkLabel_WmDU>Установка в ручном режиме на Astra Linux Special Edition</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/docker><span class=linkLabel_WmDU>Установка в Docker Compose</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/install_distributed_alse><span class=linkLabel_WmDU>Распределённая установка на Astra Linux SE 1.6</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/import_export><span class=linkLabel_WmDU>Импорт и экспорт</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/upgrade><span class=linkLabel_WmDU>Обновление системы</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/upgrade_distributed><span class=linkLabel_WmDU>Обновление распределённой системы</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/upgrade_43_to_45><span class=linkLabel_WmDU>Обновление с версии 4.3 до 4.5</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/komrad/docs/next/install/uninstall><span class=linkLabel_WmDU>Удаление</span></a></ul><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/collect><span class=categoryLinkLabel_W154>Сбор событий</span></a><button aria-label="Expand sidebar category 'Сбор событий'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/process/normalization><span class=categoryLinkLabel_W154>Обработка событий</span></a><button aria-label="Expand sidebar category 'Обработка событий'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/detect><span class=categoryLinkLabel_W154>Обнаружение угроз</span></a><button aria-label="Expand sidebar category 'Обнаружение угроз'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/respond><span class=categoryLinkLabel_W154>Реагирование и уведомления</span></a><button aria-label="Expand sidebar category 'Реагирование и уведомления'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/report><span class=categoryLinkLabel_W154>Отчётность и визуализация</span></a><button aria-label="Expand sidebar category 'Отчётность и визуализация'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/admin><span class=categoryLinkLabel_W154>Администрирование</span></a><button aria-label="Expand sidebar category 'Администрирование'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/integrations><span class=categoryLinkLabel_W154>Интеграции</span></a><button aria-label="Expand sidebar category 'Интеграции'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/support><span class=categoryLinkLabel_W154>Поддержка</span></a><button aria-label="Expand sidebar category 'Поддержка'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/komrad/docs/next/changelog><span class=categoryLinkLabel_W154>История и планы</span></a><button aria-label="Expand sidebar category 'История и планы'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div></ul></nav></div></div></aside><main class=docMainContainer_TBSr><div class="container padding-top--md padding-bottom--lg"><div class=row><div class="col docItemCol_VOVn"><div class="theme-doc-version-banner alert alert--warning margin-bottom--md" role=alert><div>Это документация для будущей версии <!-- -->KOMRAD Enterprise SIEM<!-- --> <b>4.6.X</b>.</div><div class=margin-top--md>Актуальная документация находится на странице <b><a href=/komrad/docs/install/prerequisites>последней версии</a></b> (<!-- -->4.5.X<!-- -->).</div></div><div class=docItemContainer_Djhp><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Навигационная цепочка текущей страницы"><ul class=breadcrumbs><li class=breadcrumbs__item><a aria-label="Главная страница" class=breadcrumbs__link href=/komrad/><svg viewBox="0 0 24 24" class=breadcrumbHomeIcon_YNFT><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill=currentColor /></svg></a><li class=breadcrumbs__item><a class=breadcrumbs__link href=/komrad/docs/next/install><span>Установка</span></a><li class="breadcrumbs__item breadcrumbs__item--active"><span class=breadcrumbs__link>Требования к системе</span></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Версия: 4.6.X</span><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type=button class="clean-btn tocCollapsibleButton_TO0P">Содержание этой страницы</button></div><div class="theme-doc-markdown markdown"><header><h1>Требования к системе</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=рекомендации-по-расчету-объема-накопителей-для-хранения-событий>Рекомендации по расчету объема накопителей для хранения событий<a href=#рекомендации-по-расчету-объема-накопителей-для-хранения-событий class=hash-link aria-label="Прямая ссылка на Рекомендации по расчету объема накопителей для хранения событий" title="Прямая ссылка на Рекомендации по расчету объема накопителей для хранения событий" translate=no>​</a></h2>
+<p>Можно рассчитать приблизительный объем (в байтах), необходимый для хранения суточного объема данных о событиях, по формуле:</p>
+<p><strong><em>50 (ср. значение веса одного события) × 3600 × 24 × скорость потока событий (в секунду)</em></strong></p>
+<p>Например, при средней скорости 1000 событий в секунду система запишет за сутки 4 Гб данных.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=min>Минимальные требования к составу и характеристикам технических средств<a href=#min class=hash-link aria-label="Прямая ссылка на Минимальные требования к составу и характеристикам технических средств" title="Прямая ссылка на Минимальные требования к составу и характеристикам технических средств" translate=no>​</a></h2>
+<p>Изделие должно эксплуатироваться на технических средствах следующих ОС:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>ОС<th>Версия не ниже<tbody><tr><td>Astra Linux<td>1.7 (all updates)<tr><td>Astra Linux<td>1.8<tr><td>Ubuntu<td>22<tr><td>ОСОН «ОСнова»<td>2.5<tr><td>RED ОС<td>8<tr><td>ALT Linux<td>10.2</table>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class=admonitionHeading_Gvgb><span class=admonitionIcon_Rf37><svg viewBox="0 0 12 16"><path fill-rule=evenodd d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"/></svg></span>осторожно</div><div class=admonitionContent_BuS1><p>Для установки всех компонентов KOMRAD, Вам потребуется доступ к удалённому репозиторию или диск с обновлениями</div></div>
+<p>Технические средства должны обеспечивать минимальные технические требования, приведенные в следующей таблице:</p>
+<p>Таблица 1 - Минимальные технические требования</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th style=text-align:left>Характеристика<th style=text-align:left>Base-SMART<th style=text-align:left>BASE<th style=text-align:left>All-in-One<th style=text-align:left>Enterprise<tbody><tr><td style=text-align:left>Количество ядер процессора<td style=text-align:left>2<td style=text-align:left>2<td style=text-align:left>2<td style=text-align:left>4<tr><td style=text-align:left>Базовая тактовая частота процессора<td style=text-align:left>2 ГГц<td style=text-align:left>2 ГГц<td style=text-align:left>2 ГГц<td style=text-align:left>2 ГГц<tr><td style=text-align:left>Оперативная память<td style=text-align:left>DDR3 8 Гб<td style=text-align:left>DDR3 8 Гб<td style=text-align:left>DDR3 16 Гб<td style=text-align:left>DDR3 32 Гб<tr><td style=text-align:left>SSD/HDD<td style=text-align:left>100 Гб<td style=text-align:left>100 Гб<td style=text-align:left>1 Тб<td style=text-align:left>10 Тб</table>
+<p>KOMRAD способен обработать 100 000 EPS при следующих параметрах:</p>
+<ol>
+<li class="">
+<p>Компонент СУБД <code>ClickHouse</code> (с БД <code>komrad_events</code>) и сервис <code>komrad-processor</code> на отдельных узлах с минимальными техническими требованиями:</p>
+<ul>
+<li class="">Процессор – 16 ядер, базовая тактовая частота процессора – 2.2 ГГц</li>
+<li class="">Оперативная память – 32 Гб</li>
+<li class="">SSD с поддержкой NVMe – объёмом 10 Тб</li>
+</ul>
+</li>
+<li class="">
+<p>Коллекторы на отдельных узлах</p>
+</li>
+<li class="">
+<p>Остальные компоненты на отдельном узле с минимальными техническими требованиями для лицензии Enterprise</p>
+</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=web>Поддерживаемые веб-браузеры<a href=#web class=hash-link aria-label="Прямая ссылка на Поддерживаемые веб-браузеры" title="Прямая ссылка на Поддерживаемые веб-браузеры" translate=no>​</a></h3>
+<p>Для штатной работы с веб-интерфейсом KOMRAD требуется установка на рабочую станцию одного из следующих браузеров:</p>
+<p>Таблица 2 - Поддерживаемые веб-браузеры</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th style=text-align:center>Тип браузера<th style=text-align:center>Минимальная рекомендуемая версия<tbody><tr><td style=text-align:center>Google Chrome<td style=text-align:center>Google Chrome 111<tr><td style=text-align:center>Safari<td style=text-align:center>Safari 15.0<tr><td style=text-align:center>Mozilla Firefox<td style=text-align:center>Mozilla Firefox 111<tr><td style=text-align:center>Microsoft Edge<td style=text-align:center>Microsoft Edge 111<tr><td style=text-align:center>Opera<td style=text-align:center>Opera 69<tr><td style=text-align:center>Yandex Browser<td style=text-align:center>Yandex Browser 22.1<tr><td style=text-align:center>Chromium<td style=text-align:center>Chromium 111<tr><td style=text-align:center>Internet Explorer<td style=text-align:center>Internet Explorer 11</table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=virt>Рекомендации по установке KOMRAD Enterprise SIEM в среде виртуализации<a href=#virt class=hash-link aria-label="Прямая ссылка на Рекомендации по установке KOMRAD Enterprise SIEM в среде виртуализации" title="Прямая ссылка на Рекомендации по установке KOMRAD Enterprise SIEM в среде виртуализации" translate=no>​</a></h2>
+<p>KOMRAD может устанавливаться на следующие виды виртуальных сред:</p>
+<ul>
+<li class="">VmWare</li>
+<li class="">VirtualBox</li>
+<li class="">ProxMox</li>
+<li class="">KVM</li>
+<li class="">Hyper-V</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=требования-к-среде>Требования к среде<a href=#требования-к-среде class=hash-link aria-label="Прямая ссылка на Требования к среде" title="Прямая ссылка на Требования к среде" translate=no>​</a></h3>
+<ul>
+<li class="">Для успешной установки не должно быть ограничений на выполнение <code>bash</code> пользователями</li>
+<li class="">Совместимость с другими программами не проверялась, гарантия успешной установки обеспечивается на "чистой" машине</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=настройка-хранения-данных>Настройка хранения данных<a href=#настройка-хранения-данных class=hash-link aria-label="Прямая ссылка на Настройка хранения данных" title="Прямая ссылка на Настройка хранения данных" translate=no>​</a></h3>
+<p>Для оптимального хранения рекомендуется использовать деление данных на горячие и холодные.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=настройка-работы-процессора>Настройка работы процессора<a href=#настройка-работы-процессора class=hash-link aria-label="Прямая ссылка на Настройка работы процессора" title="Прямая ссылка на Настройка работы процессора" translate=no>​</a></h3>
+<p>В виртуальных средах, где <strong>не используется</strong> режим <code>Hyperthreading</code>, количество физических ядер должно быть равно количеству логических.</p>
+<p>При наличии и включении технологии <code>Hyperthreading</code> для KOMRAD достаточно выделить вдвое меньше физических ядер.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=настройка-оперативной-памяти>Настройка оперативной памяти<a href=#настройка-оперативной-памяти class=hash-link aria-label="Прямая ссылка на Настройка оперативной памяти" title="Прямая ссылка на Настройка оперативной памяти" translate=no>​</a></h3>
+<p>Объем оперативной памяти, выделяемой виртуальной среде, не должен быть меньше значения, указанного в требованиях к аппаратным средствам. Рекомендуется устанавливать на 10-15% больше объема оперативной памяти от рекомендуемого, т.к. часть этого объема используется для работы самой виртуальной среды.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=настройка-ssdhdd>Настройка SSD/HDD<a href=#настройка-ssdhdd class=hash-link aria-label="Прямая ссылка на Настройка SSD/HDD" title="Прямая ссылка на Настройка SSD/HDD" translate=no>​</a></h3>
+<p>Объем SSD/HDD, выделяемой виртуальной среде, не должен быть меньше значения, указанного в требованиях к аппаратным средствам.</p>
+<p>Рекомендуем использовать технологию <code>Storage I/O Control</code> при обмене данными между виртуальной средой и сервером баз данных.</div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"></div><div class="col lastUpdated_JAkA"><span class=theme-last-updated>Последнее обновление<!-- --> <b><time datetime=2026-05-13T09:02:13.000Z itemprop=dateModified>13 мая 2026 г.</time></b></span></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Страница документа"><a class="pagination-nav__link pagination-nav__link--prev" href=/komrad/docs/next/install><div class=pagination-nav__sublabel>Предыдущая страница</div><div class=pagination-nav__label>Установка</div></a><a class="pagination-nav__link pagination-nav__link--next" href=/komrad/docs/next/install/get-started><div class=pagination-nav__sublabel>Следующая страница</div><div class=pagination-nav__label>Подготовка к установке</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href=#рекомендации-по-расчету-объема-накопителей-для-хранения-событий class="table-of-contents__link toc-highlight">Рекомендации по расчету объема накопителей для хранения событий</a><li><a href=#min class="table-of-contents__link toc-highlight">Минимальные требования к составу и характеристикам технических средств</a><ul><li><a href=#web class="table-of-contents__link toc-highlight">Поддерживаемые веб-браузеры</a></ul><li><a href=#virt class="table-of-contents__link toc-highlight">Рекомендации по установке KOMRAD Enterprise SIEM в среде виртуализации</a><ul><li><a href=#требования-к-среде class="table-of-contents__link toc-highlight">Требования к среде</a><li><a href=#настройка-хранения-данных class="table-of-contents__link toc-highlight">Настройка хранения данных</a><li><a href=#настройка-работы-процессора class="table-of-contents__link toc-highlight">Настройка работы процессора</a><li><a href=#настройка-оперативной-памяти class="table-of-contents__link toc-highlight">Настройка оперативной памяти</a><li><a href=#настройка-ssdhdd class="table-of-contents__link toc-highlight">Настройка SSD/HDD</a></ul></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class=footer__title>Документация</div><ul class="footer__items clean-list"><li class=footer__item><a class=footer__link-item href=/komrad/docs/intro>Документация KOMRAD Enterprise SIEM</a><li class=footer__item><a href=https://docs.etecs.ru/scanner target=_blank rel="noopener noreferrer" class=footer__link-item>Документация Сканер-ВС</a></ul></div><div class="theme-layout-footer-column col footer__col"><div class=footer__title>Сообщество</div><ul class="footer__items clean-list"><li class=footer__item><a href=https://t.me/EchelonEyes target=_blank rel="noopener noreferrer" class=footer__link-item>Новости ИБ<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=https://t.me/komrad4 target=_blank rel="noopener noreferrer" class=footer__link-item>KOMRAD Enterprise SIEM в телеграм<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a></ul></div><div class="theme-layout-footer-column col footer__col"><div class=footer__title>ГК Эшелон</div><ul class="footer__items clean-list"><li class=footer__item><a href=https://npo-echelon.ru target=_blank rel="noopener noreferrer" class=footer__link-item>АО «НПО «Эшелон»<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=https://etecs.ru target=_blank rel="noopener noreferrer" class=footer__link-item>АО «Эшелон Технологии»<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a></ul></div></div><div class="footer__bottom text--center"><div class=footer__copyright>Copyright © 2026 АО «НПО «Эшелон».</div></div></div></footer></div></body>

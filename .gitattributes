@@ -1,0 +1,2 @@
+# Preserve evidence snapshots byte-for-byte, including their SHA-256.
+tests/fixtures/** -text

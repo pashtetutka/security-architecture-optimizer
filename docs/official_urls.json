@@ -1,0 +1,27 @@
+{
+  "p04": [
+    {
+      "id": "hardware_requirements",
+      "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/sizing-guide/capacity_planning_for_installation/requirements_for_hardware_configuration/",
+      "mode": "generic",
+      "source_type": "vendor_documentation",
+      "product_version_hint": "Alertix 3.9.1 (version from documentation URL; not verified)"
+    }
+  ],
+  "p13": [
+    {
+      "id": "sources_catalog",
+      "url": "https://docs.etecs.ru/komrad/docs/next/collect/sources/",
+      "mode": "generic",
+      "source_type": "vendor_documentation",
+      "product_version_hint": "KOMRAD next (resolved release must be verified from document)"
+    },
+    {
+      "id": "hardware_requirements",
+      "url": "https://docs.etecs.ru/komrad/docs/next/install/prerequisites/",
+      "mode": "generic",
+      "source_type": "vendor_documentation",
+      "product_version_hint": "KOMRAD next (resolved release must be verified from document)"
+    }
+  ]
+}

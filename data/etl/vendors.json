@@ -1,0 +1,326 @@
+{
+  "schema_version": "1.0",
+  "disclaimer": "13 позиций из РасчетSIEM; список URL составлен из открытых источников. Наличие URL не подтверждает результат онлайн-загрузки.",
+  "vendors": [
+    {
+      "id": "p01",
+      "name": "RuSIEM",
+      "historical_excel_id": "p01",
+      "sources": [
+        {
+          "id": "parsers",
+          "url": "https://rusiem.com/ru/products/parsers",
+          "mode": "rusiem",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p02",
+      "name": "СёрчИнформ SIEM",
+      "historical_excel_id": "p02",
+      "sources": [
+        {
+          "id": "overview",
+          "url": "https://searchinform.ru/products/siem/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p03",
+      "name": "R-Vision SIEM",
+      "historical_excel_id": "p03",
+      "sources": [
+        {
+          "id": "source_catalog",
+          "url": "https://docs.rvision.ru/sources/ru/latest/ContentGuide/supported-sources.html",
+          "mode": "rvision",
+          "product_version_hint": "latest; requires resolving displayed documentation release",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "architecture",
+          "url": "https://docs.rvision.ru/siem/ru/latest/streams/ConnectSources.html",
+          "mode": "generic",
+          "product_version_hint": "latest; page shows release",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "deployment",
+          "url": "https://docs.rvision.ru/siem/ru/latest/installation/DeployingSystem.html",
+          "mode": "generic",
+          "product_version_hint": "latest; release must be validated",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "hardware_requirements",
+          "url": "https://docs.rvision.ru/siem/ru/latest/installation/TechnicalRequirements.html",
+          "mode": "generic",
+          "product_version_hint": "latest; release must be validated",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p04",
+      "name": "Alertix",
+      "historical_excel_id": "p04",
+      "sources": [
+        {
+          "id": "integration_guide",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/admin-guide/event_reception_management/receiver_management/data_collection_and_processing_engine/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "configuration",
+          "url": "https://help.ngrsoftlab.ru/alertix/blog/faq/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "overview",
+          "url": "https://www.ngrsoftlab.ru/alertix",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "platform_architecture",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/admin-guide/platform_description/platform_architecture/platform_architecture/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "hardware_requirements",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/sizing-guide/capacity_planning_for_installation/requirements_for_hardware_configuration/",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "product_version_hint": "Alertix 3.9.1 (version from documentation URL; not verified)"
+        }
+      ]
+    },
+    {
+      "id": "p05",
+      "name": "Security Capsule SIEM",
+      "historical_excel_id": "p05",
+      "sources": [
+        {
+          "id": "product_document",
+          "url": "https://www.itb.spb.ru/upload/docs/Security_Capsule_SIEM/Security_Capsule_SIEM_Opisanie_primeneniya.pdf",
+          "mode": "pdf",
+          "product_version_hint": "document revision 12 / 2025-03-24",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p06",
+      "name": "MaxPatrol SIEM",
+      "historical_excel_id": "p06",
+      "sources": [
+        {
+          "id": "sources",
+          "url": "https://help.ptsecurity.com/ru-RU/projects/siem/8.6/help/798607115",
+          "mode": "generic",
+          "product_version_hint": "8.6; link may be obsolete",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "deployment",
+          "url": "https://help.ptsecurity.com/en-US/projects/siem/8.2/help/697563019",
+          "mode": "generic",
+          "product_version_hint": "8.2",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p07",
+      "name": "САВРУС",
+      "historical_excel_id": "p07",
+      "sources": [
+        {
+          "id": "overview",
+          "url": "https://savrus.ru/product",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "product",
+          "url": "https://savrus.ru/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p08",
+      "name": "BI.ZONE SIEM",
+      "historical_excel_id": "p08",
+      "sources": [
+        {
+          "id": "compatibility",
+          "url": "https://astra.ru/ready-for-astra/compatible-software/versions/43800/",
+          "mode": "generic",
+          "product_version_hint": "BI.ZONE SIEM 0.18.0; Astra OS versions are distinct",
+          "source_type": "third_party_compatibility",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p09",
+      "name": "UserGate SIEM",
+      "historical_excel_id": "p09",
+      "sources": [
+        {
+          "id": "architecture",
+          "url": "https://docs.usergate.com/arhitektura-siem_1900.html",
+          "mode": "generic",
+          "product_version_hint": "7.x",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "collection",
+          "url": "https://docs.usergate.com/obshie-svedeniya_1928.html",
+          "mode": "generic",
+          "product_version_hint": "7.x",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p10",
+      "name": "Ankey SIEM NG",
+      "historical_excel_id": "p10",
+      "sources": [
+        {
+          "id": "product_docs",
+          "url": "https://www.infogaz-is.ru/produkty/upravlenie-ib/ankey-siem-ng",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "release",
+          "url": "https://www.infogaz-is.ru/o-kompanii/novosti/2442-ankey-siem-next-generation-ankey-siem-ng-5-2-8",
+          "mode": "generic",
+          "product_version_hint": "5.2.8",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p11",
+      "name": "Solar SIEM",
+      "historical_excel_id": "p11",
+      "sources": [
+        {
+          "id": "architecture",
+          "url": "https://rt-solar.ru/products/solar_siem/architecture/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "docs",
+          "url": "https://rt-solar.ru/products/solar_siem/documents/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p12",
+      "name": "Kaspersky KUMA",
+      "historical_excel_id": "p12",
+      "sources": [
+        {
+          "id": "source_catalog",
+          "url": "https://support.kaspersky.ru/kuma/4.0/255782",
+          "mode": "kuma",
+          "product_version_hint": "4.0 (версия из URL, требует подтверждения по странице)",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "p13",
+      "name": "KOMRAD Enterprise SIEM",
+      "historical_excel_id": "p13",
+      "sources": [
+        {
+          "id": "architecture",
+          "url": "https://docs.etecs.ru/komrad/docs/next/admin/architecture/",
+          "mode": "generic",
+          "product_version_hint": "4.6.x",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "overview",
+          "url": "https://www.etecs.ru/komrad-siem/",
+          "mode": "generic",
+          "product_version_hint": "4.5",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "versioned_doc",
+          "url": "https://docs.etecs.ru/komrad/docs/next/intro/",
+          "mode": "generic",
+          "product_version_hint": "4.6.x",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "sources_catalog",
+          "url": "https://docs.etecs.ru/komrad/docs/next/collect/sources/",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "product_version_hint": "KOMRAD next (resolved release must be verified from document)"
+        },
+        {
+          "id": "hardware_requirements",
+          "url": "https://docs.etecs.ru/komrad/docs/next/install/prerequisites/",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "product_version_hint": "KOMRAD next (resolved release must be verified from document)"
+        }
+      ]
+    }
+  ]
+}

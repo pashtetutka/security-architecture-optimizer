@@ -1,13 +1,12 @@
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
-
 [project]
-name = "security-architecture-optimizer"
-version = "0.1.0"
-description = "Explainable selection prototype for security architecture"
+name = "siem-decision-support"
+version = "0.5.0"
 requires-python = ">=3.10"
-dependencies = []
-
+dependencies = ["markdownify>=0.11,<2", "requests>=2.31,<3", "beautifulsoup4>=4.12,<5", "pypdf>=5,<7"]
+[project.scripts]
+siem-etl = "siem.etl.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
