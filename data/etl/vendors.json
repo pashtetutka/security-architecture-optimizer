@@ -93,6 +93,38 @@
           "enabled": true
         },
         {
+          "id": "connectors_syslog",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/connectors-list/connectors/syslog/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "connectors_beats",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/connectors-list/connectors/beats/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "connectors_jdbc",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/connectors-list/connectors/jdbc/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "connectors_snmp",
+          "url": "https://help.ngrsoftlab.ru/alertix/3.9.1/connectors-list/connectors/snmp/",
+          "mode": "generic",
+          "product_version_hint": "3.9.1",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
           "id": "overview",
           "url": "https://www.ngrsoftlab.ru/alertix",
           "mode": "generic",
@@ -129,6 +161,14 @@
           "product_version_hint": "document revision 12 / 2025-03-24",
           "source_type": "vendor_documentation",
           "enabled": true
+        },
+        {
+          "id": "source_product",
+          "url": "https://www.itb.spb.ru/products/Security_Capsule_SIEM/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
         }
       ]
     },
@@ -146,10 +186,34 @@
           "enabled": true
         },
         {
+          "id": "partial_sources",
+          "url": "https://help.ptsecurity.com/ru-RU/projects/siem/8.6/help/1194299019",
+          "mode": "generic",
+          "product_version_hint": "8.6",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "supported_sources",
+          "url": "https://help.ptsecurity.com/ru-RU/projects/siem/8.6/help/1083652747",
+          "mode": "generic",
+          "product_version_hint": "8.6",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
           "id": "deployment",
           "url": "https://help.ptsecurity.com/en-US/projects/siem/8.2/help/697563019",
           "mode": "generic",
           "product_version_hint": "8.2",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "supported_sources_api",
+          "url": "https://help.ptsecurity.com/api/v2/documents/document/ru-RU/siem/8.6/help/1083652747",
+          "mode": "maxpatrol_api",
+          "product_version_hint": "8.6; documentation version, product not independently verified",
           "source_type": "vendor_documentation",
           "enabled": true
         }
@@ -257,6 +321,14 @@
           "url": "https://rt-solar.ru/products/solar_siem/documents/",
           "mode": "generic",
           "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "source_whitepaper",
+          "url": "https://rt-solar.ru/upload/docs/solar-siem/Solar SIEM_v2025.3_White Paper_Website.pdf",
+          "mode": "pdf",
+          "product_version_hint": "2025.3 document; product version unknown",
           "source_type": "vendor_documentation",
           "enabled": true
         }

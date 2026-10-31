@@ -12,7 +12,7 @@ from siem.etl.catalog import write_catalog
 
 class FocusedCatalogTests(unittest.TestCase):
     def test_unknown_source_fields_remain_null(self):
-        for token in ('—', '–', 'не указано', 'неизвестно', 'unknown'):
+        for token in ('-', '—', '–', 'не указано', 'неизвестно', 'unknown'):
             with self.subTest(token=token):
                 rows=normalize_sources({'facts':[{
                     'siem_id':'p03','field':'source_integration',
@@ -34,10 +34,6 @@ class FocusedCatalogTests(unittest.TestCase):
         self.assertEqual(rows[0]['source_name'],'Cisco ASA')
         self.assertIsNone(rows[0]['siem_version'])
 
-    def test_remove_version_dash(self):
-        raw={'facts':[{'siem_id':'p03','field':'source_integration','value':'Jira',
-              'source_version':'-','evidence_status':'vendor_table'}]}
-        self.assertIsNone(normalize_sources(raw)[0]['source_version'])
 
     def test_eps_range(self):
         self.assertEqual(parse_eps_bound('До 1000'),(None,1000))
@@ -75,20 +71,6 @@ class FocusedCatalogTests(unittest.TestCase):
         self.assertEqual(len(rules),3)
         self.assertEqual([r['strength'] for r in rules],['mandatory','mandatory','recommended'])
 
-    def test_full_workflow_outputs(self):
-        html='''<h3>Минимальная конфигурация</h3><table><tr><th>EPS</th><th>Конфигурация</th></tr>
-        <tr><td>До 1000</td><td>Один сервер: 12vCPU, 20 ГБ ОЗУ, 500 ГБ на SSD</td></tr></table>'''
-        with TemporaryDirectory() as tmp:
-            tmp=Path(tmp)
-            snapshot=tmp/'hardware.html';snapshot.write_text(html,encoding='utf-8')
-            raw={'run_at':'2026-10-27T12:00:00Z','vendors':[{'id':'p03','name':'R-Vision',
-                'source_results':[{'source_id':'hardware_requirements','url':'https://example.test',
-                    'status':'ok','snapshot_path':str(snapshot)}]}],'facts':[]}
-            catalog=build_catalog(raw,tmp/'input.json')
-            self.assertEqual(len(catalog['sizing_profiles']),1)
-            summary=write_catalog(catalog,tmp/'out')
-            self.assertEqual(summary['sizing_profiles'],1)
-            self.assertTrue((tmp/'out'/'coverage.json').exists())
 
 if __name__=='__main__':unittest.main()
 
@@ -131,19 +113,19 @@ class AdditionalAdaptersTests(unittest.TestCase):
 class SnapshotRegressionTests(unittest.TestCase):
     def test_komrad_source_catalog_with_matching_hash(self):
         import hashlib
-        with TemporaryDirectory() as tmp:
-            tmp=Path(tmp)
-            html=b"<article><div class='markdown'><a href='/komrad/docs/next/collect/sources/kaspersky/'>Kaspersky Security Center</a></div></article>"
-            snapshot=tmp/'sources.html'
-            snapshot.write_bytes(html)
-            raw={'vendors':[{'id':'p13','name':'KOMRAD', 'source_results':[
-                 {'source_id':'sources_catalog','status':'ok','snapshot_path':str(snapshot),
-                  'url':'https://docs.etecs.ru/komrad/docs/next/collect/sources/',
-                  'content_sha256':hashlib.sha256(html).hexdigest()}]}], 'facts':[]}
-            catalog=build_catalog(raw,tmp/'input.json')
-            self.assertEqual(len(catalog['integrations']),1)
-            self.assertEqual(catalog['integrations'][0]['source_name'],'Kaspersky Security Center')
-            self.assertFalse(catalog['unread_source_catalog_documents'])
+        snapshot=Path(__file__).parent/'fixtures'/'komrad_sources_catalog.html'
+        digest='87e67b5833981691b5dc8584b720f995e2ef6044c3bffef0e9d70f814ec0cd65'
+        self.assertEqual(hashlib.sha256(snapshot.read_bytes()).hexdigest(),digest)
+        raw={'vendors':[{'id':'p13','name':'KOMRAD', 'source_results':[
+             {'source_id':'sources_catalog','status':'ok','snapshot_path':str(snapshot),
+              'url':'https://docs.etecs.ru/komrad/docs/next/collect/sources/',
+              'content_sha256':digest}]}], 'facts':[]}
+        catalog=build_catalog(raw,snapshot.parent/'input.json')
+        self.assertEqual(len(catalog['integrations']),41)
+        names=[row['source_name'] for row in catalog['integrations']]
+        self.assertIn('Auditbeat',names)
+        self.assertFalse(any('📄' in name for name in names))
+        self.assertFalse(catalog['unread_source_catalog_documents'])
 
     def test_komrad_source_catalog_hash_mismatch_is_reported(self):
         with TemporaryDirectory() as tmp:

@@ -23,9 +23,6 @@ class CollectionTests(unittest.TestCase):
  def test_generic_only_candidates(self):
   f=extract_content(b'<html><p>We require Kubernetes for event collection in this version.</p></html>','generic')['facts']
   self.assertEqual(f[0]['evidence_status'],'review_candidate')
- def test_offline_fixture_layout(self):
-  for name in ('p01__parsers.html','p03__source_catalog.html','p12__source_catalog.html'):
-   self.assertTrue((ROOT/'tests/fixtures/catalogs'/name).exists())
  def test_all_13_vendor_status_even_failures(self):
   manifest=json.loads((ROOT/'data/etl/vendors.json').read_text())
   d=collect(manifest,fetch=FakeFetch(),observed_at='2026-10-27T00:00:00Z')

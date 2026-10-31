@@ -128,6 +128,10 @@ def extract_pdf(data:bytes):
          'facts':facts[:3500], 'warnings':(['PDF ограничен 150 страницами'] if len(reader.pages)>150 else [])}
 
 def extract_content(data:bytes,mode:str,charset='utf-8'):
+ if mode=='maxpatrol_api':
+  from .vendors.maxpatrol import maxpatrol_api_document
+  doc=maxpatrol_api_document(data)
+  return {'title':doc['title'],'facts':[], 'warnings':['Requires targeted source normalization']}
  if mode=='pdf': return extract_pdf(data)
  # Most modern vendor HTML is UTF-8. Avoid Latin-1 mojibake caused by
  # missing HTTP charset; if UTF-8 is invalid, honor a declared charset

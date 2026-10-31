@@ -24,6 +24,8 @@ def main(argv=None):
  crawl.add_argument('--replay-from',type=Path,help='Повторно извлечь факты из ранее сохранённых снимков без сети')
  crawl.add_argument('--timeout',type=float,default=35,help='Тайм-аут одного запроса, секунд')
  crawl.add_argument('--retries',type=int,default=2,help='Повторы временных ошибок HTTP')
+ crawl.add_argument('--host-ca',action='append',default=[],metavar='HOST=PEM',
+                    help='Доверенный CA-файл только для указанного хоста (можно повторять); TLS остаётся обязательным')
  assess=sub.add_parser('assess',help='Примерить ETL-каталог к профилю организации')
  assess.add_argument('--registry',default='data/etl/vendors.json')
  assess.add_argument('--etl',required=True);assess.add_argument('--infra',required=True);assess.add_argument('--output',required=True)
@@ -58,7 +60,7 @@ def main(argv=None):
      return (Path(record['snapshot_path']).read_bytes(),record.get('http_charset'),record.get('http_content_type',''))
    fetcher=SnapshotFetcher()
   if args.fixture_dir:
-   paths={src['url']:(args.fixture_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.html')))
+   paths={src['url']:(args.fixture_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.json' if src['mode']=='maxpatrol_api' else '.html')))
           for v in registry['vendors'] for src in v['sources']}
    class FixtureFetcher:
     acquisition_method='test_fixture'
@@ -68,7 +70,7 @@ def main(argv=None):
      return file.read_bytes(),'utf-8','application/pdf' if file.suffix=='.pdf' else 'text/html'
    fetcher=FixtureFetcher()
   if args.manual_dir:
-   paths={src['url']:(args.manual_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.html')))
+   paths={src['url']:(args.manual_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.json' if src['mode']=='maxpatrol_api' else '.html')))
           for v in registry['vendors'] for src in v['sources']}
    class ManualFetcher:
     acquisition_method='manual_import'
@@ -77,7 +79,17 @@ def main(argv=None):
      if not file.exists(): raise FileNotFoundError('Нет локального документа: '+str(file))
      return file.read_bytes(),None,'application/pdf' if file.suffix=='.pdf' else 'text/html'
    fetcher=ManualFetcher()
-  if fetcher is None: fetcher=PublicFetcher(timeout=args.timeout,retries=args.retries)
+  if fetcher is None:
+   host_ca_bundles={}
+   for value in args.host_ca:
+    host,separator,bundle=value.partition('=')
+    if not separator or not host or not bundle or host in host_ca_bundles:
+     p.error('--host-ca требует уникальное HOST=PEM')
+    host_ca_bundles[host]=bundle
+   try:
+    fetcher=PublicFetcher(timeout=args.timeout,retries=args.retries,host_ca_bundles=host_ca_bundles)
+   except (ValueError,OSError) as ex:
+    p.error(str(ex))
   result=collect(registry,fetch=fetcher,snapshot_dir=args.snapshot_dir);write(args.output,result)
  elif args.cmd=='assess':
   result={'schema_version':'0.1','assessment':evaluate(read(args.registry)['vendors'],read(args.etl),read(args.infra),read(args.reviewed_rules)['rules'] if args.reviewed_rules else None)};write(args.output,result)

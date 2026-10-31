@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Подключение источников :: Руководство по эксплуатации R-Vision SIEM</title>
+    <link rel="prev" href="GettingStarted.html">
+    <link rel="next" href="ProcessingInOnePipeline.html">
+    <meta name="generator" content="Antora 3.2.0">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="../../../assets/css/footer.css">
+    <link rel="stylesheet" href="../../../assets/css/tabs.css">
+    <script>var uiRootPath = '../../../assets'</script>
+
+    <!-- Yandex.Metrika counter -->
+        <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(98999875, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+    });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/98999875" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+<link rel="apple-touch-icon" sizes="180x180" href="../../../assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../../../assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../../../assets/img/favicon-16x16.png">
+<link rel="manifest" href="../../../assets/img/site.webmanifest">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="/" class="navbar-item"><img class="logo-main" src="../../../assets/img/logo.svg" alt="R-Vision"/> <img class="logo-descriptor" src="../../../assets/img/s_portal.svg" alt="Справочный портал"/></a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Поиск">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ru" data-version="2.9.1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">R-Vision SIEM</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../description/AboutSystem.html">Об R-Vision SIEM</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../description/SystemArchitecture.html">Архитектура системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../description/UsedPorts.html">Порты и протоколы, используемые системой</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../description/SupportedExternalSystems.html">Поддерживаемые внешние системы</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../description/AboutCurrentVersion.html">О версии 2.9</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/DeployingSystem.html">Развертывание системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/TechnicalRequirements.html">Технические требования</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/InfrastructureSetup.html">Развертывание компонентов инфраструктуры: Kubernetes и СУБД</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/InstallingKubernetes.html">Развертывание кластера Kubernetes</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/InstallingK8sWithKubespray.html">Установка кластера Kubernetes с помощью Kubespray</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/InstallingK8sManually.html">Установка кластера Kubernetes вручную</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/ExternalClickHouseInstallation.html">Установка ClickHouse в выделенном кластере</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/SetupNewClickHouseCluster.html">Настройка нового кластера ClickHouse</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/SetupExistingClickHouseCluster.html">Настройка существующего кластера ClickHouse</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/ClickHouseParams.html">Справка о параметрах ClickHouse</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/ExternalPostgreSQLInstallation.html">Вынесенная установка PostgreSQL</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/SetupPostgreSQLServer.html">Установка PostgreSQL на выделенном сервере</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/SetupPostgreSQLCluster.html">Установка PostgreSQL в выделенном кластере</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/DBMSBalancerSetup.html">Настройка балансировки запросов к ClickHouse и PostgreSQL</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/PreparingToInstall.html">Подготовка к установке системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/PreparingToInstallMain.html">Подготовка к установке основного экземпляра системы</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/PreparingToInstallSatellite.html">Подготовка к установке сателлита</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/SystemEnvAudit.html">Аудит системного окружения</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/InstallingSystem.html">Установка системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/InstallationPackage.html">Пакет установки</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/InstallerEnvFiles.html">Настройка файлов с переменными окружения для установщика</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/InteractiveInstall.html">Установка системы в интерактивном режиме</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/InstallingMain.html">Процесс установки основного экземпляра системы</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/InstallingSatellite.html">Процесс установки сателлита</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/NonInteractiveInstall.html">Установка системы в неинтерактивном режиме</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/NonInteractiveInstallMain.html">Установка основного экземпляра системы в неинтерактивном режиме</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../installation/NonInteractiveInstallSatellite.html">Установка сателлита в неинтерактивном режиме</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/AntivirusExceptions.html">Настройка исключений для антивируса</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../agent/DeployAgent.html">Развертывание агентов</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/TechnicalRequirements.html">Технические требования к хосту агента</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/PrepareGoldenImage.html">Подготовка к установке агента из золотого образа</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/InstallAgent.html">Установка агента</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/AgentConfiguration.html">Настройка конфигурации агента</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../agent/AgentToSystemConnection.html">Подключение агента к системе</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../agent/TLSCertificate.html">Добавление TLS-сертификата на агенте</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../agent/AgentToGatewayConnection.html">Подключение агента к шлюзу</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/AgentOperations.html">Работа с агентами на хосте</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/UpdatingSystem.html">Обновление системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../installation/ManualInfraUpdate.html">Ручное обновление компонентов системы</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../agent/UpdateAgent.html">Обновление агента</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../endpoint/UpdateAgentViaUI.html">Обновление агента через веб-интерфейс</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../agent/UpdateAgentOnHost.html">Обновление агента на хосте</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../agent/EndpointMigration.html">Переход с агентов R-Vision Endpoint на системные агенты</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../installation/UninstallingSystem.html">Удаление системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../agent/UninstallAgent.html">Удаление агента</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../endpoint/UninstallAgentViaUI.html">Удаление агента через веб-интерфейс</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../agent/UninstallAgentOnHost.html">Удаление агента на хосте</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/SystemAdministration.html">Администрирование системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/SSLCertificate.html">Добавление SSL-сертификата</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/TrustedSelfSignedSertificate.html">Добавление самоподписанного сертификата в список доверенных</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/ClusterActions.html">Работа с кластером</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/ConnectCluster.html">Подключение к кластеру</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/ClusterMonitoring.html">Мониторинг кластера</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClusterDebugInfo.html">Сбор диагностической информации о кластере</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/MonitoringK8s.html">Состояние кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/CustomGrafanaDashboards.html">Создание пользовательских дашбордов в Grafana</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ServicesTroubleshooting.html">Анализ работоспособности сервисов кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClusterControlPlaneCheck.html">Анализ работоспособности control plane кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/CheckSatelliteConnection.html">Анализ состояния сателлита</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ViewClusterLogs.html">Просмотр журнала событий кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClusterPodsView.html">Просмотр состояния подов кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/SystemPodsSelectors.html">Список селекторов системных подов</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/GrafanaAlerts.html">Настройка оповещений</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/GrafanaTelegramBot.html">Настройка оповещений в Telegram</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/GrafanaEmail.html">Настройка оповещений по электронной почте</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/Prometheus.html">Работа с метриками Prometheus</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/ClusterControl.html">Управление кластером</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClusterNodesControl.html">Управление узлами кластера</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditManagerPod.html">Работа с подами audit-manager и collector-audit</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/CollectorManagerPod.html">Работа с подом collector-manager</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ActiveListManagerPod.html">Работа с подом active-list-manager</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ChangePersistentVolumeClaim.html">Увеличение размера тома для подов</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ChangeLokiDiskSizeAndRetention.html">Изменение размера дискового пространства и предельного срока хранения логов Loki</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/GetServiceIDFromNATS.html">Получение идентификатора сервиса в NATS Service Discovery</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/NATSObjectStore.html">Работа с объектным хранилищем NATS Object Store</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../r_space/SpaceManagerNATSStreams.html">Настройка стримов в менеджере пространств</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClusterPasswordsSecrets.html">Работа с паролями в кластере</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ChangeSystemDomainName.html">Изменение доменного имени установленного экземпляра системы</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/SeparateDiskForImagefs.html">Настройка отдельного диска под образы контейнеров</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/NginxErrorAfterSeparateDisk.html">Ошибки при запуске пода ingress-nginx-controller</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/FindSystemInstances.html">Поиск установленных экземпляров системы</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/Settings.html">Настройка системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/ProductsQuickAccess.html">Настройка быстрого доступа к продуктам R-Vision</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/SetDateFormat.html">Настройка формата даты</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/AlertLifetime.html">Настройка времени хранения оповещений</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/ChangeMetallbPool.html">Изменение пула адресов в MetalLB</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/QueryLogLifetime.html">Настройка времени хранения запросов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/SetDatabaseDriverFileSize.html">Настройка ограничений размера файла драйвера БД</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/SetFileMaxSize.html">Настройка ограничений размера загружаемых файлов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/SetMinimumEventRetentionPeriod.html">Настройка минимального срока хранения событий</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/ProxyEventsFromCustomPorts.html">Настройка получения событий по произвольному порту</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/SystemBackupAndRestoration.html">Резервное копирование и восстановление компонентов системы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/Backups.html">Резервное копирование БД и сервисов платформы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/BackupInternalDatabases.html">Резервное копирование внутренних БД</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/BackupExternalDatabases.html">Резервное копирование внешних БД</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/BackupExternalFromCluster.html">Настройка резервного копирования из кластера системы</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/BackupExternalFromServer.html">Настройка резервного копирования вне кластера системы</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/BackupsWithoutWrapper.html">Резервное копирование БД без Backup Wrapper</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/PostgreSQLBackup.html">Резервное копирование PostgreSQL без Backup Wrapper</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/ClickHouseBackups.html">Резервное копирование ClickHouse без Backup Wrapper</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/BackupPlatformServices.html">Резервное копирование NATS, MinIO и Dkron</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EtcdBackup.html">Резервное копирование хранилища etcd</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/RestoreBackups.html">Восстановление из резервных копий</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/RestoreInternalDatabases.html">Восстановление внутренних БД</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/RestoreExternalDatabases.html">Восстановление внешних БД</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/RestoreExternalPostgreSQL.html">Восстановление БД PostgreSQL</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/RestoreExternalClickHouse.html">Восстановление БД ClickHouse</a>
+  </li>
+  <li class="nav-item" data-depth="5">
+    <a class="nav-link" href="../administration/ExternalDBTroubleshooting.html">Устранение проблем при восстановлении внешних БД</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/RestorePlatformServices.html">Восстановление NATS, MinIO и Dkron</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EtcdBackupRestore.html">Восстановление хранилища etcd</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/WorkWithBackupWrapper.html">Работа с Backup Wrapper</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/PostgreSQLBackupsSetup.html">Настройка PostgreSQL для работы с Backup Wrapper</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClickHouseBackupSetup.html">Настройка ClickHouse для работы с Backup Wrapper</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/ClickHouseTieredStorage.html">Настройка многоуровневого хранилища ClickHouse</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/BackupWrapperInstall.html">Установка и настройка Backup Wrapper</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/BackupWrapperDelete.html">Удаление Backup Wrapper</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/EventsBackupAndRestoration.html">Архивирование и восстановление исторических событий</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EventBackupUtilityConfig.html">Настройка утилиты для архивирования и восстановления исторических событий</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/WorkingWithEventBackups.html">Работа с утилитой для архивирования исторических событий</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/License.html">Управление лицензией</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../r_space/SpaceManagement.html">Управление пространствами</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../r_space/Spaces.html">Работа с пространствами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../r_space/Workloads.html">Работа с сервисами</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/AccessControl.html">Управление доступом</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../core/Tenants.html">Тенанты</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../core/Users.html">Пользователи</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../core/UserGroups.html">Группы пользователей</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/Roles.html">Роли</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../core/StandardRoles.html">Стандартные роли</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/AuthPolicies.html">Политики входа и пароля</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../core/SessionTokensTTLSettings.html">Настройка лимита сеансов и времени жизни JWT-токенов</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/LDAPConnection.html">LDAP-соединения</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../core/ALDProServiceAccount.html">Настройка сервисной учетной записи ALD Pro</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../core/DistinguishedNameAttributes.html">Атрибуты Distinguished Name</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../administration/EventAccessPolicies.html">Политики управления доступом к событиям</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../endpoint/AgentSettings.html">Настройка агентов</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/AgentManagerSettings.html">Настройки менеджера агентов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/InventoryCollection.html">Сбор инвентарной информации</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/EventCollection.html">Сбор событий ИБ на агентах</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/Audit.html">Аудит</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/EventSourceAudit.html">Аудит источников событий ИБ</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EventSourceAuditSources.html">Источники событий ИБ в аудите источников</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EventSourceAuditEntryPoints.html">Точки входа в аудите источников</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/EventSourceAuditPolicies.html">Политики аудита источников</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/AuditService.html">Аудит системных событий</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditModel.html">Модель события аудита</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../administration/AuditProcessingScenarios.html">Сценарии обработки аудита</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditCollectorWithPipeline.html">Настройка конвейера для аудита коллектора</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditCriticalActionAlerts.html">Создание оповещений о критических событиях</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditSuperAdminActions.html">Отслеживание действий суперадминистраторов</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../administration/AuditObjectActions.html">Отслеживание действий над объектами</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../administration/QueryMonitoring.html">Мониторинг RQL-запросов и управление ресурсами</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../core/Authorization.html">Авторизация</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/Interface.html">Интерфейс</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/SelectTenant.html">Выбор тенанта</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/Documentation.html">Документация</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/AccountSettings.html">Настройки профиля</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/InterfaceSettings.html">Настройки интерфейса</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/PasswordChange.html">Смена пароля</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/Tables.html">Работа с таблицами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../core/WorkingWithObjects.html">Работа с объектами</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../core/ChangeObjects.html">Изменение объектов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../core/DeleteObjects.html">Удаление объектов</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../core/Hotkeys.html">Клавиши и комбинации клавиш</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="GettingStarted.html">Начало работы с системой</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="ConnectSources.html">Подключение источников</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingInOnePipeline.html">Обработка событий на одном конвейере</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingInMultiplePipelines.html">Обработка событий на нескольких конвейерах</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingInMultipleCollectors.html">Обработка событий на нескольких коллекторах</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingMultipleSources.html">Обработка событий с нескольких IP-адресов</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingInSatelliteCollector.html">Сбор событий из вынесенного коллектора</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ProcessingAgentEvents.html">Сбор событий с агентов</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="RoutingAgentEvents.html">Маршрутизация событий с агентов по типу ОС</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="RetrospectiveEventProcessing.html">Ретроспективная обработка событий</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="RetroNormalization.html">Ретроспективная нормализация событий</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="RetroCorrelation.html">Ретроспективная корреляция событий</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="RetroTroubleshooting.html">Устранение проблем при ретроспективной обработке событий</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Analytics.html">Аналитика</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Dashboards.html">Работа с дашбордами</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="Widgets.html">Работа с виджетами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="DashboardRecommendations.html">Рекомендации по работе с дашбордами</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="Alerts.html">Работа с оповещениями</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="Reports.html">Работа с отчетами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="Search.html">Работа с разделом Поиск</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Resources.html">Ресурсы</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Collectors.html">Работа с коллекторами</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Pipelines.html">Работа с конвейерами</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="EntryPoints.html">Работа с точками входа</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="VRLTransforms.html">Работа с VRL-трансформациями</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="Filters.html">Работа с фильтрами</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="Routers.html">Работа с маршрутизаторами</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="Correlators.html">Работа с корреляторами</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="Normalizers.html">Работа с нормализаторами</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="Aggregators.html">Работа с агрегаторами</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="AlertServices.html">Работа с сервисами оповещений</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="MetricsCollection.html">Работа со сбором метрик</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="DestinationPoints.html">Работа с конечными точками</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="Buses.html">Работа с шинами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="Enrichments.html">Работа с обогащениями</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="EventModel.html">Работа с моделями событий</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="UniversalEventModel.html">Универсальная модель события</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="UniversalEventModelV2.html">Универсальная модель события 2.0</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="DataTypes.html">Типы данных</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="EventActionTypes.html">Типы операций в событии</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="EventDataBase.html">Работа с базами данных событий</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="EventStorage.html">Работа с хранилищами событий</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ActiveLists.html">Работа с активными списками</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="Integrations.html">Работа с интеграциями</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="IntegrationSOAR.html">Интеграция с R-Vision SOAR</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="IntegrationMail.html">Почтовые интеграции</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="DatabaseDrivers.html">Работа с драйверами БД</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="Secrets.html">Работа с секретами</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../endpoint/AgentManagement.html">Агенты</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../endpoint/Agents.html">Работа с агентами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../endpoint/AgentGroups.html">Работа с группами агентов</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/AgentGroupConfiguration.html">Настройка конфигурации группы агентов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/XPath.html">Синтаксис языка XPath</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../endpoint/Gateways.html">Работа со шлюзами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../endpoint/AgentActions.html">Действия на агентах</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../endpoint/DisableSelfIsolationManually.html">Ручное снятие самоизоляции узла</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../expertise/ExpertiseNav.html">Экспертиза</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/Expertise.html">Работа с элементами экспертизы</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../expertise/CorrelationRules.html">Правила корреляции</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../expertise/CorrelationRuleBuilder.html">Построение правила корреляции в конструкторе</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/NormalizationRules.html">Правила нормализации</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/AggregationRules.html">Правила агрегации</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/SegmentationRules.html">Правила сегментации</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/ActiveListSchema.html">Схемы активных списков</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/DashboardSchema.html">Схемы дашбордов</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/ReportTemplateSchema.html">Схемы шаблонов отчетов</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/EnrichmentTables.html">Таблицы обогащения</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/SearchTemplates.html">Шаблоны поиска</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/GlobalFunctions.html">Глобальные функции</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/ExpertiseTesting.html">Тестирование правил экспертизы с помощью языка VRL</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../expertise/MitreAttackCoverage.html">Оценка покрытия техник MITRE ATT&amp;CK правилами экспертизы</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../rql/RQLLanguage.html">Справочник по языку запросов RQL</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../rql/RQLWorkingWithLanguage.html">Работа с RQL-запросами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../rql/RQLFunctions.html">Функции</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLAggregateFunctions.html">Агрегатные функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLConditionalFunctions.html">Условные функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLComparisonFunctions.html">Функции сравнения</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLLogicalFunctions.html">Логические функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLTypeConversionFunctions.html">Функции преобразования типов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLNullableArgumentFunctions.html">Функции для работы с Nullable-аргументами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../rql/RQLMathematicalFunctions.html">Математические функции</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLArithmeticFunctions.html">Арифметические функции</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLBitFunctions.html">Битовые функции</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLBitmapFunctions.html">Функции битовых карт</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLRoundingFunctions.html">Функции округления</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLDateTimeFunctions.html">Функции для работы с датой и временем</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../rql/RQLStringFunctions.html">Функции для работы со строками</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLSplittingMergingFunctions.html">Функции разбиения и слияния строк и массивов</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLStringSearchFunctions.html">Функции для поиска в строках</a>
+  </li>
+  <li class="nav-item" data-depth="4">
+    <a class="nav-link" href="../rql/RQLStringReplaceFunctions.html">Функции для замены строк</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLArrayFunctions.html">Функции для работы с массивами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLGeoFunctions.html">Географические функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLTimeSeriesFunctions.html">Функции временных рядов</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLIPFunctions.html">Функции для работы с IP-адресами</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLURLFunctions.html">Функции для работы с URL</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../rql/RQLIDFunctions.html">Функции для работы с идентификаторами</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vrl/VRLReference.html">Справочник по языку преобразования данных VRL</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vrl/AboutVRLLanguage.html">О языке VRL</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vrl/VRLExpressions.html">Выражения</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsNull.html">Пустое значение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsBoolean.html">Логическое значение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsInteger.html">Целое число</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsFloat.html">Число с плавающей точкой</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsTimestamp.html">Метка времени</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsString.html">Строка</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsRegex.html">Регулярное выражение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsArray.html">Массив</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsObject.html">Объект</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsVariable.html">Переменная</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsPath.html">Путь</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsIndex.html">Индекс</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsAssignment.html">Присваивание</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsArithmetic.html">Арифметическое выражение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsComparison.html">Сравнение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsLogical.html">Логическое выражение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsFunctionCall.html">Вызов функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsCoalesce.html">Объединение</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsConditional.html">Условие</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsBlock.html">Блок</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLExpressionsAbort.html">Прерывание</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vrl/VRLFunctions.html">Функции</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsParse.html">Функции разбора</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsCodec.html">Функции кодирования и декодирования</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsEvents.html">Функции событий и активных списков</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsCollections.html">Функции коллекций</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsStrings.html">Функции строк</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsTypes.html">Функции типов и форматирования</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsCrypto.html">Хэш-функции и криптографические функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsId.html">Функции генерации случайных значений и ID</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsGeo.html">Географические функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsSystem.html">Системные функции</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLFunctionsDebug.html">Функции отладки</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vrl/VRLErrorReference.html">Справочник ошибок</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../vrl/VRLBestPractices.html">Советы по написанию кода на языке VRL</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLCodeOptimization.html">Оптимизация кода</a>
+  </li>
+  <li class="nav-item" data-depth="3">
+    <a class="nav-link" href="../vrl/VRLCodestyle.html">Оформление кода</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vrl/VRLSnippets.html">Работа с VRL-сниппетами</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../vrl/VRLSandbox.html">Работа с VRL-песочницей</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../api/GraphQLAPI.html">GraphQL API</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/AccessGraphQLSandbox.html">Открытие доступа к GraphQL-песочнице</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/API.html">API-токены</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/APIQueries.html">Работа с GraphQL</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../api/APIErrorHandling.html">Обработка ошибок API</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="../troubleshooting/Troubleshooting.html">Устранение проблем</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../installation/Troubleshooting.html">Устранение проблем при установке или обновлении системы</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../agent/Troubleshooting.html">Устранение проблем при установке или обновлении агентов</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="../administration/Troubleshooting.html">Устранение проблем при эксплуатации системы</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../glossary/Glossary.html">Глоссарий</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">R-Vision SIEM</span>
+    <span class="version">2.9.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">R-Vision SIEM</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">2.9.1</a>
+        </li>
+        <li class="version">
+          <a href="../../2.8.0/index.html">2.8.0</a>
+        </li>
+        <li class="version">
+          <a href="../../2.7.2/index.html">2.7.2</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">R-Vision SIEM</a></li>
+    <li><a href="ConnectSources.html">Подключение источников</a></li>
+  </ul>
+</nav>
+<div class="page-versions">
+  <button class="version-menu-toggle" title="Show other versions of page">2.9.1</button>
+  <div class="version-menu">
+    <a class="version is-current" href="ConnectSources.html">2.9.1</a>
+    <a class="version" href="../../2.8.0/streams/ConnectSources.html">2.8.0</a>
+    <a class="version" href="../../2.7.2/streams/ConnectSources.html">2.7.2</a>
+  </div>
+</div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Содержание" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+    <h1 class="page">Подключение источников</h1>
+  <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Для получения и обработки событий необходимо подключить нужные источники, откуда эти события будут поступать в систему. Процесс подключения источников состоит из следующих этапов:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="Collectors.html#create-collector" class="xref page">Создание коллектора</a>.</p>
+</li>
+<li>
+<p><a href="Pipelines.html#add-pipeline" class="xref page">Создание конвейера</a> в коллекторе.</p>
+</li>
+<li>
+<p><a href="EntryPoints.html#add-entry-point" class="xref page">Создание точки входа</a> на конвейере для получения событий.</p>
+</li>
+<li>
+<p>Настройка обработки и хранения событий с помощью прочих <a href="Pipelines.html#add-element" class="xref page">элементов конвейера</a>.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Если вы хотите отслеживать состояние подключенных источников, обратитесь к разделу <a href="../administration/EventSourceAudit.html" class="xref page">Аудит источников событий ИБ</a>.</p>
+</li>
+<li>
+<p>Если при подключении источника наблюдаются проблемы (например, источник подключен, но события не приходят), обратитесь к разделу <a href="../administration/Troubleshooting.html" class="xref page">Устранение проблем при эксплуатации системы</a>.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="source-configuration-guide"><a class="anchor" href="#source-configuration-guide"></a>Справочник по конфигурации источников</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>С инструкциями по настройке и подключению конкретных источников можно ознакомиться в <a href="https://docs.rvision.ru/sources/ru/latest/index.html">руководстве по настройке источников</a> на справочном портале R-Vision.</p>
+</div>
+<div class="paragraph">
+<p>Список поддерживаемых системой источников событий можно посмотреть в разделе <a href="https://docs.rvision.ru/sources/ru/latest/ContentGuide/supported-sources-2.html">Поддерживаемые источники событий</a> руководства по настройке источников.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="main-scenarios"><a class="anchor" href="#main-scenarios"></a>Основные сценарии подключения источников</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Для ознакомления с основными этапами подключения источника и настройки конвейера обратитесь к тестовому сценарию <a href="ProcessingInOnePipeline.html" class="xref page">Обработка событий на одном конвейере</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вы планируете работать с небольшим количеством источников данных (например, до пяти штук), вы можете настроить их обработку на нескольких конвейерах в рамках одного коллектора. Подробности приведены в разделе <a href="ProcessingInMultiplePipelines.html" class="xref page">Обработка событий на нескольких конвейерах</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вы планируете работать с большим количеством источников, рекомендуется настраивать отдельный коллектор для каждого из источников. Подробности приведены в разделе <a href="ProcessingInMultipleCollectors.html" class="xref page">Обработка событий на нескольких коллекторах</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="specific-scenarios"><a class="anchor" href="#specific-scenarios"></a>Подключение источников для решения конкретных задач</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Если вы хотите настроить источник Syslog или Socket и данные приходят с нескольких IP-адресов, обратитесь к разделу <a href="ProcessingMultipleSources.html" class="xref page">Обработка событий с нескольких IP-адресов</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вы работаете в распределенной системе и вам необходимо получать события из сателлита, обратитесь к разделу <a href="ProcessingInSatelliteCollector.html" class="xref page">Сбор событий из вынесенного коллектора</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вам необходимо получать информацию с удаленных хостов, на которых установлены агенты, обратитесь к разделу <a href="ProcessingAgentEvents.html" class="xref page">Сбор событий с агентов</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вам необходимо выполнить повторную нормализацию или корреляцию накопленных событий, обратитесь к разделу <a href="RetrospectiveEventProcessing.html" class="xref page">Ретроспективная обработка событий</a>.</p>
+</div>
+<div class="paragraph">
+<p>Если вам необходимо получать информацию с агентов под управлением различных операционных систем, обратитесь к разделу <a href="RoutingAgentEvents.html" class="xref page">Маршрутизация событий с агентов по типу ОС</a>.</p>
+</div>
+</div>
+</div>
+
+
+<div class="valuation-block">
+  <p>Была ли полезна эта страница?</p>
+  <button class="button">Да</button>
+  <button class="button">Нет</button>
+</div>
+
+  <nav class="pagination">
+  <span class="prev"><a href="GettingStarted.html">Начало работы с системой</a></span>
+  <span class="next"><a href="ProcessingInOnePipeline.html">Обработка событий на одном конвейере</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<div class="footer-custom">
+    <div class="footer-container">
+        <div class="footer-left-block">
+            <div class="footer-logo"><a class="footer-logo" href="https://rvision.ru/">
+                    <img src="../../../assets/img/logo.svg" alt="R-Vision"></a></div>
+            <div class="footer-content">
+                <a class="footer-tel" href="tel:+7(499)7555570">+7&nbsp;(499)&nbsp;755&nbsp;55&nbsp;70</a>
+                <a class="footer-mail" href="mailto:sales@rvision.ru">sales@rvision.ru</a>
+            </div>
+        </div>
+        <div class="socials">
+            <a href="https://www.youtube.com/@rvision_ru"><img
+                    src="../../../assets/img/YouTube_Logo.svg" alt=""></a>
+            <a href="https://t.me/rvision_pro"><img src="../../../assets/img/tg_logo.svg" alt=""></a>
+            <a href="https://habr.com/ru/company/rvision/blog/"><img src="../../../assets/img/habr_logo.svg"
+                    alt=""></a>
+            <a href="https://rutube.ru/channel/33696180/"><img src="../../../assets/img/rutube_logo.svg" alt=""></a>
+            <a href="https://vk.com/rvision_ru"><img src="../../../assets/img/vk_logo.svg" alt=""></a>
+        </div>
+        <p class="footer-links">
+            <a class="footer-link mr-25" href="https://rvision.ru/about">О&nbsp;компании</a> 
+            <a class="footer-link mr-25" href="https://rvision.ru/user-agreement">Пользовательское&nbsp;соглашение</a>
+            <a class="footer-link" href="/_/files/Политика_cookie.pdf">Политика&nbsp;cookies</a>
+        </p>
+    </div>
+</div>
+
+<div class="feedback_button">
+  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
+  <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"/>
+</svg>  Обратная связь
+</div>
+
+<div class="feedback-modal" id="feedback-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="feedback-modal__backdrop" data-feedback-close></div>
+    <div class="feedback-modal__dialog" role="document">
+        <button class="feedback-modal__close" type="button" title="Закрыть" aria-label="Закрыть" data-feedback-close>×</button>
+        <div class="feedback-modal__title">Если у вас есть замечания или пожелания к этой документации, напишите нам.</div>
+        <form class="feedback-form" id="feedback-form" novalidate data-endpoint="/endpoint/">
+            <label class="feedback-form__label" for="feedback-message">Сообщение</label>
+            <textarea id="feedback-message" class="feedback-form__textarea" name="message" rows="6" placeholder="Опишите ваше замечание или пожелание" required></textarea>
+            <input type="text" name="website" tabindex="-1" aria-hidden="true" autocomplete="off" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" />
+            <input type="hidden" name="ts" id="feedback-ts" />
+            <div class="feedback-form__actions">
+                <button type="submit" class="feedback-form__submit">Отправить</button>
+            </div>
+        </form>
+        <div class="feedback-success" id="feedback-success">Спасибо за ваше обращение!</div>
+    </div>
+</div>
+
+<script src="../../../assets/js/vendor/lunr.js"></script>
+<script src="../../../assets/js/vendor/lunr-languages.js"></script>
+    <script src="../../../assets/js/vendor/lunr.js"></script>
+<script src="../../../assets/js/vendor/lunr-languages.js"></script>
+<script src="../../../assets/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="50" data-stylesheet="../../../assets/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+<script src="../../../assets/js/site.js"></script>
+<script src="../../../assets/js/cookies.js"></script>
+<script src="../../../assets/js/popup-webform.js"></script>
+<script src="../../../assets/js/scroll-up.js"></script>
+<script src="../../../assets/js/tabs.js"></script>
+<script src="../../../assets/js/tables.js"></script>
+  </body>
+</html>

@@ -1,2 +1,3 @@
 # Preserve evidence snapshots byte-for-byte, including their SHA-256.
-tests/fixtures/** -text
+tests/fixtures/** -text -whitespace
+data/etl/repro/raw/** -text -whitespace

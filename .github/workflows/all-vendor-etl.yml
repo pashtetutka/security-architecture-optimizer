@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  collect:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -16,10 +16,32 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests -v
+      - name: Verify bundled offline evidence
+        run: python -m siem.etl check --etl data/etl/repro/vendors.json --output-dir results/repro-check --no-tests
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: siem-etl-repro
+          path: |
+            data/etl/repro/vendors.json
+            data/etl/repro/raw/
+            results/repro-check/
+          retention-days: 30
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
       - name: Download official published materials
         run: python -m siem.etl crawl --output results/siem-etl.json --snapshot-dir results/raw
       - name: All-vendor status
         run: python -m siem.etl status --etl results/siem-etl.json
+      - name: Normalize snapshots and generate quality reports
+        run: python -m siem.etl check --etl results/siem-etl.json --output-dir results/normalized --no-tests
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -27,4 +49,5 @@ jobs:
           path: |
             results/siem-etl.json
             results/raw/
+            results/normalized/
           retention-days: 30

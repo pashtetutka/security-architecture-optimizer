@@ -2,6 +2,8 @@
 from __future__ import annotations
 from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
+from pathlib import Path
+import ssl
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -15,9 +17,19 @@ class RobotsPolicyUnavailable(ConnectionError):
 
 
 class PublicFetcher:
-    def __init__(self, timeout=35, retries=2, max_redirects=3):
+    def __init__(self, timeout=35, retries=2, max_redirects=3, host_ca_bundles=None):
         self.timeout = timeout
         self.max_redirects = max_redirects
+        self.host_ca_bundles = {}
+        for host, bundle in (host_ca_bundles or {}).items():
+            parts = urlparse('https://' + host)
+            if not host or parts.hostname != host or parts.netloc != host or parts.path or parts.query or parts.fragment:
+                raise ValueError('CA mapping requires an exact lowercase hostname: ' + host)
+            path = Path(bundle).resolve(strict=True)
+            # Fail early on a malformed bundle; certificate and hostname checks
+            # remain mandatory. No changes to Windows, certifi or global env.
+            ssl.create_default_context(cafile=str(path))
+            self.host_ca_bundles[host] = str(path)
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': AGENT, 'Accept': 'text/html,application/pdf;q=0.9,*/*;q=0.5'})
         retry = Retry(total=retries, connect=retries, read=retries, status=retries,
@@ -29,6 +41,10 @@ class PublicFetcher:
         self.cache = {}
         self.resolved_urls = {}
 
+    def _tls_options(self, url):
+        bundle = self.host_ca_bundles.get(urlparse(url).hostname)
+        return {'verify': bundle} if bundle else {}
+
     def allowed(self, url):
         parts = urlparse(url)
         if parts.scheme != 'https' or not parts.hostname:
@@ -37,7 +53,8 @@ class PublicFetcher:
         if host not in self.robots:
             robots_url = f'https://{host}/robots.txt'
             try:
-                resp = self.session.get(robots_url, timeout=self.timeout, allow_redirects=False)
+                resp = self.session.get(robots_url, timeout=self.timeout, allow_redirects=False,
+                                        **self._tls_options(robots_url))
                 if resp.status_code == 404:
                     parser = RobotFileParser()
                     parser.parse([])
@@ -66,7 +83,8 @@ class PublicFetcher:
         current = url
         for _ in range(self.max_redirects + 1):
             self.allowed(current)
-            with self.session.get(current, timeout=self.timeout, stream=True, allow_redirects=False) as response:
+            with self.session.get(current, timeout=self.timeout, stream=True, allow_redirects=False,
+                                  **self._tls_options(current)) as response:
                 if response.status_code in REDIRECT_CODES:
                     location = response.headers.get('Location')
                     if not location:

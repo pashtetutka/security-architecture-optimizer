@@ -4,28 +4,41 @@
 поддерживаемых источников событий и системных требований. Реестр содержит 13 SIEM.
 Неизвестные значения сохраняются явно; автоматически извлечённые данные требуют проверки.
 
-## Быстрый запуск
+## Проверка на другом компьютере
 
-Python 3.10+, команды из корня репозитория:
-
-```powershell
-python -m pip install -e .
-python -m unittest discover -s tests -v
-python -m siem.etl --help
-```
-
-Повторная нормализация сохранённых документов без сети:
+Нужны Git и Python 3.10+. Команды выполняются из корня свежего клона.
+Сохранённый набор из 36 исходных документов и манифеста находится в
+`data/etl/repro/`. Проверка работает без сети и не меняет исходные файлы.
 
 ```powershell
-$checkDir = "results/check_$(Get-Date -Format yyyyMMdd_HHmmss)_$((New-Guid).Guid.Substring(0,8))"
-python -m siem.etl normalize --etl results/vendors_focus_raw.json --output-dir $checkDir
-python -m siem.etl report --focused-dir $checkDir
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m siem.etl check --etl data/etl/repro/vendors.json
 ```
 
-Локальные `results/` не входят в Git. Если снимков нет, ETL отражает это в диагностике.
+Ожидаемый результат: **13 SIEM, 1630 записей источников, 16 аппаратных
+профилей и 26 требований**. Один PDF-тест может быть пропущен, если не установлен
+необязательный PyMuPDF; основной разбор PDF использует установленный `pypdf`.
+Откройте `results/etl_audit/report.html`. Каждый запуск создаёт новый каталог
+`results/history/check_*` с итоговыми JSON и HTML. В корне `results/` ничего
+фиксировать в Git не нужно.
+
+В Linux и macOS те же команды выполняются через `.venv/bin/python` вместо
+`.\.venv\Scripts\python.exe`. Для проверки без тестов добавьте `--no-tests`.
+
+Для повторной нормализации собственных сохранённых документов используйте:
+
+```powershell
+.\.venv\Scripts\python.exe -m siem.etl check --etl results/vendors_focus_raw.json
+```
+
+Эта локальная выгрузка не входит в Git. Папка `tests/` содержит проверки
+парсеров и неизменённые примеры документов. Она не попадает в установленный
+пакет `siem`, но остаётся в репозитории для независимой проверки результата.
 
 - [Команды, входы и результаты ETL](docs/etl.md)
 - [Структура кода и правила расширения](docs/architecture.md)
+- [Ограничения собранных данных](docs/source_collection.md)
 - [Прототип выбора SIEM для диплома](docs/decision_support.md)
 
 Прототип выбора SIEM запускается через `python -m siem.cli` или `streamlit run app.py`.

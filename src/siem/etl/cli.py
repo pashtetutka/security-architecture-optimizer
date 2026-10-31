@@ -7,6 +7,7 @@ import sys
 from .commands import collection, normalization, review
 
 COMMANDS = {
+    'check': (normalization.main, 'Create a local HTML overview and run project tests'),
     'crawl': (collection.main, 'Collect official documents or replay local snapshots'),
     'status': (collection.main, 'Show collection status by vendor'),
     'quality': (collection.main, 'Audit collected evidence'),
@@ -32,4 +33,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

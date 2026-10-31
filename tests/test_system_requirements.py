@@ -59,7 +59,7 @@ class SystemRequirementsTests(unittest.TestCase):
         self.assertNotIn('disk_gb', d2)
 
     def test_alertix_real_snapshot_storage(self):
-        path = Path(__file__).resolve().parents[1] / 'results/raw/p04/hardware_requirements_742f05f81ff55e.html'
+        path = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p04/hardware_requirements_742f05f81ff55e.html'
         if not path.is_file():
             self.skipTest('Alertix HTML snapshot unavailable')
         profiles = parse_alertix_all_in_one(path.read_text(encoding='utf-8'), meta('p04', 'Alertix'))

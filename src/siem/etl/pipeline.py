@@ -21,21 +21,26 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
    report={'source_id':sid,'url':url,'status':'pending','product_version_hint':source.get('product_version_hint'),
            'acquisition_method':getattr(fetch,'acquisition_method','unknown')}
    product['source_results'].append(report)
+   stage='download'
    try:
     data,encoding,mime=fetch.fetch(url)
     if not data:raise ValueError('Пустой ответ')
-    payload=extract_content(data,source['mode'],encoding)
     digest=hashlib.sha256(data).hexdigest()
     final_url=getattr(fetch,'resolved_urls',{}).get(url,url)
+    report.update(resolved_url=final_url,http_charset=encoding,http_content_type=mime,
+                  content_sha256=digest,retrieved_at=timestamp,snapshot_status='not_requested')
+    stage='snapshot'
     if snapshot_dir:
-     suffix='.pdf' if source['mode']=='pdf' else '.html'
+     suffix='.pdf' if source['mode']=='pdf' else '.json' if source['mode']=='maxpatrol_api' else '.html'
      saved=Path(snapshot_dir)/vendor['id']/(sid+'_'+digest[:14]+suffix)
      saved.parent.mkdir(parents=True,exist_ok=True)
-     saved.write_bytes(data)
+     if saved.exists():
+      if saved.read_bytes()!=data:raise FileExistsError('Existing snapshot differs: '+str(saved))
+     else:saved.write_bytes(data)
      report['snapshot_path']=str(saved)
-    report['resolved_url']=final_url
-    report['http_charset']=encoding
-    report['http_content_type']=mime
+     report['snapshot_status']='saved'
+    stage='extraction'
+    payload=extract_content(data,source['mode'],encoding)
     report.update(status=('ok' if payload['facts'] else 'empty_review_required'),content_sha256=digest,extracted_facts=len(payload['facts']),title=payload.get('title'),warnings=payload.get('warnings',[]))
     for x in payload['facts']:
      evidence=x.copy()
@@ -53,7 +58,7 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
     if type(ex).__name__=='RobotsPolicyUnavailable': status='robots_unavailable'
     elif isinstance(ex,PermissionError): status='access_disallowed'
     elif isinstance(ex,FileNotFoundError) and getattr(fetch,'acquisition_method',None)=='manual_import': status='missing_local_document'
-    report.update(status=status,error_type=type(ex).__name__,error=str(ex)[:350])
+    report.update(status=status,error_type=type(ex).__name__,error=str(ex)[:350],failure_stage=stage)
     output['errors'].append({'siem_id':vendor['id'],'source_id':sid,'url':url,
                              'error_type':type(ex).__name__,'message':str(ex)[:350]})
  output['totals']={'vendors':len(output['vendors']),'sources':sum(len(x['source_results']) for x in output['vendors']),

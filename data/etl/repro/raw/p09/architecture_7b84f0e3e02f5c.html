@@ -1,0 +1,2893 @@
+<!DOCTYPE HTML>
+<html lang="ru">
+<head>
+    <title>Архитектура UserGate SIEM - UserGate :: Портал документации</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords"  content="" />
+    <meta name="description"  content="" />
+    <meta name="robots"  content="ALL" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!--[if IE]>
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/common_ie.css?v=c8f98b33" />
+    <![endif]-->
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/common.css?v=c8f98b33" />
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/common_table.css?v=c8f98b33" />
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/view_left/common_view.css?v=c8f98b33" />
+    <link rel="stylesheet" type="text/css" href="https://docs.usergate.com/client/skin/view_left/default/default.css?v=c8f98b33" />
+
+    
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/box.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/form.css?v=c8f98b33">
+    
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/tooltipster/tooltipster.bundle.min.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/tooltipster/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-kbp.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/tooltipster/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-kbp_error.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/tooltipster/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.min.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/jquery.growl.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery-ui/smoothness/jquery-ui.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery-ui/smoothness/custom.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/jquery.dropdown.css?v=c8f98b33">
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/ezmodal.css?v=c8f98b33">
+    
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/foundation.css?v=c8f98b33" />
+    <link rel="stylesheet" href="https://docs.usergate.com/client/skin/foundation_custom.css?v=c8f98b33" />
+        
+    <script src="https://docs.usergate.com/client/jscript/common.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/DialogBox.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery-ui.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.dropdown.min.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/tooltipster.bundle.min.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.growl.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/ezmodal.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.serialize-object.min.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.isonscreen.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/jquery/jquery.toc.min.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/FormCollector.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/ErrorHighlighter.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/ErrorTooltipster.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/what-input.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/foundation.min.js?v=c8f98b33"></script>
+    
+    <script src="https://docs.usergate.com/client/jscript/fontfaceobserver.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/ModalManager.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/PopupManager.js?v=c8f98b33"></script>
+    <script src="https://docs.usergate.com/client/jscript/page_init.js?v=c8f98b33"></script>
+    
+    <script>
+        $(document).ready(function() {
+            setDebug(0);
+            
+            DialogBox.ok_msg = "OK";
+            DialogBox.cancel_msg = "Отмена";
+            
+            showGrowl("", "", "", "", "");                
+        });
+    </script>
+    
+    <link rel="alternate" type="application/rss+xml" title="UserGate Documentation RSS" href="https://docs.usergate.com/rss.php" />
+    <style>
+@import url('https://fonts.googleapis.com/css?family=PT+Sans:400,700&subset=cyrillic');
+@import url('https://docs.usergate.com/client/skin/addition.css');
+@font-face {
+  font-family: 'fontawesome5F';
+  font-style: normal;
+  font-weight: 400;
+  font-display: auto;
+  src: url(/client/fonts/fa/fa-regular-400.eot);
+  src: url(/client/fonts/fa/fa-regular-400.eot?#iefix) format("embedded-opentype"),url(/client/fonts/fa/fa-regular-400.woff2) format("woff2"),url(/client/fonts/fa/fa-regular-400.woff) format("woff"),url(/client/fonts/fa/fa-regular-400.ttf) format("truetype"),url(/client/fonts/fa/fa-regular-400.svg#fontawesome) format("svg");
+}
+@font-face {
+    font-family: 'fontawesome5F';
+    font-style: normal;
+    font-weight: 900;
+    font-display: auto;
+    src: url(/client/fonts/fa/fa-solid-900.eot);
+    src: url(/client/fonts/fa/fa-solid-900.eot?#iefix) format("embedded-opentype"),url(/client/fonts/fa/fa-solid-900.woff2) format("woff2"),url(/client/fonts/fa/fa-solid-900.woff) format("woff"),url(/client/fonts/fa/fa-solid-900.ttf) format("truetype"),url(/client/fonts/fa/fa-solid-900.svg#fontawesome) format("svg");
+}
+body {
+  color: #415463;
+}
+body, td, div {
+  font-family: 'PT Sans', 'Sans Serif', Helvetica, Arial, sans-serif;
+}
+a:link {
+    color: #009ad5;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,154,213,0.2);
+}
+a:visited {
+    color: rgb(0,110,160);
+    border-bottom-color: rgba(0,110,160,0.2);
+}
+a:hover, a:focus {
+    color: rgb(10,161,27);
+    border-bottom-color: rgb(13 201 35);
+}
+a.help_link {
+  border-bottom: 0;
+}
+
+.colorInput {
+  background-color: #f5f8fa;
+}
+.button,
+.button2_grey {
+  color: #fff !important;
+  text-align: center;
+  padding: 10px 20px !important;
+  font-size: 1rem;
+  line-height: 20px;
+  font-weight: 400;
+  display: inline-block;
+  -webkit-transition: background .1s linear;
+  -moz-transition: background .1s linear;
+  -ms-transition: background .1s linear;
+  -o-transition: background .1s linear;
+  transition: background .1s linear;
+  border: none;
+  background: #aac3d2;
+  background-color: #aac3d2;
+}
+.button:hover {
+  background: #5487a4;
+  background-color: #5487a4;
+}
+input.button[type=submit].button:not(.secondary),
+input.button.primary,
+.button.primary {
+  background: #7e9dc0;
+  background-color: #7e9dc0
+}
+input.button[type=submit].button:not(.secondary):hover,
+input.button.primary:hover,
+.button.primary:hover {
+  background: #577aa2;
+  background-color: #577aa2
+}
+
+/* Header */
+
+#header_div {
+  background-color: #2d4560;
+  height: 100px;
+  padding: 12px 37px 0;
+}
+#header_div .in_header {
+  height: 100%;
+}
+#header_div a.header {
+  display: inline-block;
+  background-image: url('/client/images/usergate.svg');
+  background-size: 190px 41px;
+  background-repeat: no-repeat;
+  padding-left: 220px;
+  font-size: 1.8em;
+  line-height: 1.8em;
+  height: 41px;
+  color: inherit;
+}
+#header_div div.login {
+  align-self: flex-start;
+}
+#header_div div.login svg {
+  width: 15px;
+  height: 15px;
+  fill: #afc3d1;
+}
+#header_div #login_button {
+  border: 0;
+  background: none;
+}
+#header_div a {
+  text-decoration: none;
+  border-bottom: none;
+}
+#header_div #login_button span {
+  color: #afc3d1;
+  margin-right: 0;
+  line-height: 1.1em;
+}
+
+/* Navigation */
+
+#content_div {
+  padding: 0;
+}
+#content_div .in_content {
+  padding: 0;
+}
+.menuBlock {
+  padding: 10px 37px;
+  border: 0;
+  background-color: #2d4560;
+  color: #ffffff;
+  font-weight: normal;
+  font-size: 1.25em;
+  line-height: 1.9em;
+  cursor: default;
+}
+.menuBlock td:first-of-type > div:first-of-type {
+  margin-left: -15px;
+}
+.menuBlock .menuItem,
+.menuBlock .menuItemSelected {
+  border: 0;
+  background: none;
+}
+.menuBlock .menuItemSelected {
+  font-weight: bold;
+}
+.menuBlock .menuItem a,
+.menuBlock .menuItemSelected a {
+  color: #ffffff;
+  display: block;
+  border-bottom: none;
+}
+.menuBlock .menuItemSpace {
+  padding: 0 15px;
+}
+
+/* Left menu */
+
+#content_div .menuBlock ~ table tr:first-of-type td:first-of-type {
+  width: 337px !important;
+}
+#content_div #menu_content {
+  width: 300px !important;
+  margin-left: 37px;
+  padding-bottom: 1em;
+  border: 0;
+  background-color: #5c7998;
+  color: #ffffff;
+}
+#content_div #menu_content .tree_title {
+  background-color: #5c7998;
+  color: #ffffff;
+  border: 0;
+}
+#content_div #menu_content .tree_item {
+  margin-bottom: 0;
+}
+#content_div #menu_content .tree_title a,
+#content_div #menu_content .tree_item a {
+  color: #ffffff;
+  font-size: 1.1em;
+  line-height: 1.25em;
+  display: inline-block;
+  padding: 0.4em 0;
+  border-bottom: none;
+}
+#content_div #menu_content .tree_item img {
+  filter: invert(100%) sepia(52%) saturate(3887%) hue-rotate(181deg) brightness(800%) contrast(115%);
+}
+
+/* Breadcrumbs */
+
+div.navigation {
+  background: #f5f8fa;
+  padding: 20px 10px;
+  border-bottom: 0;
+}
+div.navigation,
+div.navigation a {
+  color: #2ba3e2;
+}
+div.navigation a {
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,154,213,0.2);
+  display: inline-block;
+}
+div.navigation a:hover {
+  color: rgb(10,161,27);
+  border-bottom-color: rgb(13 201 35);
+}
+div.navigation span.navigation {
+  color: #333e66;
+}
+
+/* FAQ options block */
+
+.tdTitle {
+  background: #f5f8fa;
+  border-bottom: 0;
+  margin: 0 !important;
+  padding: 5px 4px;
+  color: #333E66;
+}
+.tdTitle .menuItemOption a {
+  border-bottom-style: dotted;
+}
+.abbLine {
+  background: #f5f8fa;
+  border-bottom: 0;
+}
+#op_list_action span.smallerText {
+  border-bottom: none !important;
+}
+
+/* Article title */
+
+.tdArticleTitle,
+.tdArticleTitle ~ .smallerText {
+  border-bottom: 1px dotted #c5d0dd !important;
+}
+h1.articleTitle {
+  clear: both;
+  font-size: 30px;
+  margin: 0;
+  padding: 15px 0;
+  line-height: 1.5em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: "PT Sans","ProximaNovaBold","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+  display: block;
+  color: #333E66;
+}
+.textBlock h1,
+.textBlock h2,
+.textBlock h3,
+.textBlock h4,
+.textBlock h5,
+.textBlock h6,
+.faqArticleTitle {
+  color: #333E66;
+}
+
+/* Table of content*/
+
+#toc_container {
+  background: #f5f8fa;
+  border: 0;
+}
+#toc_container a.atoc {
+  border-bottom-style: dotted;
+  color: #009ad5;
+}
+#toc_container a.atoc:hover {
+  color: rgb(10,161,27);
+}
+
+/* Article list */
+
+.catDescription,
+.articleDecription {
+  color: #415463;
+}
+
+/* Article */
+
+.textBlock p {
+  margin: 1em 0;
+  line-height: 22px;
+  font-size: 16px;
+  color: #415463;
+  font-family: 'PT Sans',sans-serif;
+}
+/* .textBlock .note {
+  border: 1px solid #537da2;
+  border-radius: 5px;
+} */
+.textBlock .admonition {
+  /*padding: 0 20px 0 20px;
+  line-height: 24px;
+  margin: 24px 0;
+  background: #fcfcfc;*/
+}
+.textBlock .admonition p {
+  /*text-align: justify;
+  font-size: 14px;
+  line-height: 18px;
+  margin: 0;*/
+}
+.textBlock .admonition p:last-child {
+/*    margin-bottom: 10px;*/
+}
+.textBlock .admonition-title {
+/*  color: #537da2;
+  margin: 0;
+  padding: 15px 0 5px 0;
+  font-weight: bold;
+  font-size: 16px !important;
+  display: block;*/
+}
+.textBlock .admonition-title:before {
+/*  content: "\f05a";
+  font-family: fontawesome5F;
+  font-size: 20px;
+  display: inline-block;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: inherit;
+  margin-right: 8px*/
+}
+table.docutils {
+  border: 1px solid #c5c5c5;
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+}
+table.docutils thead {
+  color: #ffff;
+  text-align: left;
+  vertical-align: bottom;
+}
+table.docutils thead th {
+  font-weight: bold;
+  background-color: #537da2;
+  text-align: center;
+  vertical-align: middle;
+  border-color: #b4c8da;
+}
+table.docutils th:last-child {
+    border-right: solid 1px #e1e4e5;
+}
+table.docutils thead th p {
+  margin: 0px;
+  font-size: 14px;
+  color: #fff;
+}
+table.docutils td {
+  font-size: 90%;
+  margin: 0;
+  overflow: visible;
+  padding: 4px 8px;
+  background-color: transparent;
+  vertical-align: middle;
+  border-bottom: 1px solid #c5c5c5;
+  border-left: 1px solid #c5c5c5;
+}
+table.docutils td:first-child {
+  border-left-width: 0;
+}
+table.docutils tbody>tr:last-child td {
+  border-bottom-width: 0;
+}
+table.docutils td p {
+    line-height: 18px;
+    margin: 6px 0 6px 0;
+}
+
+.textBlock blockquote {
+  background: #f0f3f5;
+  border: 1px solid #c5d0dd;
+  border-radius: 5px;
+  padding: 10px;
+}
+.textBlock blockquote p {
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace;
+  font-size: 1em;
+  line-height: 1em;
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0.5em 0;
+}
+
+/* Rate block */
+
+.articleContainer .smallerText {
+  border-bottom: none;
+}
+#rateQuery {
+  color: #3d4d5d;
+}
+#rateQuery a,
+#report_block a {
+  border-bottom-style: dotted;
+}
+
+.abBgrDarker {
+  background-color: #f5f8fa;
+  border: 0;
+  color: #3d4d5d;
+  font-size: 0.9em;
+  padding: 7px !important;
+}
+
+/* Content bottom */
+
+.tdSubTitle {
+  border: 0;
+  background-color: #f5f8fa;
+  color: #3d4d5d;
+}
+
+/* Contact form */
+
+.table > .grid-x:not(.skip) > div:first-child,
+.table > .grid-x:not(.skip) > div:nth-child(2) {
+  background: #f5f8fa;
+}
+
+/* Search */
+.search_header,
+.trDarker {
+  background: #f5f8fa;
+}
+.search_header button {
+  padding: 0 !important;
+  
+}
+</style>
+<style type="text/css" media="screen">
+#menu_content, #sidebar {width: 230px;} div.leftBlock #searchq {width: 145px;}
+</style>
+</head>
+<body>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   function yastart(m,e,t,r,i,k,a)
+      {
+        m[i]=m[i]||function()
+                    {
+                      (m[i].a=m[i].a||[]).push(arguments)
+
+                    };
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) 
+          {
+            if (document.scripts[j].src === r)
+             { return; }
+          }
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)};
+        yastart(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(92206446, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+    });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/92206446" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+    
+    
+
+<div id="custom_header"></div>
+
+<script>
+    function toggleMobileMenu() {
+		$('#menu_content').toggleClass('menu_open');
+    }
+</script>
+
+<div id="header_div" class="header ">
+    
+    <div class="in_header container_width_1">
+        <div class="hide-for-medium hamburger" data-toggle="leftMenu">
+            <a href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="login" viewBox="0 0 24 24">
+                    <path d="M24 6h-24v-4h24v4zm0 4h-24v4h24v-4zm0 8h-24v4h24v-4z"/>
+                </svg></a>
+        </div>
+    
+        
+        
+        
+        <span id="logo_mobile" class="hide-for-medium">
+            <a href="https://docs.usergate.com/"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHkAAAAaCAYAAACTmvO9AAAACXBIWXMAAAUbAAAFGwF+scIqAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAACAhJREFUaIHtmnmsnUUZh5+X3tLSSm0RKGUTEaFQoNAilCqyBVARJbL9AQ0goiwGoqIgEDWVBOJVICoRkU0RlNVWNMhaBCy2gIAsZZfNSgsEKpbSjcc/Zr7euV/PuefcLnJJ7i/5cmb5zTvvLO/MvDMHVgLq1upkdZ2VkdOPPgz1KhO+/l7r0o/mWKO3BdSR6po5Wv0OWnUq9WNVo1eDrI4H/gVctXrUeX9BXV8dq+6hbqeOUuO91quO3lry5sAA4GP1DHVN9dn8bawelMPX1XiT1Pvzd2ZPlalnFdxDeqnraoE6XP2u+igwB3gImAb8A5gNvKRepO72XupZoqMVQR0JfCAinm1BDdIkqOSuneNzarwNgPE5/GALmR8puOu30nV1Q/08cDkwogfaRsCxwLHqb4FjImLB/0G9pmg5yMBMYKS66epWpi9DPRq4hDSZK9wP/BV4kzR5dwZ2LPJfB95Zwfq+BHw6R8+PiOkrIgfaG+QNM2/dBnl9bv9ZHVB3Ai6kq73PAEc26nh1LHAxcC9wckS4gtXuAFRb1A3Aah3kZ0kDPQcY0wNvRRvzfsA5dHkSLwATI+LVRsSIeFidCCxZiQFepWhnkHcC1oqI17VP6Iy6BXAQac9eBDwFXBMRcxtwdwb2zdyFwCPAtRHxWsH5JDAqR+8A3gaOBMaSJu/ehcjjmg1whYhY3IPu40jL8EbAYJK3MjUiHsj5E4BN6H643UVdmsNPRcTDmRvAbsBeucwC0kHw2oiY15OOTaEenC8/Hsrx63P8NHWAek7+Rqjjc/iEmoxv2YVftqjvyoJ7Yq7jQnWpy2OhelJRdjP1Lw14qvPUwwrujUXeF7NX0AhPr1DHpTq2VGc0kfuuerm6hvq7JpwK52Z525i8jkZ4Vd2vqrud0/XGwNCIeJK0z9wHXFPnRcRS4LQi6YH8rUocD3w1h98huS7DgF1Jy+lo0+z+MGkPGwUsAW4kWfsWwAG5zJXq7Ii4u1bHT0hW1gj3NEpUhwB3NSnzm4g4HziRdDBbBNwCPAFsTFol1iOtHI80a3itvjFZl+GkfpgCvAiMBvYnnZ+mqDtHRGuZ6svqIpMrVc9bZsntKJfLrIwlTyvi+xa8fUod1JsyZ7G6R03mLuo7OX96Tist2Vzvp0yrwW1FemcTPdduYlHLyqihfkfdvFZ2fXV25j6iDjWthBcVMo7JaSNy/sycPt+0/Jfy9rNrpZsK7V2GjAQGAh9qkPdK/v13G3JWBQYW4YkmCyIibo2Ic2DZfl25HjdExJ2lgIiYAfwxR3dV61Y7NSIOj4i7IuJ5koVUGNZEL4E3im85tykijIizI+K5Wvpc4OYc3QpYEBF1GfMj4o2cvj3w8Zx+WUT8vSbvZrpWnM+oQ9s5eHW1JC3dU4CrI6ITOAW4ApjRGzGlTi249fybgE/k8PeAU9WZpMPSFbkDJxb88eqtDeRuWYTH1vIursVnF+FxNEBE/BdY9hKnngWcUedlq5uUddyUZEBlGweS3gF6ujwp27d3i/YNBLbpUEcDRwGvR0Sn6UCyI3BHRNxSKzyBdAM1AOjMNzl/60GhRnirCDdaHUqUvvl/gItIt03HA0NIp9NP5e9M9fs1+R/NX0+oP5O+VovfSdeAjVO3johZLWR2g+mccAFwHL2f2HUML8Kj89cT1ukgdcKpJAe/k7RxT6LrgNBIgcjKDwA2jYh/tqioRMndXR0cEcstb+radJ+1z2XX5JRsKbvn7wDSgaoD+AFwVlHmz8DvW+gzEzish/y7SNvRKNL2dp762Yh4t4XcEoeSJibAXGAyafV5PiIWqPfQtUK1QnlNfB3QyJJLzELdP2/STwOov87xyTm+OMe3UQ/J4cqF6szxth8P1MEmF6bCBdZebkyuxKUF51W1I+d11Lgd6tSC+211SQ4/oC537shtGVzEy4PXhAb84+2OS9Wmz6umh5UKneplRfzgGjdMh9sKQ3L6uUXasQV/6yK9boQVZ7uyn3r7ClVfSqqTYqslsUtAstofFUknANPVk9UDTX9AmAEcXXDOjoglphP+TPXU2mAPKcJPAL/K4XHAJeZ/ruQJcRTJFbxXLffmnvAL0tVihaOBWXlCTVS3UndTj1CvAb5ZK7+0CO9aBUyT+3Qau2zlhcvh6obqWqT9+g85fR/1PNOqhzpI/RppdZqmblJV1BtLPjSHK0v+aY4f3mZnVXV2qH+yPVxvsuxB6uNF+svq7eqLRdrj6lrqMLtfFCxSnzddmJQ4PevToyVnzhC7/gnTG/xQ3beWNku9VX2paEuFypI/10Teuep66pNF2kJT+xYVae+qX1kVgzxI3bFRp7Q50JPVt5o0Zp56hmnfr8rsrj7ThH+7hQ9qGpTz1QUNuM+oRxTcloNccA9VH22iQ4Wl6nT1y+ZtQT1JfbPGe1v9hvrzIq0a5DXUKQ1kVzdew9WL7T6wFR5Tv1DpHOqeJLfhhYjYS/0xcCDws4g4T11MOtSMAbYFrgYejogdVmRwG3TaCNLd8rak0/RrpPvX2xrdv5qWuAkkN2FE5t/b7L1bHU46fW8GzCc9uNydb+gqzhbAB3P0iYiY34beY4A9SI836wLzSE+LjwH3RUT9HR11GLAnyX2aC9wZEXNMz7jrZdqD5aHO9NixPTCU5M5Ni4hXivx1c/s2yTo8lfuj/YcGu1vyTjm+3LVmP97HKAc5x0eqA1uV60ffQTs3XgszbyFAo2WoH30b7QzyJGCDNv7j1Y8+iv8BtOt0/NAE0d0AAAAASUVORK5CYII=" alt="" /></a>
+        </span>
+        
+        
+        <span>
+            <a href="https://docs.usergate.com/" class="header"></a>
+        </span>
+        
+        <div class="show-for-small-only" data-toggle="rightMenu" style="margin-left: auto;">
+            
+            
+            
+            <a href="#" class="login">       
+                <svg xmlns="http://www.w3.org/2000/svg" class="login" fill-rule="evenodd" clip-rule="evenodd"><path d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z" fill="#1040e2"/><path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z"/></svg>
+            </a>
+            
+        </div>
+        
+        
+        <div class="login hide-for-small-only" style="margin-left: auto;">
+            <span style="margin-right: 20px;">
+    <a href="#" onclick="SearchBar.show();" title="Поиск">
+        <svg xmlns="http://www.w3.org/2000/svg" class="login" viewBox="0 0 24 24"
+             style="cursor: pointer;display: inline;vertical-align: middle;margin-left: 10px;">
+            <path d="M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z"/>
+        </svg></a>
+</span>
+
+
+
+
+
+
+<a href="https://docs.usergate.com/pool/" class="pool_block login fixed _tooltip" 
+    style="display: none;text-decoration: none;position: fixed;bottom: 0;right: 0;padding-right: 35px;z-index: 1;" title="Закреплённый: 0">
+    
+    <div class="round_icon"
+        style="background-color: #4584C1;background-image: url('https://docs.usergate.com/client/images/icons/article_panel/pool.svg');width: 35px;height: 35px;"></div>
+    <span class="pool_num badge" data-badge="" style="top: -32px;">&nbsp;</span>
+</a>
+
+
+
+
+<!-- <span style="margin-right: 0px;">
+    <button id="login_button" onClick="location.href = 'https://docs.usergate.com/login/1900/_entry/';" 
+        class="button">
+        <span>Войти</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 20px;">
+            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm7.753 18.305c-.261-.586-.789-.991-1.871-1.241-2.293-.529-4.428-.993-3.393-2.945 3.145-5.942.833-9.119-2.489-9.119-3.388 0-5.644 3.299-2.489 9.119 1.066 1.964-1.148 2.427-3.393 2.945-1.084.25-1.608.658-1.867 1.246-1.405-1.723-2.251-3.919-2.251-6.31 0-5.514 4.486-10 10-10s10 4.486 10 10c0 2.389-.845 4.583-2.247 6.305z"/>
+        </svg>
+    </button>
+</span> -->
+
+<span style="margin-right: 0px;">
+    <a href="/auth.php?init=1">
+    <button id="login_button" onClick="location.href = 'https://docs.usergate.com/login/1900/_entry/';" 
+        class="button">
+        <span>Войти</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 20px;">
+            <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm7.753 18.305c-.261-.586-.789-.991-1.871-1.241-2.293-.529-4.428-.993-3.393-2.945 3.145-5.942.833-9.119-2.489-9.119-3.388 0-5.644 3.299-2.489 9.119 1.066 1.964-1.148 2.427-3.393 2.945-1.084.25-1.608.658-1.867 1.246-1.405-1.723-2.251-3.919-2.251-6.31 0-5.514 4.486-10 10-10s10 4.486 10 10c0 2.389-.845 4.583-2.247 6.305z"/>
+        </svg>
+    </button>
+</a>
+</span>
+
+
+
+
+
+
+
+
+
+
+        </div>
+        
+    </div>
+</div>
+
+<div class="off-canvas-wrapper">
+    <div class="off-canvas position-left hide-for-medium" id="leftMenu" data-off-canvas data-transition="push" data-auto-focus="false">
+            <!-- <div style="margin: 0px 0 20px 0; border-bottom: 1px solid #ccc;"></div> -->
+	
+	<ul style="list-style-type: none;margin: 0;padding: 0;">
+        
+	    <li onclick="SearchBar.show();" data-toggle="leftMenu">
+            <a href="#">
+                <span style="float: left;width: 30px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="login" viewBox="0 0 24 24" style="width: 15px;height: 15px;">
+                        <path fill="#555555" d="M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z"/>
+                    </svg>
+                </span>
+                Поиск
+            </a>
+            
+        </li>
+        
+        <li style="margin: 10px 0;"></li>
+        
+        
+        <li>
+            <a href="https://docs.usergate.com/" target="_self" >
+                Главная
+            </a>
+        </li>
+        
+        <li>
+            <a href="https://support.usergate.com/ru" target="_self" >
+                Поддержка
+            </a>
+        </li>
+        
+        <li>
+            <a href="/dokumentaciya-120/" target="_self" >
+                Документация
+            </a>
+        </li>
+        
+        <li>
+            <a href="https://docs.usergate.com/opisanie-versij-121/" target="_self" >
+                Описание версий
+            </a>
+        </li>
+        
+        <li>
+            <a href="https://docs.usergate.com/glossary/" target="_self" >
+                Глоссарий
+            </a>
+        </li>
+        
+        <li>
+            <a href="/chasto-zadavaemye-voprosy-5/" target="_self" >
+                FAQ
+            </a>
+        </li>
+        
+        <li>
+            <a href="https://docs.usergate.com/index.php?View=entry&EntryID=769" target="_self" >
+                Загрузки
+            </a>
+        </li>
+        
+        <li>
+            <a href="https://docs.usergate.com/avtorizovannoe-obuchenie-i-sertifikaciya_1335.html" target="_self" >
+                Обучение
+            </a>
+        </li>
+        
+        
+        
+    </ul>
+<!-- </div> -->
+
+
+    </div>
+    
+    <div class="off-canvas position-right hide-for-medium" id="rightMenu" data-off-canvas data-transition="push" data-auto-focus="false">
+    	<script>
+$(document).ready(function() {
+    $('#notifications2').on('show', function(event, dropdownData) {
+        $('#notifications div div').remove();
+        $('#notifications2').empty();
+        xajax_loadNotificationList();
+    });
+});
+</script>
+
+<ul style="list-style-type: none; margin: 0;padding: 0;">
+    
+
+<li style="margin-top: 20px;" class="rPanel">
+	<a href="https://docs.usergate.com/login/1900/_entry/">
+	    <span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                <path d="M8 9v-4l8 7-8 7v-4h-8v-6h8zm6-7c-1.787 0-3.46.474-4.911 1.295l.228.2 1.395 1.221c1.004-.456 2.115-.716 3.288-.716 4.411 0 8 3.589 8 8s-3.589 8-8 8c-1.173 0-2.284-.26-3.288-.715l-1.395 1.221-.228.2c1.451.82 3.124 1.294 4.911 1.294 5.522 0 10-4.477 10-10s-4.478-10-10-10z"/>
+            </svg>
+        </span>
+	    Войти
+	</a>
+</li>
+
+
+
+
+
+
+
+
+
+
+<li class="rPanel pool_block" style="margin-top: 20px; display: none;">
+	<a href="https://docs.usergate.com/pool/" style="display: none; text-decoration: none;">
+		<span>
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+			    <path d="M21.639 14l-1.333 8h-16.612l-1.333-8h19.278zm2.361-2h-24l2 12h20l2-12zm-19.226-2l2.667-8h9.117l2.667 8h2.107l-3.332-10h-12l-3.333 10h2.107zm3.248-5l-.333 1h8.621l-.333-1h-7.955zm-.667 2l-.333 1h9.955l-.333-1h-9.289zm10.29 3l-.333-1h-10.624l-.333 1h11.29zm-8.956-7l-.333 1h7.288l-.334-1h-6.621zm6.311 13h-6v2h6v-2z"/>
+			</svg>
+		</span>
+		Закреплённый
+		<span class="pool_num badge" data-badge="">&nbsp;</span>
+        <!-- <span class="pool_num badge" style="top: 10px; right: -120px;" data-badge="">&nbsp;</span> -->
+	</a>
+</li>
+
+
+
+
+
+
+
+
+</ul>
+    </div>
+    
+    <div class="off-canvas-content" data-off-canvas-content>
+        <div class="content" id="content_div">
+            <div class="in_content container_width_1">
+			
+    			
+			
+    			<div class="menuBlock hide-for-small-only">
+    <!-- <table class="sTable" style="margin: 0; padding: 0;"> -->
+        <table class="sTable">
+        <tr>
+            <td>
+                
+                <div class="menuItemSelected" style="display: inline-block;">
+                    <a href="https://docs.usergate.com/" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Главная</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="https://support.usergate.com/ru" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Поддержка</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="/dokumentaciya-120/" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Документация</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="https://docs.usergate.com/opisanie-versij-121/" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Описание версий</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="https://docs.usergate.com/glossary/" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Глоссарий</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="/chasto-zadavaemye-voprosy-5/" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">FAQ</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="https://docs.usergate.com/index.php?View=entry&EntryID=769" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Загрузки</div>
+					</a>
+                </div>
+                
+                <div class="menuItem" style="display: inline-block;">
+                    <a href="https://docs.usergate.com/avtorizovannoe-obuchenie-i-sertifikaciya_1335.html" target="_self" >
+						<div class="menuItemSpace" style="display: inline-block;">Обучение</div>
+					</a>
+                </div>
+                
+
+                
+            </td>
+
+            <td style="padding-right: 5px;text-align: right;">
+                
+            </td>
+        </tr>
+    </table>
+</div>
+			
+    			<table class="sTable">
+			
+    			
+    			<tr>
+    			    <td style="width: 220px;height: 1px;"></td>
+    			    <td style="width: 100%;"></td>
+    			</tr>
+    			
+			
+    			<tr>
+			
+    			    
+    			    <td class="content1" style="vertical-align: top;">
+    			        <div id="menu_content" style="display: block;">
+    			            
+<link rel="stylesheet" href="https://docs.usergate.com/client/skin/ajax_tree.css?v=c8f98b33" />
+<script src="https://docs.usergate.com/client/jscript/CategoryMenu.js?v=c8f98b33"></script>
+<script>
+    $(document).ready(function() {
+        loading_img = $('<div id="loading_icon"><img src="https://docs.usergate.com/client/images/ajax/circle.gif" />Загрузка...</div>');
+    });
+
+    function setMenuCategoryCookie(category_id) {
+        if(category_id) {
+            createCookie('kb_category_id_', category_id, 0);
+        }
+    }
+</script>
+<div class="tree_title menuItem3" style="margin-bottom: 10px;">
+    <!-- a href="https://docs.usergate.com/">База знаний</a -->
+    
+    
+    
+    <img src="https://docs.usergate.com/client/images/icons/x-mark.svg" class="show-for-small-only" 
+        width="10" height="10" title="Закрыть" alt="Закрыть"
+    	style="float: right;cursor: pointer;margin-top: 3px;" onclick="toggleMobileMenu();" />
+    
+    
+</div>
+
+
+
+<div id="menu_item_120" style="padding-left: 7px;" class="tree_item category_loaded">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_expanded.svg" alt="menu collapse" style="cursor: pointer;" onclick="toggleCategory(120, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/dokumentaciya-120/" class="node " title="Документация" style="" 
+            onclick="setMenuCategoryCookie('')">Документация
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item__more_120" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_entry.svg" alt="menu item"  />
+    </div>
+    
+    
+    
+    
+    <div style="float: left;cursor: pointer;font-size: 0.9em;" 
+        onclick="xajax_loadEntries(120, 'show');">
+        ...
+    </div>
+    <div style="clear: both;"></div>
+    
+    
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_7" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(7, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/obshie-svedeniya-7/" class="node " title="Общие сведения" style="" 
+            onclick="setMenuCategoryCookie('')">Общие сведения
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_663" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(663, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/ngfw-663/" class="node " title="NGFW" style="" 
+            onclick="setMenuCategoryCookie('')">NGFW
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_662" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(662, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/dcfw-662/" class="node " title="DCFW" style="" 
+            onclick="setMenuCategoryCookie('')">DCFW
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_718" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(718, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/waf-718/" class="node " title="WAF" style="" 
+            onclick="setMenuCategoryCookie('')">WAF
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_884" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(884, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/swg-884/" class="node " title="SWG" style="" 
+            onclick="setMenuCategoryCookie('')">SWG
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_664" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(664, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/management-center-664/" class="node " title="Management Center" style="" 
+            onclick="setMenuCategoryCookie('')">Management Center
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_665" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(665, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/log-analyzer-665/" class="node " title="Log Analyzer" style="" 
+            onclick="setMenuCategoryCookie('')">Log Analyzer
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_666" style="padding-left: 16px;" class="tree_item category_loaded">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_expanded.svg" alt="menu collapse" style="cursor: pointer;" onclick="toggleCategory(666, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/siem-666/" class="node " title="SIEM" style="" 
+            onclick="setMenuCategoryCookie('')">SIEM
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_382" style="padding-left: 24px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(382, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/usergate-siem-72x-rukovodstvo-administratora-382/" class="node " title="UserGate SIEM 7.2.x Руководство администратора" style="" 
+            onclick="setMenuCategoryCookie('')">UserGate SIEM 7.2.x Руководство администратора
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_679" style="padding-left: 24px;" class="tree_item category_loaded">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_expanded.svg" alt="menu collapse" style="cursor: pointer;" onclick="toggleCategory(679, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/usergate-siem-7x-rukovodstvo-administratora-679/" class="node " title="UserGate SIEM 7.x Руководство администратора" style="" 
+            onclick="setMenuCategoryCookie('')">UserGate SIEM 7.x Руководство администратора
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_680" style="padding-left: 32px;" class="tree_item category_loaded">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_expanded.svg" alt="menu collapse" style="cursor: pointer;" onclick="toggleCategory(680, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/vvedenie-680/" class="node " title="Введение" style="" 
+            onclick="setMenuCategoryCookie('')">Введение
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_entry_1900" style="padding-left: 40px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_entry.svg" alt="menu item"  />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/arhitektura-usergate-siem_1900.html" class="node menu_item_selected" title="Архитектура UserGate SIEM" style="" 
+            onclick="setMenuCategoryCookie('680')">Архитектура UserGate SIEM
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_681" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(681, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/licenzirovanie-681/" class="node " title="Лицензирование" style="" 
+            onclick="setMenuCategoryCookie('')">Лицензирование
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_682" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(682, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/pervonachal6naya-nastrojka-682/" class="node " title="Первоначальная настройка" style="" 
+            onclick="setMenuCategoryCookie('')">Первоначальная настройка
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_684" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(684, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/nastrojka-ustrojstva-684/" class="node " title="Настройка устройства" style="" 
+            onclick="setMenuCategoryCookie('')">Настройка устройства
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_685" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(685, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/nastrojka-seti-685/" class="node " title="Настройка сети" style="" 
+            onclick="setMenuCategoryCookie('')">Настройка сети
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_687" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(687, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/sensory-687/" class="node " title="Сенсоры" style="" 
+            onclick="setMenuCategoryCookie('')">Сенсоры
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_688" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(688, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/sborshik-logov-688/" class="node " title="Сборщик логов" style="" 
+            onclick="setMenuCategoryCookie('')">Сборщик логов
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_689" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(689, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/biblioteki-689/" class="node " title="Библиотеки" style="" 
+            onclick="setMenuCategoryCookie('')">Библиотеки
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_690" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(690, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/diagnostika-i-monitoring-690/" class="node " title="Диагностика и мониторинг" style="" 
+            onclick="setMenuCategoryCookie('')">Диагностика и мониторинг
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_692" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(692, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/zhurnaly-i-otchety-692/" class="node " title="Журналы и отчеты" style="" 
+            onclick="setMenuCategoryCookie('')">Журналы и отчеты
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_696" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(696, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/analitika-696/" class="node " title="Аналитика" style="" 
+            onclick="setMenuCategoryCookie('')">Аналитика
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_697" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(697, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/incidenty-697/" class="node " title="Инциденты" style="" 
+            onclick="setMenuCategoryCookie('')">Инциденты
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_698" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(698, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/interfejs-komandnoj-stroki-698/" class="node " title="Интерфейс командной строки" style="" 
+            onclick="setMenuCategoryCookie('')">Интерфейс командной строки
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_711" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(711, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/dashbord-711/" class="node " title="Дашборд" style="" 
+            onclick="setMenuCategoryCookie('')">Дашборд
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_712" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(712, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/tehnicheskaya-podderzhka-712/" class="node " title="Техническая поддержка" style="" 
+            onclick="setMenuCategoryCookie('')">Техническая поддержка
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_713" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(713, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/admin-713/" class="node " title="Admin" style="" 
+            onclick="setMenuCategoryCookie('')">Admin
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_714" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(714, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/izbrannye-714/" class="node " title="Избранные" style="" 
+            onclick="setMenuCategoryCookie('')">Избранные
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_715" style="padding-left: 32px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(715, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/prilozheniya-715/" class="node " title="Приложения" style="" 
+            onclick="setMenuCategoryCookie('')">Приложения
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_781" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(781, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/usergate-client-781/" class="node " title="UserGate Client" style="" 
+            onclick="setMenuCategoryCookie('')">UserGate Client
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_722" style="padding-left: 16px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(722, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/konvertery-konfiguracij-722/" class="node " title="Конвертеры конфигураций" style="" 
+            onclick="setMenuCategoryCookie('')">Конвертеры конфигураций
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_121" style="padding-left: 7px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(121, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/opisanie-versij-121/" class="node " title="Описание версий" style="" 
+            onclick="setMenuCategoryCookie('')">Описание версий
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_274" style="padding-left: 7px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(274, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/apparatnye-platformy-274/" class="node " title="Аппаратные платформы" style="" 
+            onclick="setMenuCategoryCookie('')">Аппаратные платформы
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_5" style="padding-left: 7px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(5, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/chasto-zadavaemye-voprosy-5/" class="node " title="Часто задаваемые вопросы" style="" 
+            onclick="setMenuCategoryCookie('')">Часто задаваемые вопросы
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+<div id="menu_item_546" style="padding-left: 7px;" class="tree_item ">
+    <div style="float: left;margin: 0 5px 5px 0;">
+        <img src="https://docs.usergate.com/client/images/icons/menu_category_collapsed.svg" alt="menu expand" style="cursor: pointer;" onclick="toggleCategory(546, 'https://docs.usergate.com/');" />
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="float: left; width: 85%;">
+        <a href="https://docs.usergate.com/obuchenie-546/" class="node " title="Обучение" style="" 
+            onclick="setMenuCategoryCookie('')">Обучение
+        </a>
+    </div>
+    
+
+    
+    
+    
+    
+    <div style="clear: both;"></div>
+</div>
+
+    			        </div>
+			
+    			    </td>
+    			    
+			
+    			    <td style="vertical-align: top;">
+			
+    			        <div class="navigation view_left">
+    			        	
+    						<div id="mobile_menu_toggle" class="show-for-small-only" onclick="toggleMobileMenu();">
+    							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#666666" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 17h-12v-2h12v2zm0-4h-12v-2h12v2zm0-4h-12v-2h12v2z"/></svg>
+    						</div>
+    						
+						
+    						<div style="overflow: hidden;">
+    			            	<span class="navigation"><a href="https://docs.usergate.com/" class="navigation">Главная</a></span> / <span class="navigation"><a href="https://docs.usergate.com/dokumentaciya-120/" class="navigation">Документация</a></span> / <span class="navigation"><a href="https://docs.usergate.com/siem-666/" class="navigation">SIEM</a></span> / <span class="navigation"><a href="https://docs.usergate.com/usergate-siem-7x-rukovodstvo-administratora-679/" class="navigation">UserGate SIEM 7.x Руководство администратора</a></span> / <span class="navigation"><a href="https://docs.usergate.com/vvedenie-680/" class="navigation">Введение</a></span> / <span class="navigation">Архитектура UserGate SIEM</span>
+    			            </div>
+    			        </div>
+			        
+    			        <div style="clear: both;"></div>
+			
+    			        <div class="contentMain">
+    			            <a id="content"></a>
+    			            
+    			            <div class="articleContainer">
+
+    <div id="top" class="tdArticleTitle" style="overflow: hidden;"
+         >
+        
+        
+
+        <div style="overflow: hidden;position: relative;">
+            <h1 id="title_text" class="articleTitle ">Архитектура UserGate SIEM</h1>
+            
+            
+        </div>
+
+        <div style="clear: both"></div>
+    </div>
+
+    
+    <div class="smallerText" style="padding: 10px 5px; border-bottom: 1px dotted;">
+        <div style="padding-bottom: 3px;">ID статьи: 1900</div>
+        <div>Последнее обновление: 13 May, 2026</div>
+    </div>
+    
+
+    <div style="position: relative;">
+
+        <script>
+    
+    $(document).ready(function() {
+        PoolManager.stick_msg = "Закрепить";
+        PoolManager.unstick_msg = "Открепить";
+        
+        $('._tooltip_fp:not([title=""])').tooltipster({
+            contentAsHTML: true,
+            theme: ['tooltipster-kbp'],
+            interactive: true,
+            maxWidth: 300,
+            side: 'left'
+        });
+
+        $('._tooltip_fp2:not([title=""])').tooltipster({
+            contentAsHTML: true,
+            theme: ['tooltipster-kbp'],
+            interactive: true,
+            maxWidth: 300,
+            side: 'left',
+            functionBefore: function(instance) {
+                return ($('#action_menu_panel').is(":hidden")); // for admin dropdown menu
+            }
+        });
+    });
+    
+    
+    function subscribeToEntry(status) {
+        $('#subscribe_panel_item div').css('background-image', 'url("https://docs.usergate.com/client/images/ajax/three-dots.svg")');
+        
+        if(status) {
+            $('#save_panel_item .hasBadgeIcon, #save_panel_item2 .hasBadgeIcon').addClass('badgeIcon');
+            $('#save_panel_item a, #save_panel_item2 a').attr('href', '#remove');
+            $('#save_panel_item a, #save_panel_item2 a').attr('onclick', 'subscribeToEntry(0);');
+            $('#save_panel_item').tooltipster('content', "Удалить");
+            $('#save_panel_item2 div.icon_title').html("Удалить");
+        } else {
+            $('#save_panel_item .hasBadgeIcon, #save_panel_item2 .hasBadgeIcon').removeClass('badgeIcon');
+            $('#save_panel_item a, #save_panel_item2 a').attr('href', '#save');
+            $('#save_panel_item a, #save_panel_item2 a').attr('onclick', 'subscribeToEntry(1);');
+            $('#save_panel_item').tooltipster('content', "Сохранить");
+            $('#save_panel_item2 div.icon_title').html("Сохранить");
+        }
+        
+        xajax_doSubscribe(status);
+    }
+    
+    function showMorePanel() {
+        ModalManager.show('panel_more', 'middle');
+    }
+    
+    
+    function showCommentPanel() {
+        if($('#panel_more').is(":visible")) {
+            ModalManager.hide('panel_more');
+        }
+        
+        ModalManager.show('panel_comment', 'middle');
+    }
+    
+    
+    function closeCommentPanel() {
+        ModalManager.hide('panel_comment');
+    }
+    
+    
+</script>
+<script src="https://docs.usergate.com/client/jscript/PoolManager.js?v=c8f98b33"></script>
+
+<div id="right_panel">
+    <ul id="social-counters">
+        
+        <li id="save_panel_item" title="Сохранить" class="_tooltip_fp" >
+            <a href="#save" onclick="subscribeToEntry(1);">
+                <div class="round_icon hasBadgeIcon " 
+                    style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/bookmark.svg');" data-color=""></div>
+            </a>
+        </li>
+        
+        <li id="print_panel_item" title="Печать" class="_tooltip_fp" >
+            <a href="https://docs.usergate.com/print/1900/" >
+                <div class="round_icon hasBadgeIcon " 
+                    style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/print.svg');" data-color=""></div>
+            </a>
+        </li>
+        
+        
+        <li title="еще" class="_tooltip_fp">
+            <a href="#" onclick="showMorePanel();">
+                <div class="round_icon" data-color=""
+                    style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/more.svg');background-size: auto;">
+                </div>
+            </a>
+        </li>
+        
+        
+    </ul>
+    
+    <div id="panel_more" style="display: none;">
+        <div style="margin-top: 20px;">
+            <div class="jq-dropdown-panel" style="min-width: 350px;">
+    
+    
+    <div style="margin-bottom: 25px;">
+        <div class="more_title">
+            Поделиться
+        </div>
+        
+        <div class="grid-x align-stretch">
+            
+            <div id="twitter_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="#" title="Twitter" style="text-decoration: none;cursor: auto;" onclick="shareArticle('http://twitter.com/intent/tweet?url=[url]');">
+                    <div class="more_item">
+                        <div class="round_icon" style="background-image: url('https://docs.usergate.com/client/images/icons/social/twitter.svg');" data-color="#55acee"></div>
+                        <div class="icon_title">
+                            <span class="icon">Twitter</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div id="facebook_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="#" title="Facebook" style="text-decoration: none;cursor: auto;" onclick="shareArticle('http://facebook.com/sharer.php?u=[url]&title=[title]');">
+                    <div class="more_item">
+                        <div class="round_icon" style="background-image: url('https://docs.usergate.com/client/images/icons/social/facebook.svg');" data-color="#3b5998"></div>
+                        <div class="icon_title">
+                            <span class="icon">Facebook</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div id="send_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="mailto:?subject=%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B0%20%D0%BE%D1%82%20%D0%92%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D0%B4%D1%80%D1%83%D0%B3%D0%B0&body=%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B0%20%D0%BE%D1%82%20%D0%92%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D0%B4%D1%80%D1%83%D0%B3%D0%B0%0Ahttps%3A%2F%2Fdocs.usergate.com%2Fentry%2F1900%2F" title="Отправить по email" style="text-decoration: none;cursor: auto;" >
+                    <div class="more_item">
+                        <div class="round_icon" style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/email.svg');" data-color=""></div>
+                        <div class="icon_title">
+                            <span class="icon">Отправить по email</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div style="margin-bottom: 25px;">
+        <div class="more_title">
+            Действия
+        </div>
+        
+        <div class="grid-x grid-padding-x">
+            
+            <div id="save_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="#save" title="Сохранить" style="text-decoration: none;cursor: auto;" onclick="subscribeToEntry(1);">
+                    <div class="more_item">
+                        <div class="round_icon hasBadgeIcon badgeIconPopup "  
+                            style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/bookmark.svg');" data-color=""></div>
+                            
+                        <div class="icon_title">
+                            <span class="icon">Сохранить</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div id="print_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="https://docs.usergate.com/print/1900/" title="Печать" style="text-decoration: none;cursor: auto;" >
+                    <div class="more_item">
+                        <div class="round_icon hasBadgeIcon badgeIconPopup "  
+                            style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/print.svg');" data-color=""></div>
+                            
+                        <div class="icon_title">
+                            <span class="icon">Печать</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div id="stick_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="#pin" title="Закрепить" style="text-decoration: none;cursor: auto;" onclick="PoolManager.add(1900);">
+                    <div class="more_item">
+                        <div class="round_icon hasBadgeIcon badgeIconPopup "  
+                            style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/stick.svg');" data-color=""></div>
+                            
+                        <div class="icon_title">
+                            <span class="icon">Закрепить</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div id="comment_panel_item2" class="medium-6" style="padding: 0 5px;" >
+                <a href="#add_comment" title="Добавить комментарий" style="text-decoration: none;cursor: auto;" onclick="showCommentPanel();">
+                    <div class="more_item">
+                        <div class="round_icon hasBadgeIcon badgeIconPopup "  
+                            style="background-image: url('https://docs.usergate.com/client/images/icons/article_panel/comment.svg');" data-color=""></div>
+                            
+                        <div class="icon_title">
+                            <span class="icon">Добавить комментарий</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    <div id="permalink_block">
+        <div class="more_title">
+            <div style="float: left;">
+                Постоянная ссылка
+            </div>
+            <a href="#/" class="copy_block smallerText2" style="float: right; font-weight: normal;"
+                onclick="copyUrl();">Копировать</a>
+            <div class="copied_block smallerText" 
+                style="float: right;display: none; font-weight: normal;">Скопировано</div>
+            <div style="clear: both;"></div>
+        </div>
+        <input type="text" class="share_url" value="https://docs.usergate.com/index.php?View=entry&amp;EntryID=1900" style="color: #666;" readonly="readonly" />
+    </div>
+</div>
+        </div>
+    </div>
+        
+    <div id="panel_comment" style="display: none;">
+        <div style="margin-top: 20px;">
+            <link rel="stylesheet" href="https://docs.usergate.com/client/skin/search2.css?v=c8f98b33" />
+<link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/magnific-popup.css?v=c8f98b33" />
+<script src="https://docs.usergate.com/client/jscript/jquery/jquery.magnific-popup.min.js?v=c8f98b33"></script>
+<script>
+<!--
+$(document).ready(function() {
+    $('#bbcode_help_link').magnificPopup({
+        type: 'inline'
+    });
+});
+//-->
+</script>
+
+<style>
+    .table > .grid-x:not(.skip) > div:first-child {
+        text-align: left;
+/*        padding: 12px 12px;*/
+    }
+    
+</style>
+
+
+
+
+ 
+
+<div class="niceForm niceForm100">
+
+<form action="https://docs.usergate.com/comment/1900/post/" method="post" id="aContentForm">
+<input type="hidden" name="id" value="">
+<input type="hidden" name="user_id" value="">
+<input type="hidden" name="entry_id" value="">
+<input type="hidden" name="date_posted" value="">
+<!-- <input type="hidden" id="internal" name="internal" value="0"> -->
+<input type="hidden" name="atoken" id="atoken" value="$2y$07$AAEmggABCmIAAYQZAADobOY6GTpLOc1sNRaKSI1kEEkwLp39JHnhm" />
+
+<span style="display: none;">
+    <input type="text" name="captcha2" id="captcha2" value="" class="longText" />
+</span>
+
+
+<div class="table">
+
+    
+    <div class="grid-x">
+        <div class="small-12 cell">
+            <input type="text" name="name" id="name" value="" class="longText"
+                 placeholder="Имя" />
+        </div>
+    </div>
+    
+    <div class="grid-x">
+        <div class="small-12 cell">
+            <input type="text" name="email" id="email" value="" class="longText" 
+                placeholder="Email" />
+        </div>
+    </div>
+    
+    
+    <div class="grid-x">
+        <div class="small-12 cell">
+            <!--            -->
+            
+            <div style="position:relative">
+                <textarea rows="7" name="comment" id="comment" style="width: 100%;"
+                    placeholder="* Комментарий"></textarea>
+                
+                <a id="bbcode_help_link" href="#bbcode_help_block"
+                    style="position:absolute; right: 10px; top: 10px;"
+                    class="help_link _tooltip" title="">
+                    <img src="https://docs.usergate.com/client/images/icons/help.svg" width="20" height="20" />
+                </a>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+
+
+<div class="grid-x">
+    <div class="large-12 cell">
+        <input type="text" name="captcha" id="captcha" value="" placeholder="* Введите символы с изображения ниже" 
+            class="longText" autocomplete="off" /> 
+        <img src="https://docs.usergate.com/captcha.php" alt="Подтверждения кода изображения" id="captcha_img" style="margin-top: 10px;"/>
+    </div>
+</div>
+
+
+
+
+
+    
+    <div class="grid-x donotshow">
+        <div class="small-12 cell">
+            <input type="text" name="s_company" value="" class="longText" />
+            <input type="checkbox" name="s_company_set" value="" />            
+        </div>
+    </div>
+    
+    
+    
+    <div class="grid-x skip">
+        <div class="small-12 cell" style="text-align:center;">
+            <div><br /></div>
+            <button type="submit" name="submit" id="submit" class="button primary"
+                onClick="validateForm();return false;">
+                Отправить
+            </button>
+    
+            <input type="button" value="Отмена" 
+                onclick="closeCommentPanel();" class="button" />
+        </div>  
+    </div>
+</div>
+
+</form>
+</div>
+
+<div id="bbcode_help_block" class="help_block mfp-hide">
+    <h2>BBCode подсказки</h2>
+    <div>
+
+URL-адреса будут обрабатываться автоматически <br />
+<b>http://www.kbpublisher.com</b> - <a href="http://www.kbpublisher.com">http://www.kbpublisher.com</a>
+<br /><br />
+
+<b>[b]</b>text<b>[/b]</b> - <b>Жирный</b> текст.
+<br /><br />
+
+<b>[u]</b>text<b>[/u]</b> - <u>Подчеркнутый</u> текст.
+<br /><br />
+
+<b>[i]</b>text<b>[/i]</b> - <i>Курсивный</i> текст.
+<br /><br />
+
+<b>[s]</b>text<b>[/s]</b> - <s>Зачеркнутый</s> текст.
+<br /><br />
+
+<b>[color=green]</b>text<b>[/color]</b> - <font color='green'>Цветной</font> текст.
+<br /><br />
+
+<b>[url]</b>kbpublisher.com<b>[/url]</b> - <a href="http://www.kbpublisher.com">kbpublisher.com</a>
+<br /><br />
+
+<b>[url=kbpublisher.com]</b>text<b>[/url]</b> - <a href="http://www.kbpublisher.com">text</a>
+<br /><br />
+
+<b>[email]</b>example@example.com<b>[/email]</b> - <a href="mailto:example@example.com">example@example.com</a>
+<br /><br />
+
+<b>[quote]</b>text<b>[/quote]</b> - <q>Цитируемый</q> текст
+<br /><br />
+
+<b>[h1]</b>text<b>[/h1]</b> - <span style="font-size: 18px;">Заголовок.</span>
+<br /><br />
+
+<b>[code]</b>text<b>[/code]</b> - <code>Код</code> text
+<br /><br />
+
+
+Нумерованный список:<br /><br />
+<div style="float: left; margin-left: 10px;">
+	<b>[list]</b><br /><b>[*]</b> пункт1<br /><b>[*]</b> пункт2<br /><b>[/list]</b>
+</div>
+<div style="float: left;">
+	<ol>
+		<li>пункт 1</li>
+		<li>пункт 2</li>
+	</ol>
+</div>
+<div style="clear: both"></div>
+
+<br /><br />
+
+Неупорядоченный список:<br /><br />
+<div style="float: left;  margin-left: 10px;">
+	<b>[ulist]</b><br /><b>[*]</b> пункт1<br /><b>[*]</b> пункт2<br /><b>[/ulist]</b>
+</div>
+<div style="float: left;">
+	<ul>
+		<li>пункт 1</li>
+		<li>пункт 2</li>
+	</ul>
+</div>
+<div style="clear: both"></div></div>
+</div>
+        </div>
+    </div>
+        
+</div>
+        
+        <div id="kbp_article_body" class="textBlock ab_padding_class" style="min-height: 143px;">
+
+            <div id="toc_container"><div><a href="#toc" class="atoc" onclick="toggleToc('toc_content', 'kb_hide_toc_'); return false;">Содержание:</a></div><div id="toc_content" style="display: block;"><ol id="toc" data-toc="#kbp_article_body" data-toc-headings="h1,h2,h3"></ol></div></div>
+
+            <div id="custom_block_1" class="customFieldItem">Documentation: <input type="checkbox" disabled="disabled" checked ></div><div id="custom_block_4" class="customFieldItem">Product: SIEM</div><div id="custom_block_5" class="customFieldItem">Version: 7.x</div><div id="custom_block_6" class="customFieldItem">Technology: SIEM</div>
+
+            <p>UserGate SIEM — система управления событиями информационной безопасности, которая собирает системные журналы и данные о событиях с различных устройств в подконтрольной сетевой инфраструктуре. Данные подвергаются обработке и анализу, в результате которого могут быть выявлены подозрительные действия или признаки известных сетевых угроз. В зависимости от степени опасности выявленных угроз могут быть произведены определенные действия реагирования, включающие в себя оповещения, создание инцидентов безопасности для дальнейшего расследования или отправка команд на определенные устройства сети с целью предотвращения угрозы.&nbsp;</p>
+
+<p>Результаты обработки данных отображаются в едином веб-интерфейсе, а также предоставляются в виде файлов с отчетами для изучения характерных особенностей инцидентов безопасности.&nbsp;Для проведения расследований инцидентов кибербезопасности используется встроенная в UserGate SIEM система IRP. IRP — это платформа управления процессами реагирования на инциденты информационной безопасности. Она позволяет настроить процесс расследования инцидентов индивидуально под нужды конкретной компании.</p>
+
+<p>UserGate SIEM поставляется в виде образа виртуальной машины, предназначенного для развертывания в виртуальной среде.</p>
+
+<h3>Архитектура решения</h3>
+
+<p>В основе решения UserGate SIEM лежат следующие программные модули:</p>
+
+<p><img alt="" height="582" src="/kb_upload/image/SIEM-0_1.svg" width="509" /></p>
+
+<ul>
+	<li>
+	<p>core&nbsp;— модуль ядра&nbsp;системы, реализующий&nbsp;функции настройки, управления, API, хранения&nbsp;конфигурации.&nbsp;</p>
+	</li>
+	<li>
+	<p>statistics&nbsp;— основной функциональный модуль системы, реализующий функции приема, обработки,&nbsp;анализа, хранения&nbsp;данных,&nbsp;создания инцидентов безопасности,&nbsp;управления процессами реагирования, экспорта данных и создания отчетов.</p>
+	</li>
+	<li>
+	<p>log-collector&nbsp;— модуль сбора событий от сетевых устройств по протоколу syslog.&nbsp;</p>
+	</li>
+	<li>
+	<p>DB&nbsp;— хранилище данных.</p>
+	</li>
+	<li>
+	<p>webconsole&nbsp;— модуль веб-консоли&nbsp;управления системой.</p>
+	</li>
+	<li>
+	<p>CLI&nbsp;— модуль интерфейса командной строки для управления системой.</p>
+	</li>
+	<li>
+	<p>reportbuilder&nbsp;— модуль генерации отчетов в форматах HTML и PDF.</p>
+	</li>
+</ul>
+
+<h3>Функциональная модель</h3>
+
+<p>Функциональную модель UserGate SIEM можно описать с помощью следующих основных блоков:</p>
+
+<ul>
+	<li>
+	<p>Блок сбора данных.</p>
+	</li>
+	<li>
+	<p>Блок обработки&nbsp;данных.</p>
+	</li>
+	<li>
+	<p>Блок анализа данных.</p>
+	</li>
+	<li>
+	<p>Блок реагирования.</p>
+	</li>
+	<li>
+	<p>Блок настройки&nbsp;и управления&nbsp;системой.</p>
+	</li>
+</ul>
+
+<p><img alt="" height="656" src="/kb_upload/image/SIEM-1_2(2).svg" width="819" /></p>
+
+<p></p>
+
+<h3>Сбор данных</h3>
+
+<p>UserGate SIEM собирает данные с внешних источников с помощью сборщика логов (модуль log-collector) и&nbsp;с помощью сенсоров (настраиваются и хранятся в модуле core).</p>
+
+<p>Сборщик логов предназначен для сбора событий от сетевых устройств по протоколу syslog. Настраиваемые правила syslog позволяют осуществлять фильтрацию записей событий по времени, критичности событий, объектам, названию устройств, приложениям, упрощая поиск необходимой информации.&nbsp;</p>
+
+<p>Сенсоры позволяют собирать данные с межсетевых экранов UserGate (сенсор UserGate), конечных устройств с установленным ПО UserGate Client (сенсор конечных устройств), компьютеров под управлением ОС Windows (сенсор WMI), а также с любых других сетевых устройств, способных передавать данные по протоколу SNMP (сенсор SNMP).</p>
+
+<p>При интеграции с межсетевым экраном UserGate NGFW устройство UserGate SIEM сначала подключается к UserGate NGFW с помощью параметров, настроенных в сенсоре UserGate, и передает в UserGate NGFW настройки для подключения. Далее UserGate NGFW собирает свои данные в локальном кэше и периодически передает их в модуль statistics в UserGate SIEM по таймеру.</p>
+
+<p>С помощью сенсора SNMP можно подключить SNMP-совместимое сетевое устройство к UserGate SIEM для сбора и анализа его метрик. SIEM может отображать любые метрики, полученные с помощью запросов SNMP. Для настройки сенсора SNMP необходимо иметь базы MIB на управляемое устройство. Базы MIB устройств сторонних производителей могут импортироваться в систему SIEM.</p>
+
+<p>С помощью сенсора WMI можно подключить WMI-совместимое сетевое устройство (компьютер под управлением ОС Windows) к UserGate SIEM для сбора и анализа его данных. В настройках сенсора WMI указываются адрес устройства, атрибуты входа в устройство, пространство имен и параметры event-лога Windows, которые будут контролироваться системой SIEM.</p>
+
+<p>Конечные устройства с установленным ПО UserGate Client подключаются к UserGate SIEM не напрямую, а через UserGate Management Center. При интеграции UserGate SIEM c UserGate MC между ними устанавливается SSH-туннель, по которому параметры настройки и данные статистики с интегрированных в MC конечных устройств передаются на UserGate SIEM.&nbsp; &nbsp;&nbsp;</p>
+
+<h3>Обработка и хранение данных</h3>
+
+<p>Собираемые данные поступают в модуль statistics, где они подвергаются предварительному анализу и нормализации. В процессе нормализации записи журналов, полученные из различных источников, приводятся к единому виду, пригодному для записи в стандартные поля базы данных UserGate SIEM. Далее нормализованные записи передаются в сервис лог-экспорта&nbsp;и в хранилище данных.</p>
+
+<p>Сервис лог-экспорта с помощью настраиваемых правил позволяет экспортировать журналы (в формате CEF или JSON) на внешние серверы FTP, SSH (SFTP) и syslog.&nbsp;Отправка на серверы SSH и FTP проводится по указанному в настройках правил расписанию или разово. Отправка на серверы syslog происходит сразу же при добавлении записи в журнал.</p>
+
+<p>В таблицах хранилища данных содержатся все собранные записи журналов как самого устройства&nbsp;UserGate SIEM, так и подключенных к нему устройств. Также в таблицах хранилища данных содержатся созданные инциденты и оповещения.&nbsp;</p>
+
+<p>Данные устройств в таблицах хранятся по ключу, который содержит в себе ClusterID. Например, при регистрации UserGate NGFW в UserGate SIEM в модуле statistics для него создается аккаунт, в котором ему прописывается ClusterID и токен. Токен возвращается в UserGate NGFW и используется для авторизации.&nbsp; &nbsp;</p>
+
+<p>Журналы в хранилище данных циклически перезаписываются, обеспечивая необходимое для работы свободное дисковое пространство. Ротация записей журналов (всех, кроме журнала событий) происходит автоматически по критерию свободного пространства на данном разделе.&nbsp;Записи о ротации базы данных отображаются в журнале событий UserGate SIEM. Ротация записей журнала событий не производится.</p>
+
+<h3>Анализ данных</h3>
+
+<p>Сервис аналитики работает также в модуле statistics. С его помощью производится анализ журналов событий безопасности, полученных с настроенных сенсоров. В процессе анализа данных сервис аналитики производит агрегацию повторяющихся событий и их корреляцию, используя условия правил аналитики, написанные с помощью SQL-подобного синтаксиса. В случае срабатывания правила будет выполнено действие реагирования, настроенное для данного правила.&nbsp;</p>
+
+<h3>Реагирование</h3>
+
+<p>В качестве мер реагирования на выявленные в результате анализа данных аномалии и угрозы безопасности могут использоваться следующие действия:</p>
+
+<ul>
+	<li>
+	<p>Визуализация срабатываний системы анализа данных в консоли управления системой.</p>
+	</li>
+	<li>
+	<p>Оповещение персонала служб информационной безопасности.</p>
+	</li>
+	<li>
+	<p>Создание инцидента информационной безопасности для дальнейшего расследования.</p>
+	</li>
+	<li>
+	<p>Создание отчетов об инцидентах информационной безопасности<font color="#e74c3c">.</font></p>
+	</li>
+	<li>
+	<p>Отправка&nbsp;команд на определенные&nbsp;сетевые&nbsp;устройства&nbsp;с целью&nbsp;снижения&nbsp;угрозы.</p>
+	</li>
+</ul>
+
+<p>В правилах аналитики UserGate SIEM задаются действия реагирования, которые должны выполняться в случае их срабатывания. В качестве таких действий могут быть использованы оповещения по email или SMS, отображение информации на специальной веб-странице (webhook), отправка команд для выполнения на сетевом устройстве, создание инцидента. Создание инцидента как действие реагирования позволяет автоматизировать процесс создания инцидентов информационной безопасности. Информация о срабатывании правил аналитики и о созданных инцидентах безопасности выводится в режиме онлайн на информационных экранах и дашбордах в веб-консоли администратора UserGate SIEM.&nbsp;</p>
+
+<p>Расследование инцидентов информационной безопасности производится с помощью платформы управления процессами реагирования — IRP (Incident Response Platform). Сервис IRP интегрирован с сервисом аналитики&nbsp;и необходим для управления процессами реагирования на инциденты информационной безопасности.&nbsp;При расследовании инцидентов сервис IRP использует внешние ресурсы для сбора дополнительной информации&nbsp;—&nbsp;внешние сервисы обогащений. В случае, если в качестве улик к инциденту прикреплены записи журнала, то IRP&nbsp;автоматически извлекает сведения об индикаторах компрометации (IP-адресе, URL, домене, названии файла, хэш) для работы с внешними сервисами обогащений.</p>
+
+<p>С помощью модуля генерации отчетов могут создаваться отчеты по инцидентам безопасности в формате PDF или HTML, которые доступны для скачивания или отправки на электронную почту.</p>
+
+<p>С помощью настраиваемых программных коннекторов возможна организация подключения системы UserGate SIEM к различным средствам защиты или службам обмена данными об инцидентах информационной безопасности. Через коннектор с типом сервера SSH возможна передача команд на подключенное устройство в качестве реакции на срабатывание правила аналитики. <!-- #### -->По умолчанию в системе создан коннектор Gossopka, предназначенный для автоматизации обмена информацией об инцидентах информационной безопасности с ГосСОПКА (Государственной системой обнаружения, предупреждения и ликвидации последствий компьютерных атак)<!-- #### -->.</p>
+
+<h3>Настройка и управление</h3>
+
+<p>Модуль веб-консоли&nbsp;взаимодействует с большинством модулей UserGate SIEM и выполняет функции управления и представления данных. Модуль позволяет формировать и просматривать отчеты и журналы, использовать графическое представление данных с помощью виджетов дашборда, производить настройки в веб-интерфейсе управления (общие настройки SIEM, настройки правил аналитики, управление инцидентами безопасности и т. д.).&nbsp;</p>
+
+<p>Запросы из веб-консоли&nbsp;приходят сначала в модуль сore в специальный сервис Web Console Proxy, затем запросы на чтение данных напрямую (не попадая в API) перебрасываются в модуль statistics. Statistics обрабатывает эти запросы, формирует корректные SQL-запросы к базе данных и возвращает данные обратно по прямому туннелю в веб-консоль.&nbsp;&nbsp;</p>
+
+<p>Настройка UserGate SIEM также может выполняться с использованием интерфейса командной строки посредством модуля CLI. Команды интерфейса CLI реализованы с помощью API.</p>
+
+<p></p>
+
+
+            
+
+        </div>
+    </div>
+
+    <div style="clear: both;"></div>
+
+	<div>
+		<script src="https://docs.usergate.com/client/jscript/jquery/jquery.MetaData.js?v=c8f98b33"></script>
+<script src="https://docs.usergate.com/client/jscript/jquery/jquery.rating.js?v=c8f98b33"></script>
+<link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/jquery.rating.css?v=c8f98b33" />
+<script>
+    $(document).ready(function(){
+        $('.auto-submit-star').rating({
+            callback: function(value, link){
+                xajax_doRate(value, 'spinner');
+            }
+        });
+    });
+    
+    
+    function slideToTextarea() {
+        $('html, body').animate({    
+            scrollTop: $('#rate_feedback').offset().top - 30
+        }, 500, 'swing', function() {
+            $('#rate_feedback').focus();
+        });
+    }
+    
+    
+    function toggleReportForm() {
+        if ($('#rateFeedbackForm:visible').length) {
+           $('#rateFeedbackForm').slideUp();
+           
+        } else {
+            $('#comment_rate_neg').hide();
+            $('#comment_rate_pos').hide();
+            $('#comment_report').show();
+            
+            $('#rateFeedbackForm').slideDown();
+            // slideToTextarea();
+            
+            var cl = $('#report_block').attr('class');
+            var float = (cl == 'fleft') ? 'left' : 'right';
+            
+            $('#rateFeedbackForm').css('float', float);
+            $('#rate_rating').val(0);
+        }
+    }
+    
+    
+    function showReportPanel() {
+        ModalManager.show('panel_report', 'middle');
+    }
+        
+
+    function closeReportPanel(do_empty) {
+        ModalManager.hide('panel_report');
+        if(do_empty) {
+            $('#rate_feedback2').val('');
+        }
+    }
+    
+</script>
+
+<div style="clear: both"></div>
+<div class="smallerText" style="padding: 8px 5px;  border-top: 1px solid #D4D4D4;margin-bottom: 20px;">
+    <div style="padding: 5px 3px;">    
+        
+        
+            <span id="spinner" style="margin-left: 5px;display: none;">
+                <img src="https://docs.usergate.com/client/images/ajax/indicator.svg" alt="" />
+            </span>
+        
+            <span id="rateQuery" style="float: left;">
+                <span style="float: left; margin-right: 5px;">Эта статья была:&nbsp;&nbsp;</span>
+                <span style="float: left; margin-right: 20px;">
+                
+                    <a href="#rate" onclick="xajax_doRate(10, 'spinner'); return false;" 
+                        class="abbLink" rel="nofollow">Полезна</a> | 
+                
+                    <a href="#rate" onclick="xajax_doRate(1, 'spinner'); return false;" 
+                        class="abbLink" rel="nofollow">Не полезна</a>
+                
+                
+                </span>
+            </span>     
+        
+            <span id="rateResponce" style="display: none;float: left;">
+                Спасибо за Ваш отзыв!
+            </span>
+		
+    		<!-- <span id="currentRating" class="fright">
+                
+            </span> -->
+		
+        
+        
+        <!-- report issue -->
+        
+    
+        
+	
+    </div>
+</div>
+
+
+
+	</div>
+
+    <div class="abbBlock">
+        <script>
+    $(document).ready(function() {
+        PoolManager.stick_msg = "Закрепить";
+        PoolManager.unstick_msg = "Открепить";
+    });
+</script>
+<script src="https://docs.usergate.com/client/jscript/PoolManager.js?v=c8f98b33"></script>
+
+<div class="grid-x">
+
+    
+    <div class="small-12 medium-3 auto cell abBgrDarker">   
+        <div class="space">
+            ID статьи: 1900
+        </div>
+        
+        <div class="space">
+            Последнее обновление: <span class="date_updated">13 May, 2026</span>
+        </div>
+        
+        <div class="space">
+            Ревизия: 8
+        </div>
+        
+        
+        
+    </div>    
+    
+    
+    
+            
+    
+    <div class="small-12 medium-3 auto cell abBgrDarker nowrap">
+        
+            <div class="less_space">Просмотры: 9451</div>
+        
+        
+        
+            <div class="less_space">Комментарии: 0</div>
+        
+    </div>
+    
+    
+    
+    
+</div>
+        
+
+
+    </div>
+
+</div>
+
+<div class="grid-x">
+	<div class="tdSubTitle small-12 medium-3 cell auto hide-for-small-only">
+        <a href="https://docs.usergate.com/vvedenie-680/" title="Введение" class="nextprev">
+            <span class="smallerText">Пред.</span>
+        </a>
+    </div>
+    <div class="tdSubTitle small-12 medium-3 cell hide-for-small-only" style="text-align: right;">
+    	<a href="https://docs.usergate.com/licenzirovanie-681/" title="Лицензирование" class="nextprev">
+            <span class="smallerText">След.</span>
+        </a>
+	</div>
+</div>
+<div class="grid-x">
+    <div class="tdSubTitle small-12 medium-3 cell auto">
+        <a href="https://docs.usergate.com/vvedenie-680/" class="noformat" title="Введение">
+        	<span class="smallerText show-for-small-only">&laquo;</span>
+            <span class="smallerText">Введение</span>
+        </a>
+    </div>
+    <div class="tdSubTitle small-12 medium-3 cell" style="text-align: right;">
+        <a href="https://docs.usergate.com/licenzirovanie-681/" class="noformat"  title="Лицензирование">
+            <span class="smallerText">Лицензирование</span>
+            <span class="smallerText show-for-small-only">&raquo;</span>
+        </a>
+    </div>
+</div>
+<br />
+    			        </div>
+			
+    			    </td>
+    			</tr>
+    			</table>
+			
+    			<div class="bottom" style="clear: left;">
+			
+    			    
+<!--     			    <div class="fright">
+    			        <a href="https://docs.usergate.com/rssfeed/">
+                            <img src="https://docs.usergate.com/client/images/icons/rss_feed_color.svg" title="RSS"
+                                width="16" height="16" alt="rss" />
+    			        </a>
+    			    </div> -->
+    			    
+                    <!-- Custom Footer -->
+                    <div class="custom_footer">
+                                                <div class='footer_container'>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href='https://www.usergate.com/ru/company/about-us'>О компании</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href='https://www.usergate.com/ru/products'>Продукты</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://support.usergate.com/ru"> Поддержка </a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://support.usergate.com/ru/technical-documentation">Техническая документация</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://docs.usergate.com/avtorizovannoe-obuchenie-i-sertifikaciya_1335.html">Обучение от Академии UserGate</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div  class="non_custom_footer">
+                        <div class='footer_container'>
+                            <div class='custom_footer_item line_item'>
+                                <a class="white" href="https://www.usergate.com/ru/terms-of-use">
+                                    Условия использования
+                                </a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class="white" href="https://www.usergate.com/ru/privacy-policy">
+                                    Конфиденциальность
+                                </a>
+                            </div>
+                            <div class='custom_footer_item white float-right' >
+                                <a href="https://usergate.com/ru">Copyright © 2001&ndash;2026 <a href="https://www.usergate.com/ru/" title="UserGate" target="_blank">UserGate</a></a>,
+                                <a href="https://www.kbpublisher.com/" title="KBPublisher" target="_blank"> Powered by KBPublisher</a>
+
+                            </div>
+                           
+                    <!--  End Custom Footer -->
+
+
+			
+    			   <!--  <div class="copyright" style="text-align: left;">
+    			        Copyright © 2001&ndash;2026 <a href="https://www.usergate.com/ru/" title="UserGate" target="_blank">UserGate</a>
+    			    </div> -->
+                    
+    			</div>
+                                
+            </div> <!--  in_content  -->
+            
+         </div>
+         
+        <!-- <div id="custom_footer">
+                                    <div class='footer_container'>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href='https://www.usergate.com/ru/company/about-us'>О компании</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href='https://www.usergate.com/ru/products'>Продукты</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://support.usergate.com/ru"> Поддержка </a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://support.usergate.com/ru/technical-documentation">Техническая документация</a>
+                            </div>
+                            <div class='custom_footer_item'>
+                                <a class='dark' href="https://docs.usergate.com/avtorizovannoe-obuchenie-i-sertifikaciya_1335.html">Обучение от Академии UserGate</a>
+                            </div>
+                        </div>
+        </div> -->
+         
+    	
+         
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://docs.usergate.com/client/skin/jquery/icheck/skins/square/blue.css?v=c8f98b33" />
+<style>
+    #search_bar {
+        z-index: 101;
+        text-align: center;
+        display: none;
+        font-size: 14px;
+        background: transparent !important;
+    }
+    
+    #search_bar_container2 {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    #search_bar_container {
+/*        position: relative;*/
+        padding: 0 5px 0 3px;
+        margin-top: 30px;
+    }
+        
+    #search_bar_container input {
+/*         position: relative;*/
+        width: 90%;
+        margin-top: 0px;
+    }
+    
+    #search_bar_container svg { 
+        float: right;
+/*        position: absolute;*/
+/*        top: 15px;*/
+/*        left: 580px;*/
+    }
+    
+    #search_field {
+        margin-top: 14px;
+/*        padding: 5px 0;*/
+        margin-bottom: 5px;
+        width: 100%;
+        color: black !important;
+        border: 0;
+        color: white;
+        outline: none;
+    }
+    
+    #search_bar input::placeholder {
+        color: #cccccc;
+    }
+    
+    #search_suggestions {
+        z-index: 999999999 !important;
+        width: 750px !important;
+        min-width: 750px;
+        font-family: "Fira Sans", Tahoma, Verdana, Arial, Helvetica, sans-serif !important;
+        border: 0;
+        min-height: 242px;
+    }
+    
+    #search_suggestions h3 {
+        color: #888;
+        padding: 10px 0 10px 79px;
+        font-weight: normal; 
+        opacity: 1;
+    }
+    
+    #search_suggestions li a {
+        margin: 0 81px !important;
+        padding-left: 5px !important;
+    }
+    
+    #search_suggestions li:last-child {
+        padding-bottom: 20px;
+    }
+    
+    #search_menu {
+        background: #fff;
+        border-top: 1px solid #ccc;
+        text-align: left;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        margin-top: -3px;
+    }
+</style>
+<script src="https://docs.usergate.com/client/jscript/jquery/icheck.min.js?v=c8f98b33"></script>
+<script src="https://docs.usergate.com/client/jscript/SearchBar.js?v=c8f98b33"></script>
+<script>
+    $(document).ready(function() {
+        $('#search_bar2 input[type=radio]').iCheck({
+            radioClass: 'iradio_square-blue'
+        });
+        
+        
+        SearchBar.suggestions_msg = 'Подсказки поиска';
+        SearchBar.init('https://docs.usergate.com/endpoint.php?type=suggest', 'search_field', 'left-75 top+5', 'search_menu');
+        
+    });
+    
+    function selectSearchOption(key) {
+        $('#search_bar input[type="checkbox"]').not('#' + key).prop('checked', false);
+        $('#search_bar input[type="checkbox"]').iCheck('update');
+    }
+</script>
+
+<div id="search_bar2" style="display: none;">
+    <div id="search_bar_container2">
+        <form action="https://docs.usergate.com/search/" id="search_form"
+            onsubmit="return validateQuickSearch('Пожалуйста введите ключевое слово или ID', 'search_field');">
+            
+            <input type="hidden" name="s" value="1" />
+            
+            <div id="search_bar_container">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" class="login" viewBox="0 0 24 24"
+                    style="cursor: pointer; width: 15px; height: 15px;"
+                    onclick="$('#search_form').submit();">
+                    <path fill="#666" d="M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z"/>
+                </svg>
+                
+                <input type="text" id="search_field" name="q" placeholder="Поиск" />
+            </div>
+        
+            <aside id="search_menu">
+                <section style="padding-bottom: 26px;">
+                <h3 style="color: #888;padding: 10px 0 0 7px;font-weight: normal;">Искать в</h3>
+                <ul style="list-style: none;">
+                    
+                    <li class="selected" style="padding-bottom: 7px;">
+                        <input type="radio" id="all" name="in" value="all"  checked 
+                            onclick="selectSearchOption('all');" />
+                        
+                        <label for="all" 
+                            style="display: inline;text-align: left;padding-left: 12px;cursor: pointer;" 
+                            onclick="selectSearchOption('all');">
+                            Все содержимое
+                        </label>
+                    </li>
+                    
+                    <li class="" style="padding-bottom: 7px;">
+                        <input type="radio" id="category" name="in" value="article" data-category="680" 
+                            onclick="selectSearchOption('article');" />
+                        
+                        <label for="category" 
+                            style="display: inline;text-align: left;padding-left: 12px;cursor: pointer;" 
+                            onclick="selectSearchOption('article');">
+                            В этой категории
+                        </label>
+                    </li>
+                    
+                    <li class="" style="padding-bottom: 7px;">
+                        <input type="radio" id="article" name="in" value="article"  
+                            onclick="selectSearchOption('article');" />
+                        
+                        <label for="article" 
+                            style="display: inline;text-align: left;padding-left: 12px;cursor: pointer;" 
+                            onclick="selectSearchOption('article');">
+                            Статьи
+                        </label>
+                    </li>
+                    
+                </ul>
+                <div id="advanced_link">
+                    <img src="https://docs.usergate.com/client/images/icons/gear.gif" alt="gear" 
+                        style="margin: 0 4px 0 5px; vertical-align: middle;" />
+                    <a href="https://docs.usergate.com/search/">Расширенный поиск</a>
+                </div>
+                <div style="clear: both;"></div>
+                </section>
+            </aside>
+        
+        </form>
+    </div>
+</div>
+
+
+
+<div id="loading_spinner"><div></div></div>
+
+	<script>
+var xajaxRequestUri="https://docs.usergate.com/entry/1900/?ajax=1";
+var xajaxDebug=false;
+var xajaxStatusMessages=false;
+var xajaxWaitCursor=true;
+var xajaxDefinedGet=0;
+var xajaxDefinedPost=1;
+var xajaxLoaded=false;
+function xajax_doSubscribe(){return xajax.call("doSubscribe", arguments, 1);}
+function xajax_validate(){return xajax.call("validate", arguments, 1);}
+function xajax_doRate(){return xajax.call("doRate", arguments, 1);}
+function xajax_doRateFeedback(){return xajax.call("doRateFeedback", arguments, 1);}
+function xajax_saveTitle(){return xajax.call("saveTitle", arguments, 1);}
+function xajax_loadNotificationList(){return xajax.call("loadNotificationList", arguments, 1);}
+function xajax_dismissNotification(){return xajax.call("dismissNotification", arguments, 1);}
+function xajax_getCategoryChildren(){return xajax.call("getCategoryChildren", arguments, 1);}
+function xajax_loadEntries(){return xajax.call("loadEntries", arguments, 1);}
+	</script>
+	<script src="https://docs.usergate.com/client/jscript/xajax_js/xajax.js"></script>
+	<script>
+window.setTimeout(function () { if (!xajaxLoaded) { alert('Error: the xajax Javascript file could not be included. Perhaps the URL is incorrect?\nURL: https://docs.usergate.com/client/jscript/xajax_js/xajax.js'); } }, 6000);
+	</script>
+<script src="https://docs.usergate.com/client/jscript/xajax_js/spiner.js"></script>
+
+
+    <div class='upDown'>
+        <!-- Injected UserGate`s Code -->
+        <div id="toTop" class='arrowBtn'>&nbsp;</div>
+        <div id="toBottom" class='arrowBtn'>&nbsp;</div>
+    </div>
+</body>
+</html>

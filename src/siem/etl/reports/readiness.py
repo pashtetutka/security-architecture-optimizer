@@ -12,7 +12,8 @@ def _vendor_document_status(raw: dict, sid: str, relevant_ids: set[str]) -> dict
     documents=[d for d in vendor.get('source_results', []) if d.get('source_id') in relevant_ids]
     counts=dict(Counter(x.get('status','unknown') for x in documents))
     return {'registered':len(documents),'statuses':counts,
-            'failed_urls':[d.get('url') for d in documents if d.get('status')=='error'],
+            'failed_urls':[d.get('url') for d in documents if d.get('status') in
+                           ('error', 'robots_unavailable', 'access_disallowed', 'missing_local_document')],
             'empty_urls':[d.get('url') for d in documents if d.get('status')=='empty_review_required']}
 
 
@@ -25,14 +26,37 @@ def readiness_report(catalog: dict, raw: dict | None = None) -> dict:
     unparsed=defaultdict(list)
     for missing in catalog.get('unparsed_system_documents',[])+catalog.get('unread_system_documents',[]):
         unparsed[missing['siem_id']].append(missing)
+    partial=defaultdict(list)
+    for missing in catalog.get('partial_system_documents',[]):
+        partial[missing['siem_id']].append(missing)
     source_problems=defaultdict(list)
     for missing in catalog.get('unread_source_catalog_documents',[]):
         source_problems[missing['siem_id']].append(missing)
     result=[]
+    targeted_source_docs = {
+        'p02': {'overview'}, 'p04': {'configuration', 'connectors_syslog',
+                                    'connectors_beats', 'connectors_jdbc', 'connectors_snmp'},
+        'p05': {'source_product'},
+        'p06': {'partial_sources', 'supported_sources', 'supported_sources_api'},
+        'p09': {'architecture'}, 'p11': {'architecture', 'source_whitepaper'},
+    }
+    targeted_system_docs = {
+        'p05': {'product_document'}, 'p07': {'product'},
+        'p10': {'product_docs'}, 'p04': {'configuration'},
+    }
     for info in catalog.get('coverage',[]):
         sid=info['siem_id']; src=integrations[sid]; prof=profiles[sid]; req=requirements[sid]
-        source_docs=_vendor_document_status(raw,sid,{'sources','source_catalog','sources_catalog','parsers'})
-        sys_docs=_vendor_document_status(raw,sid,{'hardware_requirements','system_requirements','deployment','architecture','platform_architecture'})
+        source_docs=_vendor_document_status(raw,sid,
+            {'sources','source_catalog','sources_catalog','parsers'} | targeted_source_docs.get(sid, set()))
+        sys_docs=_vendor_document_status(raw,sid,
+            {'hardware_requirements','system_requirements','deployment','architecture','platform_architecture'}
+            | targeted_system_docs.get(sid, set()))
+        vendor_raw = next((v for v in raw.get('vendors', []) if v.get('id') == sid), {})
+        unavailable = [{'source_id': d.get('source_id'), 'status': d.get('status'),
+                        'url': d.get('url'), 'reason': d.get('error')}
+                       for d in vendor_raw.get('source_results', [])
+                       if d.get('status') in ('error', 'robots_unavailable',
+                                              'access_disallowed', 'missing_local_document')]
         source_status=('not_extracted' if not src else 'extracted_needs_review')
         system_status=('not_extracted' if not (prof or req) else 'extracted_needs_review')
         reasons=[]
@@ -50,7 +74,9 @@ def readiness_report(catalog: dict, raw: dict | None = None) -> dict:
             if any(r.get('sizing_complete') is False for r in req):
                 reasons.append('incomplete_conditioned_capacity_example')
         if unparsed[sid]:reasons.append('system_documents_not_fully_parsed')
+        if partial[sid]:reasons.append('system_documents_partially_parsed')
         if source_problems[sid]:reasons.append('source_documents_unreadable')
+        if unavailable:reasons.append('registered_documents_unavailable')
         # Calculations are explicitly gated by human review and coverage signoff.
         result.append({
             'siem_id':sid,'siem_name':info.get('siem_name'),
@@ -58,8 +84,10 @@ def readiness_report(catalog: dict, raw: dict | None = None) -> dict:
                                  'documents':source_docs,'unread_documents':len(source_problems[sid])},
             'system_requirements':{'status':system_status,'sizing_profiles':len(prof),
                                    'typed_rules':len(req),'documents':sys_docs,
-                                   'unprocessed_documents':len(unparsed[sid])},
+                                   'unprocessed_documents':len(unparsed[sid]),
+                                   'partially_parsed_documents':len(partial[sid])},
             'calculation_ready':False,'readiness_basis':'automatic_extract_only',
+            'unavailable_documents': unavailable,
             'blocking_reasons':list(dict.fromkeys(reasons)),
         })
     return {'schema_version':'focused-siem-etl-readiness/1.0',

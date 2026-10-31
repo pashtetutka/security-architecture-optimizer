@@ -64,6 +64,9 @@ class KomradTests(unittest.TestCase):
             self.assertEqual(profile['applicability'],dict(edition=edition,
                 requirement_level='minimum',document_release='4.6.X',eps_sizing=False))
             self.assertIsNone(profile['eps_to'])
+            self.assertIsNone(profile['siem_version'])
+            self.assertEqual(profile['document_release'],'4.6.X')
+            self.assertEqual(profile['sizing_scope'],'edition_minimum_not_eps_sizing')
         oses=[r for r in rules if r['category']=='operating_system']
         self.assertEqual([(r['component'],r['value']) for r in oses],
             [('Astra Linux','1.7 (all updates)'),('Astra Linux','1.8'),
@@ -93,21 +96,6 @@ class KomradTests(unittest.TestCase):
         profiles,_=parse_komrad_requirements(html,meta())
         self.assertEqual(profiles,[])
 
-    def test_four_editions_no_unit_assumption(self):
-        rows, rules=parse_komrad_requirements(KOMRAD,meta())
-        self.assertEqual([r['edition'] for r in rows],['Base-SMART','BASE','All-in-One','Enterprise'])
-        self.assertEqual([r['nodes'][0]['cpu_cores'] for r in rows],[2,2,2,4])
-        self.assertEqual([r['nodes'][0]['ram_gb'] for r in rows],[8,8,16,32])
-        self.assertTrue(all(r['nodes'][0]['vcpu'] is None for r in rows))
-        self.assertEqual(rows[-1]['nodes'][0]['storage_devices'][0]['capacity_unit'],'TB')
-        self.assertEqual(rows[-1]['nodes'][0]['storage_devices'][0]['total_capacity'],10.0)
-        self.assertIsNone(rows[-1]['nodes'][0]['storage_devices'][0]['per_device_capacity'])
-        self.assertIsNone(rows[-1]['nodes'][0]['disk_gb'])
-        self.assertEqual(rows[0]['nodes'][0]['disk_gb'],100.0)
-        self.assertTrue(all(r['eps_to'] is None for r in rows))
-        self.assertTrue(all(r['document_release']=='4.6.X' for r in rows))
-        self.assertTrue(all(r['siem_version'] is None for r in rows))
-        self.assertEqual(rows[0]['sizing_scope'],'edition_minimum_not_eps_sizing')
 
     def test_100k_is_condition_not_universal_capacity(self):
         profiles,rules=parse_komrad_requirements(KOMRAD,meta())

@@ -152,7 +152,8 @@ def parse_komrad_catalog(html: str, meta: dict) -> list[dict]:
         href=link.get('href','')
         # Don't include navigation, sibling docs or unrelated cross-links.
         if '/collect/sources/' not in href:continue
-        name=clean(link.get_text(' ',strip=True))
+        # Docusaurus prepends a document icon to each link's visible text.
+        name=re.sub(r'^[\s📄\ufe0f]+', '', clean(link.get_text(' ',strip=True)))
         if len(name)<3 or len(name)>100 or name.casefold() in ('источники событий','назад','далее'):continue
         absolute=urljoin(meta['url'],href)
         key=(name.casefold(),absolute)

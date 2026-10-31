@@ -87,3 +87,100 @@ def parse_alertix_all_in_one(html: str, meta: dict) -> list[dict]:
         if profiles:
             return profiles
     return []
+
+
+def parse_alertix_faq(html: str, meta: dict) -> tuple[list[dict], list[dict]]:
+    """Extract only explicit collection and host OS claims from the saved FAQ."""
+    soup = BeautifulSoup(html, 'html.parser')
+    paragraphs = soup.select('p')
+    sources, requirements = [], []
+    for p in paragraphs:
+        statement = clean(p.get_text(' ', strip=True))
+        if ('WEC-коллектор' in statement and 'встроенный WEC-ресивер' in statement
+                and 'событий' in statement):
+            sources.append({
+                'siem_id': meta['siem_id'], 'siem_name': meta['siem_name'],
+                'siem_version': None, 'siem_version_hint': document_nullable(meta.get('product_version_hint')),
+                'source_name': 'Windows event logs', 'source_vendor': None,
+                'source_family': None, 'source_variant': None, 'source_version': None,
+                'collection_method': 'WEC', 'normalizer_id': None, 'normalizer_format': None,
+                'integration_evidence': 'published_collection_path',
+                'functional_integration_verified': False, 'review_status': 'extracted_unverified',
+                'evidence': [document_evidence(meta, statement, 'alertix_faq_wec', 'FAQ: сбор событий Windows')],
+            })
+        if statement == 'Серверную часть Alertix можно установить на ОС:':
+            listing = p.find_next_sibling('ul')
+            if listing is None:
+                continue
+            for item in listing.find_all('li', recursive=False):
+                name = clean(item.get_text(' ', strip=True)).rstrip(';.')
+                if name not in ('Ubuntu', 'Astra Linux SE', 'РЕД ОС'):
+                    continue
+                requirements.append({
+                    'siem_id': meta['siem_id'], 'siem_name': meta['siem_name'],
+                    'siem_version': None, 'siem_version_hint': document_nullable(meta.get('product_version_hint')),
+                    'category': 'operating_system', 'component': name,
+                    'property': 'supported_host_os', 'operator': '=', 'value': name,
+                    'unit': 'operating_system', 'strength': 'supported',
+                    'scenario': 'server_installation', 'applies_to': 'alertix_server',
+                    'review_status': 'extracted_unverified',
+                    'evidence': document_evidence(meta, statement + ' ' + clean(item.get_text(' ', strip=True)),
+                                                  'alertix_faq_host_os', 'FAQ: серверная ОС'),
+                })
+    return sources, requirements
+
+
+def parse_alertix_architecture(html: str, meta: dict) -> list[dict]:
+    soup = BeautifulSoup(html, 'html.parser')
+    for p in soup.select('p'):
+        statement = clean(p.get_text(' ', strip=True))
+        match = re.search(r'при соблюдении аппаратных требований.{0,250}?до\s+(\d[\d\s]*)\s+событий в секунду,\s*измеряемую на усредненном недельном интервале', statement, re.I)
+        if not match:
+            continue
+        return [{
+            'siem_id': meta['siem_id'], 'siem_name': meta['siem_name'],
+            'siem_version': None, 'siem_version_hint': document_nullable(meta.get('product_version_hint')),
+            'category': 'capacity_condition', 'component': 'platform_deployment',
+            'property': 'published_eps_capacity', 'operator': '<=',
+            'value': int(re.sub(r'\s+', '', match.group(1))), 'unit': 'EPS',
+            'strength': 'conditional', 'scenario': 'hardware_requirements_met',
+            'applies_to': 'one_or_more_computing_units', 'averaging_interval': 'one_week',
+            'sizing_complete': False, 'reason': 'full_hardware_requirements_in_separate_document',
+            'review_status': 'extracted_unverified',
+            'evidence': document_evidence(meta, statement, 'alertix_architecture_conditional_capacity',
+                                          'Архитектура платформы'),
+        }]
+    return []
+
+
+def parse_alertix_connectors(html: str, meta: dict, receiver: str) -> list[dict]:
+    """Rows from the four published 3.9.1 receiver connector tables."""
+    if receiver not in {'Syslog', 'Beats', 'JDBC', 'SNMP'}:
+        return []
+    soup = BeautifulSoup(html, 'html.parser')
+    for table in soup.select('table'):
+        rows = table_rows(table)
+        if not rows or rows[0] != ['Источник', 'Производитель', 'Тип']:
+            continue
+        result = []
+        for row in rows[1:]:
+            if len(row) != 3 or not row[0] or not row[1]:
+                continue
+            name, maker, source_type = row
+            result.append({
+                'siem_id': meta['siem_id'], 'siem_name': meta['siem_name'],
+                'siem_version': None,
+                'siem_version_hint': document_nullable(meta.get('product_version_hint')),
+                'source_name': name, 'source_vendor': None if maker == 'Различные' else maker,
+                'source_family': source_type or None, 'source_variant': None,
+                'source_version': None, 'collection_method': receiver,
+                'normalizer_id': None, 'normalizer_format': None,
+                'integration_evidence': 'published_connector_table',
+                'functional_integration_verified': False,
+                'review_status': 'extracted_unverified',
+                'evidence': [document_evidence(meta, ' | '.join(row),
+                                               'alertix_connector_table',
+                                               f'Перечень коннекторов {receiver} ресивера')],
+            })
+        return result
+    return []
