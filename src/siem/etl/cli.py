@@ -5,6 +5,7 @@ import argparse
 import sys
 
 from .commands import collection, normalization, review
+from .console import configure_console
 
 COMMANDS = {
     'check': (normalization.main, 'Create a local HTML overview and run project tests'),
@@ -22,6 +23,7 @@ COMMANDS = {
 
 
 def main(argv=None):
+    configure_console()
     parser = argparse.ArgumentParser(description='SIEM documentation ETL')
     subparsers = parser.add_subparsers(dest='command', required=True)
     for command, (_, description) in COMMANDS.items():

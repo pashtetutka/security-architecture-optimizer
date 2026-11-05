@@ -10,6 +10,7 @@ import json
 from ..coverage import match_inventory
 from ..vendors.rusiem import parse_html, URL
 from ..pdf_docs import find_candidates
+from ..console import configure_console
 
 AGENT = 'SIEMResearchETL/0.3 (non-commercial academic prototype)'
 
@@ -36,6 +37,7 @@ def download_vendor_page() -> str:
 
 
 def main(argv=None):
+    configure_console()
     parser = argparse.ArgumentParser(description='ETL evidence / RuSIEM sources / PT PDF review')
     sub = parser.add_subparsers(dest='command',required=True)
     extract = sub.add_parser('rusiem',help='Extract vendor source list')

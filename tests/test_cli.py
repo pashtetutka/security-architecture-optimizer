@@ -2,6 +2,7 @@
 import hashlib
 import io
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -61,9 +62,31 @@ class CLITests(unittest.TestCase):
         for module in ('siem.etl', 'siem.etl.cli', 'siem.etl.all_cli', 'siem.etl.focused_cli'):
             with self.subTest(module=module):
                 result = subprocess.run([sys.executable, '-m', module, '--help'],
-                                        capture_output=True, text=True)
+                                        capture_output=True, encoding='utf-8')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn('usage:', result.stdout)
+
+    def test_russian_cli_output_is_utf8_under_cp1252(self):
+        env = dict(os.environ, PYTHONUTF8='0', PYTHONIOENCODING='cp1252')
+        for module, args, expected in (
+            ('siem.etl', ['crawl', '--help'], 'Показать URL'),
+            ('siem.etl.cli', ['normalize', '--help'], 'Добавить документы'),
+            ('siem.etl.all_cli', ['--help'], 'условная оценка'),
+            ('siem.etl.focused_cli', ['--help'], 'Нормализация'),
+            ('siem.etl.commands.collection', ['crawl', '--dry-run', '--only', 'p02'], 'СёрчИнформ SIEM'),
+            ('siem.etl.commands.normalization', ['--help'], 'Нормализация'),
+        ):
+            with self.subTest(module=module):
+                result = subprocess.run([sys.executable, '-m', module, *args], env=env,
+                                        capture_output=True, encoding='utf-8')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(expected, result.stdout)
+        with TemporaryDirectory() as temp:
+            result = subprocess.run([sys.executable, '-m', 'siem.etl', 'check',
+                                     '--etl', str(Path(temp)/'missing.json')],
+                                    env=env, capture_output=True, encoding='utf-8')
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('Не найден входной JSON', result.stderr)
 
     def test_normalize_real_komrad_snapshot_and_report(self):
         snapshot = Path(__file__).parent / 'fixtures/komrad_prerequisites_4_6.html'

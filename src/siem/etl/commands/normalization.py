@@ -6,6 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 from ..catalog import build_catalog, write_catalog, locate_snapshot
 from ..reports.overview import write_overview, write_latest_report
+from ..console import configure_console
 
 
 def load_inputs(paths):
@@ -41,6 +42,7 @@ def load_inputs(paths):
 
 
 def main(argv=None):
+    configure_console()
     p=argparse.ArgumentParser(description='Нормализация ТОЛЬКО источников событий и системных требований')
     sub=p.add_subparsers(dest='command',required=True)
     n=sub.add_parser('normalize',help='Нормализовать результат ETL, используя локальные снимки')

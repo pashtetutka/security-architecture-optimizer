@@ -24,7 +24,8 @@ class CollectionTests(unittest.TestCase):
   f=extract_content(b'<html><p>We require Kubernetes for event collection in this version.</p></html>','generic')['facts']
   self.assertEqual(f[0]['evidence_status'],'review_candidate')
  def test_all_13_vendor_status_even_failures(self):
-  manifest=json.loads((ROOT/'data/etl/vendors.json').read_text())
+  manifest=json.loads((ROOT/'data/etl/vendors.json').read_text(encoding='utf-8'))
+  self.assertEqual(next(v for v in manifest['vendors'] if v['id']=='p02')['name'], 'СёрчИнформ SIEM')
   maxpatrol=next(v for v in manifest['vendors'] if v['id']=='p06')
   enabled={s['id'] for s in maxpatrol['sources'] if s.get('enabled',True)}
   self.assertNotIn('partial_sources',enabled);self.assertIn('supported_sources_api',enabled)

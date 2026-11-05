@@ -6,6 +6,7 @@ from ..pipeline import collect
 from ..fetcher import PublicFetcher
 from ..applicability import evaluate
 from ..catalog import locate_snapshot
+from ..console import configure_console
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def write(path,data):
@@ -13,6 +14,7 @@ def write(path,data):
  path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 def main(argv=None):
+ configure_console()
  p=argparse.ArgumentParser(description='ETL всех 13 SIEM и условная оценка применимости')
  sub=p.add_subparsers(dest='cmd',required=True)
  crawl=sub.add_parser('crawl',help='Скачать официальные источники (robots, HTTPS, без обхода всего домена)')
