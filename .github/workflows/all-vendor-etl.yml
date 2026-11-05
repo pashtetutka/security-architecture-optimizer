@@ -1,5 +1,7 @@
-name: SIEM vendor ETL (13 vendors)
+name: SIEM ETL
 on:
+  push:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '25 5 * * 1'
@@ -7,27 +9,38 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            python: '3.10'
+          - os: ubuntu-latest
+            python: '3.12'
+          - os: macos-latest
+            python: '3.12'
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python }}
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests -v
       - name: Verify bundled offline evidence
-        run: python -m siem.etl check --etl data/etl/repro/vendors.json --output-dir results/repro-check --no-tests
+        run: python -m siem.etl check --etl data/etl/repro/vendors.json --automatic-only --output-dir results/repro-check --no-tests
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: siem-etl-repro
+          name: siem-etl-repro-${{ matrix.os }}
           path: |
             data/etl/repro/vendors.json
             data/etl/repro/raw/
             results/repro-check/
           retention-days: 30
   collect:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -37,7 +50,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -e .
       - name: Download official published materials
-        run: python -m siem.etl crawl --output results/siem-etl.json --snapshot-dir results/raw
+        run: python -m siem.etl crawl --exclude-restricted-documents --output results/siem-etl.json --snapshot-dir results/raw
       - name: All-vendor status
         run: python -m siem.etl status --etl results/siem-etl.json
       - name: Normalize snapshots and generate quality reports

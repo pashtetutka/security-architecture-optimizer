@@ -1,0 +1,81 @@
+"""Stable, conservative identities for published event-source names."""
+from __future__ import annotations
+
+from collections import defaultdict
+
+from .coverage import ALIAS, canonical
+
+
+def identity_name(row: dict) -> str:
+    """Only curated product aliases may discard a catalog family prefix."""
+    variant = row.get('source_variant')
+    if variant and canonical(variant) in set(ALIAS.values()):
+        return variant
+    return row['source_name']
+
+
+def source_entity_id(name: str) -> str:
+    """Return an identity key; retain the vendor spelling separately."""
+    return 'source:' + canonical(name)
+
+
+def source_vendor_entity_id(name: str | None) -> str | None:
+    return None if not name else 'vendor:' + canonical(name)
+
+
+def version_kind(value: str | None) -> str:
+    if not value:
+        return 'unknown'
+    lowered = value.casefold()
+    if any(token in lowered for token in ('—', '–', '-', 'выше', 'ниже', 'до ')):
+        return 'range_or_open_ended'
+    if ',' in value or ';' in value or ' и ' in lowered:
+        return 'listed_values'
+    return 'published_value'
+
+
+def type_integrations(rows: list[dict]) -> list[dict]:
+    for row in rows:
+        row['source_name_raw'] = row['source_name']
+        # A structured catalog variant is the product identity.  The display
+        # name can include a broader family, such as "1C 8.3 <variant>".
+        name = identity_name(row)
+        row['source_identity_basis'] = ('source_variant' if name == row.get('source_variant')
+                                        else 'source_name')
+        row['source_entity_id'] = source_entity_id(name)
+        row['source_identity_name_raw'] = name
+        row['source_vendor_entity_id'] = source_vendor_entity_id(row.get('source_vendor'))
+        row['source_version_raw'] = row.get('source_version')
+        row['source_version_kind'] = version_kind(row.get('source_version'))
+    return rows
+
+
+def unique_source_values(rows: list[dict]) -> dict:
+    """Auditable enumeration of values without collapsing support claims."""
+    entities: dict[str, dict] = {}
+    fields = ('source_name', 'source_vendor', 'source_version', 'collection_method',
+              'normalizer_id', 'normalizer_format', 'support_scope', 'source_version_kind')
+    values = {field: defaultdict(int) for field in fields}
+    for row in rows:
+        entity = entities.setdefault(row['source_entity_id'], {
+            'source_entity_id': row['source_entity_id'], 'display_names': set(),
+            'source_vendor_entity_ids': set(), 'siem_ids': set(), 'support_claims': 0,
+        })
+        entity['display_names'].add(row.get('source_identity_name_raw', row['source_name_raw']))
+        if row.get('source_vendor_entity_id'):
+            entity['source_vendor_entity_ids'].add(row['source_vendor_entity_id'])
+        entity['siem_ids'].add(row['siem_id'])
+        entity['support_claims'] += 1
+        for field in fields:
+            if row.get(field) is not None:
+                values[field][str(row[field])] += 1
+    return {
+        'summary': {'support_claims': len(rows), 'source_entities': len(entities)},
+        'entities': [{**item, 'display_names': sorted(item['display_names']),
+                      'source_vendor_entity_ids': sorted(item['source_vendor_entity_ids']),
+                      'siem_ids': sorted(item['siem_ids'])}
+                     for _, item in sorted(entities.items())],
+        'values': {field: [{'value': value, 'support_claims': count}
+                           for value, count in sorted(group.items())]
+                   for field, group in values.items()},
+    }

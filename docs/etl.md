@@ -49,18 +49,20 @@ python -m siem.etl quality --etl "$runDir/vendors.json"
 Пример для сохранённого официального CA и публичного API MaxPatrol:
 
 ```powershell
-$caPath = (Get-ChildItem results/tls_retry_20261031_a/raw -Filter 'tls_official_root*').FullName
+$caPath = 'C:\certificates\vendor-root.pem' # заранее полученный и проверенный CA
 $runDir = "results/collect_$(Get-Date -Format yyyyMMdd_HHmmss)_$((New-Guid).Guid.Substring(0,8))"
 python -m siem.etl crawl --only p06 --host-ca "help.ptsecurity.com=$caPath" --output "$runDir/vendors.json" --snapshot-dir "$runDir/raw"
 python -m siem.etl normalize --etl "$runDir/vendors.json" --output-dir "$runDir/normalized"
 ```
 
 Для MaxPatrol режим `maxpatrol_api` сохраняет оригинальный JSON с HTML-таблицей.
-Обычные веб-адреса портала могут вернуть только оболочку SPA. Пустой результат
-первичного извлечения (`empty_review_required`) затем обрабатывает специализированный
-адаптер; SHA-256 относится к исходному JSON. API не заменяет сохранённую вручную
-таблицу частичной поддержки. Для её воспроизведения используйте текущий объединённый
-вход `results/vendors_focus_raw.json`.
+Обычные веб-адреса портала могут вернуть только оболочку SPA, поэтому дублирующие
+адреса полного каталога отключены. API-документ получает статус `ok` и признак
+`targeted_normalization_required`, затем его обрабатывает специализированный
+адаптер; SHA-256 относится к исходному JSON. Ручная таблица частичной поддержки
+отключена в активном реестре; её исторический снимок сохранён для воспроизводимости.
+HTML вместо robots.txt приводит к `robots_unavailable`; такой ответ не считается
+разрешением на сбор даже при корректном TLS.
 
 ## Нормализация и проверка
 
@@ -73,9 +75,10 @@ python -m siem.etl check
 Команда без сети повторно нормализует `results/vendors_focus_raw.json`, запускает
 тесты и обновляет постоянную страницу `results/etl_audit/report.html`.
 
-В свежем клоне используйте `python -m siem.etl check --etl data/etl/repro/vendors.json`:
-этот манифест и 36 исходных снимков включены в репозиторий. По состоянию на
-31.10.2026 ожидается 1630 записей источников, 16 профилей и 26 требований.
+В свежем клоне используйте `python -m siem.etl check --etl data/etl/repro/vendors.json --automatic-only`:
+этот манифест и 37 исходных снимков включены в репозиторий. Контрольный результат:
+1451 запись источников, 25 профилей и 67 требований.
+Без `--automatic-only` включаются 179 исторических строк ручного импорта MaxPatrol.
 Манифест ссылается на относительные пути от корня репозитория; запускать
 команду следует именно из корня. Для локальной выгрузки в `results/` оставьте
 команду `python -m siem.etl check` без `--etl`. Откройте отчёт:
@@ -85,7 +88,7 @@ start .\results\etl_audit\report.html
 ```
 
 Данные каждого запуска сохраняются отдельно в `results/history/check_*/`. В HTML есть сводка по 13 SIEM, статусы документов, найденные профили,
-требования и источники событий с фильтром. Рядом сохраняются девять JSON и `tests.txt`.
+требования и источники событий с фильтром. Рядом сохраняются 12 JSON и `tests.txt`.
 В корне `results/` остаются текущий вход `vendors_focus_raw.json`, исходные
 снимки `raw/` и постоянная страница `etl_audit/report.html`. Старые выгрузки
 сохранены в `history/normalizations/`, ранние результаты сбора — в
@@ -93,6 +96,29 @@ start .\results\etl_audit\report.html
 `check --etl путь/к/сбору.json` проверяет другую выгрузку, `--no-tests` ускоряет
 просмотр. Если входного файла нет, команда сообщает об этом без создания отчёта.
 Автоматический отчёт не заменяет сверку фактов с документами вендоров.
+
+### Дополнительный каталог Ankey
+
+Официальный обзор Ankey 5.2.8 содержит таблицы 3.1 и 3.2 с 23 новыми и 7 обновлёнными
+источниками. Адаптер извлекает производителя, продукт, версию и окружение с
+сохранением номера страницы и строки. Это часть каталога, а не полный перечень
+всех интеграций Ankey. Окружение источника не превращается в требования к SIEM.
+
+```powershell
+$runDir = "results/ankey_$(Get-Date -Format yyyyMMdd_HHmmss)_$((New-Guid).Guid.Substring(0,8))"
+python -m siem.etl crawl --only p10 --source-ids release_sources --output "$runDir/vendors.json" --snapshot-dir "$runDir/raw"
+python -m siem.etl check --etl data/etl/repro/vendors.json --additional-etl "$runDir/vendors.json" --automatic-only
+```
+
+На проверенном PDF расширенный результат — 1481 запись источников, 25 профилей и
+67 требований. `--additional-etl` объединяет разные документы; конфликтующие
+`source_id` отклоняются. Исходные манифесты не изменяются.
+
+В PDF есть прямое ограничение перепубликации. Оригинал остаётся в игнорируемом
+`results/`; он не добавляется в Git. CI использует `--exclude-restricted-documents`,
+чтобы не загружать этот документ в публикуемые артефакты. Тест реального PDF
+запускается при наличии локального снимка, иначе явно пропускается; проверки
+координатного разбора и отказа при неоднозначности выполняются без этого файла.
 
 Для ручного запуска отдельных шагов:
 
@@ -106,10 +132,25 @@ python -m siem.etl report --focused-dir $checkDir
 Нормализация проверяет SHA-256. Отсутствующий снимок или несовпадение хеша не заменяются
 данными из предположений. Для существующих относительных путей запускать из корня проекта.
 
-Выходы: `sources.json`, `sizing_profiles.json`, `system_requirements.json`,
-`coverage.json`, `quality_report.json`, `readiness_report.json`,
+Выходы: `sources.json`, `unique_source_values.json`, `sizing_profiles.json`, `system_requirements.json`,
+`coverage.json`, `quality_report.json`, `readiness_report.json`, `schema_validation.json`,
 `unread_system_documents.json`, `unparsed_system_documents.json`,
-`unread_source_catalog_documents.json`. Формат этих файлов сохранён при рефакторинге.
+`partial_system_documents.json`, `unread_source_catalog_documents.json`.
+
+Каждая запись `sources.json` сохраняет исходное название в `source_name_raw` и получает
+`source_entity_id` для сопоставления. Канонизация устраняет только безопасные различия
+представления и явные редакционные алиасы; версии, область поддержки, профиль сбора и
+evidence не склеиваются. `unique_source_values.json` содержит полный перечень
+уникальных сущностей и значений полей с числом подтверждающих записей.
+Общие варианты вроде `Switch` сохраняют семейство/производителя в идентификаторе;
+самостоятельный вариант используется только при наличии явного алиаса продукта.
+`schema_validation.json` — обязательная машинная проверка идентификаторов, единиц
+накопителей и условий их активации; при её ошибке сохраняется диагностика,
+а выходной каталог не записывается. `normalize` и `check` требуют новый каталог
+результатов, чтобы не перезаписывать прежнюю проверку.
+Реестр алиасов находится в `src/siem/etl/coverage.py`; в него добавляют только
+проверенные эквивалентности из сохранённых документов, а не похожие семейства или
+подкомпоненты.
 
 Общая ёмкость накопителей хранится как `total_capacity`, ёмкость устройства —
 `per_device_capacity`, количество — `quantity`, единица — `capacity_unit`.
@@ -122,8 +163,10 @@ python -m siem.etl report --focused-dir $checkDir
 
 `rusiem`, `match` и `pdf-candidates` предназначены для извлечения и ручной проверки
 источников; `enrich-registry` дополняет реестр из `docs/official_urls.json`.
-`assess` сохраняет существующий экспериментальный расчёт применимости; его алгоритм
-при структурном рефакторинге не изменялся.
+`assess` сохраняет существующий экспериментальный расчёт применимости. В качестве
+`--etl` он принимает и прежний сырой JSON, и типизированный `sources.json`; для нового
+ETL следует передавать именно `sources.json`, иначе специализированные адаптеры не
+участвуют в сопоставлении.
 
 Прежние `python -m siem.etl.all_cli` и `python -m siem.etl.focused_cli` делегируют
 тем же обработчикам. Python-импорты из модулей `*_v2`, `system_v08`, `system_v09`
@@ -137,8 +180,8 @@ python -m unittest discover -s tests -v
 ```
 
 Тесты сгруппированы по назначению. HTML-фикстуры в `tests/fixtures/` хранятся отдельно
-от локальных результатов. Реальный тест Alertix использует доступный снимок в `results/raw`
-и явно пропускается, если его нет. PDF-тест требует необязательный PyMuPDF.
+от локальных результатов. Реальный тест Alertix использует воспроизводимый снимок из
+`data/etl/repro/raw`. PDF-тест требует необязательный PyMuPDF.
 
 Автоматические факты остаются `extracted_unverified`, `calculation_ready=false`.
 Полнота всех документов и всех 13 продуктов не гарантируется.

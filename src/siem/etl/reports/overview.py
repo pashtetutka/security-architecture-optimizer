@@ -11,6 +11,31 @@ from .quality import sizing_quality_report
 from .readiness import readiness_report
 
 
+REASONS = {
+    'source_catalog_not_extracted': 'Каталог источников не извлечён',
+    'source_integrations_not_reviewed': 'Записи источников ожидают сверки по первоисточнику',
+    'source_version_scope_unverified': 'Применимость источников к версии SIEM не подтверждена',
+    'system_requirements_not_extracted': 'Системные требования не извлечены',
+    'no_hardware_profiles': 'Нет аппаратных профилей',
+    'system_data_not_reviewed': 'Системные требования ожидают сверки',
+    'system_version_scope_unverified': 'Версия системных требований не подтверждена',
+    'edition_minimum_not_usable_as_eps_sizing': 'Минимумы редакций не задают производительность по EPS',
+    'incomplete_conditioned_capacity_example': 'Пример производительности содержит не все условия',
+    'system_documents_not_fully_parsed': 'Есть непрочитанные или неразобранные системные документы',
+    'system_documents_partially_parsed': 'Есть противоречия первоисточника или частично разобранные разделы',
+    'source_documents_unreadable': 'Не удалось прочитать документы источников',
+    'registered_documents_unavailable': 'Часть зарегистрированных документов недоступна',
+    'published_node_count_conflicts_with_listed_roles': 'Ankey: заявлено 2 сервера, перечислены 3 роли; требуется уточнение вендора',
+    'additional_infrastructure_sections_not_normalized': 'KUMA: EPS, ОС, базовые агенты и Kubernetes разобраны; остались Метрики, производительность коннекторов и дополнительные сервисы',
+    'access_disallowed': 'Загрузка запрещена robots.txt',
+    'robots_unavailable': 'Не удалось проверить robots.txt',
+}
+
+
+def _reason(code) -> str:
+    return _text(REASONS.get(code, code))
+
+
 def _text(value) -> str:
     if value is None:
         return '—'
@@ -47,10 +72,19 @@ def _storage(node: dict) -> str:
             result.append(f'{prefix}{_text(disk["per_device_capacity"])} {_text(disk.get("capacity_unit"))} на диск')
         else:
             result.append('—')
+        if disk.get('mount_path'):
+            result[-1] += ' — ' + _text(disk['mount_path'])
     return '; '.join(result)
 
 
 def _cpu(node: dict) -> str:
+    if node.get('cpu_alternatives'):
+        labels = {'logical_threads': 'логических потоков', 'vCPU': 'vCPU', 'cores_unspecified': 'ядер (тип не указан)'}
+        return ' или '.join(f'от {_text(a["minimum"])} {labels.get(a["unit"], _text(a["unit"]))}' +
+                           (f' с {_text(a["logical_threads"])} потоками' if a.get('logical_threads') else '')
+                           for a in node['cpu_alternatives'])
+    if node.get('physical_cores_per_socket') is not None:
+        return f'{_text(node.get("cpu_sockets"))} CPU × {_text(node["physical_cores_per_socket"])} ядер'
     if node.get('cpu_cores') is not None:
         return f'{_text(node["cpu_cores"])} физических ядер'
     if node.get('vcpu') is not None:
@@ -67,6 +101,7 @@ def write_overview(catalog: dict, output_dir: Path, tests: dict | None = None) -
     raw = catalog.get('_raw_run') or {}
     readiness = readiness_report(catalog, raw)
     quality = sizing_quality_report(catalog)
+    schema_validation = catalog.get('schema_validation', {'valid': False, 'errors': []})
     source_problems = catalog.get('unread_source_catalog_documents', [])
     system_problems = (catalog.get('unread_system_documents', []) +
                        catalog.get('unparsed_system_documents', []) +
@@ -108,7 +143,7 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
     cards = [('SIEM', len(summaries)), ('Источников событий', totals['integrations']),
              ('Аппаратных профилей', totals['sizing_profiles']), ('Типизированных требований', totals['system_requirements']),
              ('Проблемных документов', len(source_problems) + len(system_problems)),
-             ('Структурных ошибок', quality['totals']['issues_by_severity'].get('error', 0))]
+             ('Структурных ошибок', len(schema_validation.get('errors', [])))]
     add('<div class="cards">' + ''.join(f'<div class="card"><strong>{_text(value)}</strong>{_text(label)}</div>'
                                       for label, value in cards) + '</div>')
     if tests:
@@ -124,7 +159,7 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
         src, req = item['supported_sources'], item['system_requirements']
         notes = []
         for problem in problems[sid]:
-            notes.append(f'{_text(problem.get("source_id"))}: {_text(problem.get("reason"))}')
+            notes.append(_reason(problem.get('reason')))
         problem_html = '<br>'.join(notes) if notes else '—'
         doc_counts = Counter(doc.get('status', 'unknown') for vendor in raw.get('vendors', [])
                              if vendor.get('id') == sid for doc in vendor.get('source_results', []))
@@ -135,28 +170,42 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
             f'<td>{_text(req["typed_rules"])}</td><td>{doc_html}</td>'
             f'<td><span class="review">{state}</span><br>{problem_html}</td></tr>')
     add('</tbody></table></div>')
-    add('<h2>Что требует внимания</h2>')
-    add(f'<p>Статусы загрузки: {", ".join(f"{_text(k)}: {_text(v)}" for k,v in statuses.items()) or "—"}. '
-        f'Замечания к структуре: {_text(totals["issues"])}. '
+    add('<h2>Качество извлечения</h2>')
+    categories = totals.get('issues_by_category', {})
+    add(f'<p>Ошибки контракта JSON: {len(schema_validation.get("errors", []))}. '
+        f'Диагностики извлечения: {categories.get("extraction_error", 0)}. '
+        f'Группы пропусков данных: {categories.get("data_gap", 0)}. '
         '<a href="quality_report.json">Подробный отчёт качества</a>, '
-        '<a href="readiness_report.json">готовность данных</a>.</p>')
+        '<a href="readiness_report.json">готовность данных</a>, '
+        '<a href="schema_validation.json">проверка контракта JSON</a>.</p>')
+    add('<p>Непроверенная версия и отсутствие опубликованного параметра учитываются '
+        'отдельно от ошибок парсера. Повторяющиеся замечания к профилям сгруппированы.</p>')
+    add('<h2>Ограничения документов и покрытия</h2>')
+    labels = {'ok': 'Загружено', 'empty_review_required': 'Загружено без первичных фактов',
+              'access_disallowed': 'Запрет robots.txt', 'robots_unavailable': 'robots.txt не проверен'}
+    add('<p>' + ', '.join(f'{_text(labels.get(k,k))}: {_text(v)}' for k,v in statuses.items()) +
+        '. Статусы относятся к сохранённому сбору. Отсутствие первичных фактов '
+        'не означает ошибку загрузки: документ может разбираться специализированным адаптером.</p>')
     for item in source_problems + system_problems:
         add(f'<details><summary>{_text(item.get("siem_id"))} / {_text(item.get("source_id"))}: '
-            f'{_text(item.get("reason"))}</summary>{_link(item.get("url"), "Исходный документ")}</details>')
+            f'{_reason(item.get("reason"))}</summary><p>{_text(item.get("detail"))}</p>'
+            f'{_link(item.get("url"), "Исходный документ")}</details>')
     for item in summaries:
         for doc in item.get('unavailable_documents', []):
             add(f'<details><summary>{_text(item["siem_id"])} / {_text(doc.get("source_id"))}: '
-                f'{_text(doc.get("status"))}</summary><p>{_text(doc.get("reason"))}</p>'
+                f'{_reason(doc.get("status"))}</summary><p>{_text(doc.get("reason"))}</p>'
                 f'{_link(doc.get("url"), "Адрес документа")}</details>')
     if not source_problems and not system_problems:
         add('<p>Снимков с ошибками чтения и неразобранных системных документов нет.</p>')
+    add('<h2>Условия использования данных в расчётах</h2>')
+    add('<p>ETL выполняет извлечение и проверку структуры. Подтверждение версии и '
+        'содержания фактов выполняется на этапе проверки данных; автоматический '
+        'сбор сам по себе не присваивает допуск к расчёту.</p>')
     for item in summaries:
         sid = item['siem_id']
         detail = issues[sid]
-        add(f'<details><summary>{_text(sid)} {_text(item.get("siem_name"))}: '
-            f'ограничения и замечания ({len(detail)})</summary>')
-        add('<p>Причины отсутствия допуска к расчёту: ' +
-            ', '.join(_text(reason) for reason in item['blocking_reasons']) + '</p>')
+        add(f'<details><summary>{_text(sid)} {_text(item.get("siem_name"))}</summary>')
+        add('<p>' + '; '.join(_reason(reason) for reason in item['blocking_reasons']) + '.</p>')
         if detail:
             add('<ul>' + ''.join(f'<li>{_text(i["severity"])}: {_text(i["detail"])}</li>' for i in detail) + '</ul>')
         add('</details>')
@@ -166,8 +215,11 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
     for profile in catalog.get('sizing_profiles', []):
         nodes = []
         for node in profile.get('nodes', []):
-            nodes.append(f'{_text(node.get("role"))}: {_cpu(node)}, '
-                         f'{_text(node.get("ram_gb"))} GB RAM, {_storage(node)}')
+            ram = (f'{_text(node["ram_mb"])} MB' if node.get('ram_mb') is not None else
+                   f'{_text(node.get("ram_gb"))} GB')
+            quantity = f'{_text(node["quantity"])} × ' if node.get('quantity') is not None else ''
+            nodes.append(f'{quantity}{_text(node.get("role"))}: {_cpu(node)}, '
+                         f'{ram} RAM, {_storage(node)}')
         band = (f'{_text(profile.get("eps_from"))}–{_text(profile.get("eps_to"))} EPS'
                 if profile.get('eps_from') is not None or profile.get('eps_to') is not None
                 else 'EPS не указан')
@@ -186,7 +238,8 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
     add('<h2>Поддерживаемые источники событий</h2>')
     add('<p>Строки опубликованного каталога требуют проверки версии и работы интеграции. '
         'Записи с пометкой «Частичная поддержка» не равны полной поддержке источника. '
-        '<a href="sources.json">Полный JSON с происхождением каждого факта</a>.</p>')
+        '<a href="sources.json">Полный JSON с происхождением каждого факта</a>; '
+        '<a href="unique_source_values.json">уникальные значения и идентичности</a>.</p>')
     add('<label for="vendor">SIEM:</label> <select id="vendor"><option value="">Все</option>')
     for item in summaries:
         add(f'<option value="{_text(item["siem_id"])}">{_text(item["siem_id"])} '
@@ -203,6 +256,7 @@ input,select{padding:8px;margin:0 8px 8px 0;border:1px solid #9eb2c4;border-radi
             f'<td>{_evidence(source)}</td></tr>')
     add('''</tbody></table></div><p class="muted">Выходные файлы: <a href="sizing_profiles.json">профили</a>,
 <a href="system_requirements.json">требования</a>, <a href="coverage.json">охват</a>,
+<a href="unique_source_values.json">уникальные значения</a>,
 <a href="unread_system_documents.json">непрочитанные документы</a>,
 <a href="unparsed_system_documents.json">неразобранные документы</a>,
 <a href="partial_system_documents.json">частично разобранные документы</a>.</p>

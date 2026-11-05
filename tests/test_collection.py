@@ -25,6 +25,10 @@ class CollectionTests(unittest.TestCase):
   self.assertEqual(f[0]['evidence_status'],'review_candidate')
  def test_all_13_vendor_status_even_failures(self):
   manifest=json.loads((ROOT/'data/etl/vendors.json').read_text())
+  maxpatrol=next(v for v in manifest['vendors'] if v['id']=='p06')
+  enabled={s['id'] for s in maxpatrol['sources'] if s.get('enabled',True)}
+  self.assertNotIn('partial_sources',enabled);self.assertIn('supported_sources_api',enabled)
+  self.assertNotIn('sources',enabled);self.assertNotIn('supported_sources',enabled)
   d=collect(manifest,fetch=FakeFetch(),observed_at='2026-10-27T00:00:00Z')
   self.assertEqual(d['totals']['vendors'],13)
   self.assertGreater(d['totals']['errors'],0)

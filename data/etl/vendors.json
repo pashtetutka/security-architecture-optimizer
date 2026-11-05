@@ -183,7 +183,7 @@
           "mode": "generic",
           "product_version_hint": "8.6; link may be obsolete",
           "source_type": "vendor_documentation",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "partial_sources",
@@ -191,7 +191,7 @@
           "mode": "generic",
           "product_version_hint": "8.6",
           "source_type": "vendor_documentation",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "supported_sources",
@@ -199,7 +199,7 @@
           "mode": "generic",
           "product_version_hint": "8.6",
           "source_type": "vendor_documentation",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "deployment",
@@ -286,6 +286,15 @@
       "historical_excel_id": "p10",
       "sources": [
         {
+          "id": "release_sources",
+          "url": "https://www.infogaz-is.ru/files/pressa/Обзор_новых_возможностей_Ankey_SIEM_NG_5.2.8.pdf",
+          "mode": "pdf",
+          "product_version_hint": "5.2.8 release document; product not independently verified",
+          "source_type": "vendor_documentation",
+          "redistribution": "permission_required_do_not_publish_snapshot",
+          "enabled": true
+        },
+        {
           "id": "product_docs",
           "url": "https://www.infogaz-is.ru/produkty/upravlenie-ib/ankey-siem-ng",
           "mode": "generic",
@@ -339,6 +348,14 @@
       "name": "Kaspersky KUMA",
       "historical_excel_id": "p12",
       "sources": [
+        {
+          "id": "hardware_requirements",
+          "url": "https://support.kaspersky.ru/kuma/4.0/217889",
+          "mode": "kuma_requirements",
+          "product_version_hint": "4.0 documentation; product release not verified",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
         {
           "id": "source_catalog",
           "url": "https://support.kaspersky.ru/kuma/4.0/255782",

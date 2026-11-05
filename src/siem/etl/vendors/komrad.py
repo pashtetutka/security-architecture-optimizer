@@ -166,9 +166,7 @@ def parse_komrad_catalog(html: str, meta: dict) -> list[dict]:
             'source_version':None,'collection_method':None,'normalizer_id':None,
             'normalizer_format':None,'integration_evidence':'published_integration_guide_index',
             'functional_integration_verified':False,'review_status':'extracted_unverified',
-            'evidence':[{'url':absolute,'document_title':meta.get('title'),
-                'document_sha256':meta.get('content_sha256'),'document_version_hint':meta.get('product_version_hint'),
-                'retrieved_at':meta.get('retrieved_at'),'excerpt':name,
-                'page':None,'extraction_method':'komrad_document_link'}],
+            'integration_guide_url': absolute,
+            'evidence':[document_evidence(meta, name, 'komrad_document_link')],
         })
     return found

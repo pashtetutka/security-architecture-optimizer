@@ -34,11 +34,13 @@ def readiness_report(catalog: dict, raw: dict | None = None) -> dict:
         source_problems[missing['siem_id']].append(missing)
     result=[]
     targeted_source_docs = {
-        'p02': {'overview'}, 'p04': {'configuration', 'connectors_syslog',
+        'p02': {'overview'}, 'p03': {'source_catalog', 'architecture'},
+        'p04': {'configuration', 'connectors_syslog',
                                     'connectors_beats', 'connectors_jdbc', 'connectors_snmp'},
         'p05': {'source_product'},
         'p06': {'partial_sources', 'supported_sources', 'supported_sources_api'},
         'p09': {'architecture'}, 'p11': {'architecture', 'source_whitepaper'},
+        'p10': {'release_sources'},
     }
     targeted_system_docs = {
         'p05': {'product_document'}, 'p07': {'product'},
@@ -46,8 +48,11 @@ def readiness_report(catalog: dict, raw: dict | None = None) -> dict:
     }
     for info in catalog.get('coverage',[]):
         sid=info['siem_id']; src=integrations[sid]; prof=profiles[sid]; req=requirements[sid]
-        source_docs=_vendor_document_status(raw,sid,
-            {'sources','source_catalog','sources_catalog','parsers'} | targeted_source_docs.get(sid, set()))
+        source_ids = ({'sources','source_catalog','sources_catalog','parsers'}
+                      | targeted_source_docs.get(sid, set()))
+        if sid == 'p06':
+            source_ids -= {'sources', 'supported_sources'}
+        source_docs=_vendor_document_status(raw,sid,source_ids)
         sys_docs=_vendor_document_status(raw,sid,
             {'hardware_requirements','system_requirements','deployment','architecture','platform_architecture'}
             | targeted_system_docs.get(sid, set()))

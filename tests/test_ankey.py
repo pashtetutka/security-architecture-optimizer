@@ -16,8 +16,9 @@ class AnkeyTests(unittest.TestCase):
             'snapshot_path': str(path), 'content_sha256': digest,
         }]}], 'facts': []}
         catalog = build_catalog(raw, path.parent / 'input.json')
-        self.assertEqual(len(catalog['sizing_profiles']), 1)
-        profile = catalog['sizing_profiles'][0]
+        self.assertEqual(len(catalog['sizing_profiles']), 3)
+        profiles = {p['scenario']: p for p in catalog['sizing_profiles']}
+        profile = profiles['low_load']
         self.assertEqual(profile['scenario'], 'low_load')
         self.assertIsNone(profile['eps_to'])
         node = profile['nodes'][0]
@@ -30,10 +31,36 @@ class AnkeyTests(unittest.TestCase):
                          (1000, 'GB', 'effective_required'))
         self.assertIsNone(disk['quantity'])
         self.assertIsNone(disk['per_device_capacity'])
-        self.assertEqual({(r['component'], r['value']) for r in catalog['system_requirements']},
+        self.assertEqual({(r['component'], r['value']) for r in catalog['system_requirements']
+                          if r['scenario'] == 'low_load'},
                          {('Astra Linux', '1.7.3'), ('Debian', '10')})
+        medium = profiles['medium_load']
+        self.assertEqual((medium['applicability']['published_server_count'],
+                          medium['applicability']['listed_node_count']), (2, 3))
+        self.assertEqual(medium['applicability']['diagnostic'],
+                         'published_server_count_conflicts_with_listed_roles')
+        self.assertEqual({n['role'] for n in medium['nodes']},
+                         {'core_and_management', 'siem_server_and_events_storage', 'network_sensor'})
+        high = profiles['high_load']
+        self.assertEqual(sum(n['quantity'] for n in high['nodes']), 7)
+        storage = next(n for n in high['nodes'] if n['role'] == 'events_storage')
+        self.assertIn((10, 4.0, 'TB', 'RAID 10'),
+                      {(d['quantity'], d['per_device_capacity'], d['capacity_unit'], d['raid'])
+                       for d in storage['storage_devices']})
+        self.assertIn((12, 4.0, 'TB', 'RAID 10'),
+                      {(d['quantity'], d['per_device_capacity'], d['capacity_unit'], d['raid'])
+                       for d in storage['storage_devices']})
+        self.assertTrue(any(d['purpose'] == 'os_and_software'
+                            for n in high['nodes'] for d in n['storage_devices']))
+        shelf = next(d for d in storage['storage_devices'] if d['purpose'] == 'expansion_shelf')
+        self.assertEqual(shelf['activation_conditions'], [
+            {'metric': 'EPS', 'operator': '>=', 'value': 15000, 'unit': 'EPS',
+             'required_expansion_shelves': 1},
+            {'metric': 'EPS', 'operator': '>=', 'value': 20000, 'unit': 'EPS',
+             'required_expansion_shelves': 2},
+        ])
         self.assertEqual(catalog['partial_system_documents'][0]['reason'],
-                         'medium_and_high_load_profiles_not_extracted')
+                         'published_node_count_conflicts_with_listed_roles')
 
 
 if __name__ == '__main__':

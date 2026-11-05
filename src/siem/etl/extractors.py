@@ -131,7 +131,8 @@ def extract_content(data:bytes,mode:str,charset='utf-8'):
  if mode=='maxpatrol_api':
   from .vendors.maxpatrol import maxpatrol_api_document
   doc=maxpatrol_api_document(data)
-  return {'title':doc['title'],'facts':[], 'warnings':['Requires targeted source normalization']}
+  return {'title':doc['title'],'facts':[], 'targeted_normalization_required':True,
+          'warnings':['Requires targeted source normalization']}
  if mode=='pdf': return extract_pdf(data)
  # Most modern vendor HTML is UTF-8. Avoid Latin-1 mojibake caused by
  # missing HTTP charset; if UTF-8 is invalid, honor a declared charset
@@ -145,4 +146,8 @@ def extract_content(data:bytes,mode:str,charset='utf-8'):
    except (UnicodeError,LookupError): html=None
    if html is None: html=UnicodeDammit(data,is_html=True).unicode_markup
    if html is None: raise UnicodeError('Не удалось определить кодировку HTML')
+ if mode=='kuma_requirements':
+  soup=BeautifulSoup(html,'html.parser')
+  return {'title':clean(soup.title.get_text(' ',strip=True)) if soup.title else '',
+          'facts':[], 'targeted_normalization_required':True, 'warnings':[]}
  return extract_html(html,mode)

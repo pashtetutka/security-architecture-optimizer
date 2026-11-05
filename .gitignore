@@ -15,4 +15,7 @@ results/
 *.xls
 *.zip
 data/private/
+local_archive/
+.coverage
+htmlcov/
 AGENTS.md

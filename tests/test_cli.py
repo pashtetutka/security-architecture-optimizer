@@ -16,6 +16,33 @@ from siem.etl.reports.overview import write_overview, write_latest_report
 
 
 class CLITests(unittest.TestCase):
+    def test_additional_etl_preserves_snapshot_base_and_rejects_duplicate_ids(self):
+        from siem.etl.commands.normalization import load_inputs
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            base = root/'base.json'
+            extra_dir = root/'extra'
+            extra_dir.mkdir()
+            snapshot = extra_dir/'source.html'
+            snapshot.write_text('<html>original</html>', encoding='utf-8')
+            extra = extra_dir/'run.json'
+            base.write_text(json.dumps({'vendors': [{'id': 'p10', 'source_results': []}],
+                                        'facts': []}), encoding='utf-8')
+            extra.write_text(json.dumps({'vendors': [{'id': 'p10', 'source_results': [{
+                'source_id': 'release_sources', 'snapshot_path': 'source.html', 'status': 'ok'}]}],
+                'facts': []}), encoding='utf-8')
+            result = load_inputs([base, extra])
+            self.assertEqual(result['vendors'][0]['source_results'][0]['snapshot_path'], str(snapshot.resolve()))
+            self.assertEqual(result['totals']['sources'], 1)
+            self.assertEqual(json.loads(base.read_text(encoding='utf-8'))['vendors'][0]['source_results'], [])
+            with self.assertRaisesRegex(ValueError, 'Duplicate source_id'):
+                load_inputs([base, extra, extra])
+
+    def test_restricted_documents_are_excluded_from_public_collection(self):
+        with redirect_stdout(io.StringIO()) as output:
+            main(['crawl', '--dry-run', '--only', 'p10', '--source-ids', 'release_sources',
+                  '--exclude-restricted-documents'])
+        self.assertNotIn('.pdf', output.getvalue())
     def test_dry_run_accepts_no_output(self):
         with redirect_stdout(io.StringIO()) as output:
             main(['crawl', '--dry-run', '--only', 'p13'])
@@ -58,8 +85,10 @@ class CLITests(unittest.TestCase):
             profiles = json.loads((output / 'sizing_profiles.json').read_text(encoding='utf-8'))
             self.assertEqual(profiles['items'], expected['sizing_profiles'])
             self.assertEqual(len(profiles['items']), 4)
-            self.assertEqual(len(list(output.glob('*.json'))), 10)
+            self.assertEqual(len(list(output.glob('*.json'))), 12)
             self.assertIsNone(profiles['items'][0]['nodes'][0]['storage_devices'][0]['quantity'])
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                main(['normalize', '--etl', str(source), '--output-dir', str(output)])
             with redirect_stdout(io.StringIO()) as report:
                 main(['report', '--focused-dir', str(output)])
             self.assertIn('KOMRAD', report.getvalue())
@@ -84,7 +113,11 @@ class CLITests(unittest.TestCase):
             self.assertIn('10.0 TB всего',page)
             self.assertIn('100000 EPS',page)
             self.assertIn('Результат этой проверки:',terminal.getvalue())
-            self.assertEqual(len(list(output.glob('*.json'))),10)
+            self.assertIn('Качество извлечения', page)
+            self.assertIn('Условия использования данных в расчётах', page)
+            self.assertNotIn('Замечания к структуре:', page)
+            self.assertNotIn('source_integrations_not_reviewed', page)
+            self.assertEqual(len(list(output.glob('*.json'))),12)
             with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 main(['check','--etl',str(source),'--output-dir',str(output),'--no-tests'])
 

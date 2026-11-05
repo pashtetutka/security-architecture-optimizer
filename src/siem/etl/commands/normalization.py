@@ -4,8 +4,40 @@ import argparse, json, re, subprocess, sys
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
-from ..catalog import build_catalog, write_catalog
+from ..catalog import build_catalog, write_catalog, locate_snapshot
 from ..reports.overview import write_overview, write_latest_report
+
+
+def load_inputs(paths):
+    """Combine distinct source documents, preserving each input's snapshot base."""
+    merged = None
+    for path in paths:
+        raw = json.loads(path.read_text(encoding='utf-8'))
+        for vendor in raw.get('vendors', []):
+            for doc in vendor.get('source_results', []):
+                snapshot = locate_snapshot(doc.get('snapshot_path'), path.parent)
+                if snapshot is not None:
+                    doc['snapshot_path'] = str(snapshot.resolve())
+        if merged is None:
+            merged = raw
+            continue
+        for vendor in raw.get('vendors', []):
+            target = next((v for v in merged['vendors'] if v['id'] == vendor['id']), None)
+            if target is None:
+                merged['vendors'].append(vendor)
+                continue
+            ids = {d.get('source_id') for d in target.get('source_results', [])}
+            if any(d.get('source_id') in ids for d in vendor.get('source_results', [])):
+                raise ValueError('Duplicate source_id in additional ETL: ' + vendor['id'])
+            target.setdefault('source_results', []).extend(vendor.get('source_results', []))
+        merged.setdefault('facts', []).extend(raw.get('facts', []))
+        merged.setdefault('errors', []).extend(raw.get('errors', []))
+    if len(paths) > 1:
+        documents = [d for v in merged.get('vendors', []) for d in v.get('source_results', [])]
+        merged['totals'] = {'vendors': len(merged.get('vendors', [])), 'sources': len(documents),
+                            'ok_sources': sum(d.get('status') == 'ok' for d in documents),
+                            'facts': len(merged.get('facts', [])), 'errors': len(merged.get('errors', []))}
+    return merged
 
 
 def main(argv=None):
@@ -18,6 +50,11 @@ def main(argv=None):
     check.add_argument('--etl',type=Path,default=Path('results/vendors_focus_raw.json'))
     check.add_argument('--output-dir',type=Path,help='Новый каталог проверки; по умолчанию создаётся автоматически')
     check.add_argument('--no-tests',action='store_true',help='Не запускать тесты проекта')
+    for command in (n, check):
+        command.add_argument('--additional-etl', action='append', type=Path, default=[],
+                             help='Добавить документы другой выгрузки; повторяющиеся source_id запрещены')
+        command.add_argument('--automatic-only', action='store_true',
+                             help='Только документы с acquisition_method=automatic_https')
     report=sub.add_parser('report',help='Показать готовность по каждому продукту')
     report.add_argument('--focused-dir',required=True,type=Path)
     enrich=sub.add_parser('enrich-registry',help='Добавить проверенные URL двух целевых категорий в манифест')
@@ -30,8 +67,8 @@ def main(argv=None):
         out_dir=args.output_dir or Path('results/history') / ('check_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid4().hex[:8])
         if out_dir.exists():
             p.error('Каталог проверки уже существует: '+str(out_dir))
-        raw=json.loads(args.etl.read_text(encoding='utf-8'))
-        catalog=build_catalog(raw,args.etl)
+        raw=load_inputs([args.etl, *args.additional_etl])
+        catalog=build_catalog(raw,args.etl,automatic_only=args.automatic_only)
         summary=write_catalog(catalog,out_dir)
         tests=None
         if not args.no_tests:
@@ -91,8 +128,10 @@ def main(argv=None):
         args.registry.write_text(json.dumps(registry,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         print('Добавлено URL:',added)
         return
-    raw=json.loads(args.etl.read_text(encoding='utf-8'))
-    catalog=build_catalog(raw,args.etl)
+    raw=load_inputs([args.etl, *args.additional_etl])
+    if args.output_dir.exists():
+        p.error('Каталог нормализации уже существует: '+str(args.output_dir))
+    catalog=build_catalog(raw,args.etl,automatic_only=args.automatic_only)
     summary=write_catalog(catalog,args.output_dir)
     print(json.dumps(summary,ensure_ascii=False,indent=2))
     print('Созданы:',', '.join(x.name for x in args.output_dir.glob('*.json')))

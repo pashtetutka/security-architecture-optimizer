@@ -23,14 +23,53 @@ class Replay:
 
 
 class SnapshotIntegrityTests(unittest.TestCase):
+    def test_replay_resolves_relative_snapshot_and_rejects_corruption(self):
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from siem.etl.cli import main
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            collected = collect(REGISTRY, Replay(), snapshot_dir=root/'raw')
+            doc = collected['vendors'][0]['source_results'][0]
+            snapshot = Path(doc['snapshot_path'])
+            doc['snapshot_path'] = str(snapshot.relative_to(root))
+            manifest = root/'input.json'
+            manifest.write_text(json.dumps(collected), encoding='utf-8')
+            registry = root/'registry.json'
+            registry.write_text(json.dumps(REGISTRY), encoding='utf-8')
+            for digest, expected in [(doc['content_sha256'], 'ok'), ('0'*64, 'error')]:
+                doc['content_sha256'] = digest
+                manifest.write_text(json.dumps(collected), encoding='utf-8')
+                output = root/(expected+'.json')
+                with redirect_stdout(StringIO()):
+                    main(['crawl', '--registry', str(registry), '--replay-from', str(manifest),
+                          '--output', str(output), '--snapshot-dir', str(root/expected)])
+                result = json.loads(output.read_text(encoding='utf-8'))
+                self.assertEqual(result['vendors'][0]['source_results'][0]['status'], expected)
+
     def test_bundled_reproduction_data_is_complete_and_hash_verified(self):
         manifest = Path(__file__).parent.parent/'data/etl/repro/vendors.json'
         raw = json.loads(manifest.read_text(encoding='utf-8'))
         result = build_catalog(raw, manifest)
         self.assertEqual((len(result['integrations']), len(result['sizing_profiles']),
-                          len(result['system_requirements'])), (1630, 16, 26))
+                          len(result['system_requirements'])), (1630, 25, 67))
         self.assertEqual(result['unread_source_catalog_documents'], [])
         self.assertEqual(result['unread_system_documents'], [])
+        self.assertEqual(result['unparsed_system_documents'], [])
+        self.assertEqual([x['reason'] for x in result['partial_system_documents']],
+                         ['additional_infrastructure_sections_not_normalized',
+                          'published_node_count_conflicts_with_listed_roles'])
+        automatic = build_catalog(raw, manifest, automatic_only=True)
+        self.assertEqual(len(automatic['integrations']), 1451)
+        self.assertFalse(any(row.get('support_scope') == 'partial'
+                             for row in automatic['integrations']))
+        self.assertTrue(automatic['schema_validation']['valid'])
+        self.assertTrue(all(e['acquisition_method'] == 'automatic_https'
+                            for row in automatic['integrations'] for e in row['evidence']))
+        komrad = next(row for row in automatic['integrations'] if row['siem_id'] == 'p13')
+        self.assertNotEqual(komrad['integration_guide_url'], komrad['evidence'][0]['url'])
+        self.assertTrue(komrad['evidence'][0]['url'].endswith('/collect/sources/'))
+        self.assertEqual(len(result['integrations']), 1630)  # input/history unchanged
 
     def test_parser_failure_retains_original_hash_url_and_timestamp(self):
         with TemporaryDirectory() as temp:

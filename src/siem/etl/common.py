@@ -22,6 +22,7 @@ def evidence_for_doc(meta: dict, excerpt: str, method: str) -> dict:
         'document_sha256': meta.get('content_sha256'),
         'document_version_hint': meta.get('product_version_hint'),
         'retrieved_at': meta.get('retrieved_at'),
+        'acquisition_method': meta.get('acquisition_method', 'unknown'),
         'excerpt': clean(excerpt)[:350],
         'page': None, 'extraction_method': method,
     }
@@ -37,6 +38,7 @@ def document_evidence(meta: dict, excerpt: str, method: str, section: str | None
         'document_sha256': meta.get('content_sha256'),
         'document_version_hint': meta.get('product_version_hint'),
         'retrieved_at': meta.get('retrieved_at'),
+        'acquisition_method': meta.get('acquisition_method', 'unknown'),
         'excerpt': clean(excerpt)[:350], 'page': None,
         'extraction_method': method,
     }

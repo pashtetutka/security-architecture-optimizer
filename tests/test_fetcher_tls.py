@@ -10,6 +10,15 @@ from siem.etl.fetcher import PublicFetcher, RobotsPolicyUnavailable
 
 
 class FetcherTLSTests(unittest.TestCase):
+    def test_html_instead_of_robots_is_not_permission_to_crawl(self):
+        fetcher = PublicFetcher(retries=0)
+        fetcher.session.get = Mock(return_value=Mock(
+            status_code=200, text='<!doctype html><html><body>SPA</body></html>'))
+        for _ in range(2):
+            with self.assertRaisesRegex(RobotsPolicyUnavailable, 'returned HTML'):
+                fetcher.fetch('https://vendor.test/doc')
+        self.assertEqual(fetcher.session.get.call_count, 1)
+
     def test_custom_ca_only_for_exact_host_and_for_robots_and_redirect(self):
         bundle = str(Path(requests.certs.where()).resolve())
         fetcher = PublicFetcher(retries=0, host_ca_bundles={'vendor.test': bundle})

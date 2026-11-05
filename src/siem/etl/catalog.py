@@ -16,6 +16,8 @@ from .vendors.published_claims import (parse_searchinform_overview, parse_userga
                                        parse_solar_architecture, parse_savrus_product,
                                        parse_security_capsule_pdf)
 from .vendors.ankey import parse_ankey_low_load
+from .vendors.kuma import parse_kuma_requirements
+from .vendors.ankey_release import parse_ankey_release_pdf
 from .vendors.deployment_context import parse_rvision_deployment, parse_komrad_architecture
 from .vendors.maxpatrol import parse_maxpatrol_partial_sources, parse_maxpatrol_supported_api
 from .vendors.solar import parse_solar_whitepaper
@@ -23,6 +25,8 @@ from .vendors.published_claims import parse_security_capsule_product
 from .vendors.rvision import enrich_rvision_profiles, parse_rvision_context_requirements
 from .reports.quality import sizing_quality_report
 from .reports.readiness import readiness_report
+from .identities import type_integrations, unique_source_values
+from .validation import validate_catalog
 
 def locate_snapshot(value: str | None, base: Path) -> Path | None:
     if not value: return None
@@ -50,7 +54,6 @@ def normalize_requirements(raw: dict, input_file: Path) -> tuple[list[dict],list
                     'url':s.get('url'),'reason':'not_html_or_unsupported_format'})
                 continue
             data=snapshot.read_bytes()
-            import hashlib
             digest=hashlib.sha256(data).hexdigest()
             if s.get('content_sha256') and digest!=s['content_sha256']:
                 unread.append({'siem_id':vendor['id'],'source_id':s.get('source_id'),
@@ -62,7 +65,16 @@ def normalize_requirements(raw: dict, input_file: Path) -> tuple[list[dict],list
                       retrieved_at=s.get('retrieved_at') or raw.get('run_at'))
             meta['url']=s.get('resolved_url') or s.get('url')
             if s.get('source_id')=='hardware_requirements':
-                if vendor['id']=='p13':
+                if vendor['id']=='p12':
+                    try:
+                        kuma_profiles, kuma_rules = parse_kuma_requirements(html, meta)
+                        profiles.extend(kuma_profiles)
+                        requirements.extend(kuma_rules)
+                    except ValueError as ex:
+                        unread.append({'siem_id': vendor['id'], 'source_id': s.get('source_id'),
+                                       'url': meta['url'], 'reason': str(ex)})
+                    continue
+                elif vendor['id']=='p13':
                     komrad_profiles, komrad_rules = parse_komrad_requirements(html,meta)
                     profiles.extend(komrad_profiles)
                     requirements.extend(komrad_rules)
@@ -143,7 +155,16 @@ def validated_source_facts(raw: dict, input_file: Path) -> tuple[list[dict], lis
     return accepted, list(issues.values())
 
 
-def build_catalog(raw: dict, input_file: Path) -> dict:
+def build_catalog(raw: dict, input_file: Path, *, automatic_only: bool = False) -> dict:
+    if automatic_only:
+        documents = {(v['id'], d.get('source_id'))
+                     for v in raw.get('vendors', []) for d in v.get('source_results', [])
+                     if d.get('acquisition_method') == 'automatic_https'}
+        raw = {**raw, 'vendors': [{**v, 'source_results': [
+            d for d in v.get('source_results', []) if (v['id'], d.get('source_id')) in documents
+        ]} for v in raw.get('vendors', [])], 'facts': [
+            f for f in raw.get('facts', []) if (f.get('siem_id'), f.get('source_id')) in documents
+        ]}
     source_facts, unread_source_catalog_documents = validated_source_facts(raw, input_file)
     integrations=normalize_sources({'facts': source_facts})
     partial_system_documents=[]
@@ -161,7 +182,6 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
                     'url':doc.get('url'),'reason':'local_snapshot_unavailable_or_unsupported_format'})
                 continue
             data=snapshot.read_bytes()
-            import hashlib
             digest=hashlib.sha256(data).hexdigest()
             if doc.get('content_sha256') and digest!=doc['content_sha256']:
                 unread_source_catalog_documents.append({
@@ -174,8 +194,13 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
                       retrieved_at=doc.get('retrieved_at') or raw.get('run_at'))
             meta['url']=doc.get('resolved_url') or doc.get('url')
             integrations.extend(parse_komrad_catalog(html,meta))
-    integrations.sort(key=lambda r:(r['siem_id'],r['source_name'].casefold()))
     profiles,requirements,unread=normalize_requirements(raw,input_file)
+    if any(p['siem_id'] == 'p12' for p in profiles):
+        partial_system_documents.append({
+            'siem_id': 'p12', 'source_id': 'hardware_requirements',
+            'url': next(p['evidence']['url'] for p in profiles if p['siem_id'] == 'p12'),
+            'reason': 'additional_infrastructure_sections_not_normalized',
+            'detail': 'EPS matrix, host OS, base agents and Kubernetes extracted; separate metrics scaling, connector-specific agent performance and optional service sections remain outside this adapter.'})
     # Alertix FAQ is outside the generic system-document set. Parse its two
     # explicit claims without treating unrelated FAQ integration names as sources.
     for vendor in raw.get('vendors', []):
@@ -190,7 +215,6 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
                                'url': doc.get('url'), 'reason': 'local_snapshot_unavailable_or_unsupported_format'})
                 continue
             data = snapshot.read_bytes()
-            import hashlib
             if doc.get('content_sha256') and hashlib.sha256(data).hexdigest() != doc['content_sha256']:
                 unread.append({'siem_id': vendor['id'], 'source_id': 'configuration',
                                'url': doc.get('url'), 'reason': 'snapshot_hash_mismatch'})
@@ -216,6 +240,7 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
         ('p07', 'product'): ('html_requirement', parse_savrus_product),
         ('p09', 'architecture'): ('html_source', parse_usergate_architecture),
         ('p10', 'product_docs'): ('html_profile', parse_ankey_low_load),
+        ('p10', 'release_sources'): ('pdf_source', parse_ankey_release_pdf),
         ('p11', 'architecture'): ('html_source', parse_solar_architecture),
         ('p11', 'source_whitepaper'): ('pdf_source', parse_solar_whitepaper),
     }
@@ -233,7 +258,6 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
                 (unread_source_catalog_documents if kind.endswith('_source') else unread).append(issue)
                 continue
             data = snapshot.read_bytes()
-            import hashlib
             if doc.get('content_sha256') and hashlib.sha256(data).hexdigest() != doc['content_sha256']:
                 issue = {'siem_id': vendor['id'], 'source_id': doc.get('source_id'),
                          'url': doc.get('url'), 'reason': 'snapshot_hash_mismatch'}
@@ -262,14 +286,15 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
                 extracted_profiles, extracted_requirements = rows
                 profiles.extend(extracted_profiles)
                 requirements.extend(extracted_requirements)
-                if extracted_profiles and ('Средненагруженная система' in html or
-                                           'Высоконагруженная система' in html):
+                ambiguous = [p for p in extracted_profiles
+                             if p.get('applicability', {}).get('diagnostic')]
+                if ambiguous:
                     partial_system_documents.append({
                         'siem_id': vendor['id'], 'siem_name': vendor['name'],
                         'source_id': doc.get('source_id'), 'url': meta['url'],
-                        'reason': 'medium_and_high_load_profiles_not_extracted',
-                        'detail': 'Medium-load page claims two servers but lists three roles; '
-                                  'high-load configuration requires separate parsing.',
+                        'reason': 'published_node_count_conflicts_with_listed_roles',
+                        'detail': 'All listed roles were extracted; the published medium-load '
+                                  'heading says two servers while three role entries are listed.',
                     })
             else:
                 (integrations if kind.endswith('_source') else requirements).extend(rows)
@@ -284,7 +309,8 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
         if richer is not None:
             richer['evidence'].extend(row['evidence'])
             integrations.remove(row)
-    integrations.sort(key=lambda r:(r['siem_id'],r['source_name'].casefold()))
+    type_integrations(integrations)
+    integrations.sort(key=lambda r:(r['siem_id'],r['source_entity_id'],r['source_name'].casefold()))
     # A successfully downloaded document may still be unprocessed because no
     # targeted adapter exists. Do NOT silently report this as complete coverage.
     parsed_document_urls = {
@@ -300,6 +326,10 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
     unparsed_system_documents = []
     for vendor in raw.get('vendors', []):
         for doc in vendor.get('source_results', []):
+            # R-Vision's registered "architecture" URL is actually the
+            # source-connection guide, not an infrastructure document.
+            if vendor['id'] == 'p03' and doc.get('source_id') == 'architecture':
+                continue
             if doc.get('source_id') not in SYSTEM_DOC_IDS or doc.get('status') != 'ok':
                 continue
             url = doc.get('resolved_url') or doc.get('url')
@@ -323,10 +353,11 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
         result['no_normalized_data'] = not any(result.values())
         result.update(siem_id=v['id'],siem_name=v['name'])
         coverage.append(result)
-    return {
+    catalog = {
         'schema_version':SCHEMA,'source_run_at':raw.get('run_at'),
         '_raw_run': raw,
         'integrations':integrations,'sizing_profiles':profiles,
+        'unique_source_values':unique_source_values(integrations),
         'system_requirements':requirements,
         'coverage':coverage,'unread_system_documents':unread,
         'unparsed_system_documents':unparsed_system_documents,
@@ -339,14 +370,24 @@ def build_catalog(raw: dict, input_file: Path) -> dict:
             'Versions inferred from hints are NOT verified product versions.',
         ],
     }
+    catalog['schema_validation'] = validate_catalog(catalog)
+    return catalog
 
 
 def write_catalog(catalog: dict, out_dir: Path) -> dict:
     out_dir.mkdir(parents=True,exist_ok=True)
+    validation = validate_catalog(catalog)
+    catalog['schema_validation'] = validation
+    if not validation['valid']:
+        (out_dir/'schema_validation.json').write_text(
+            json.dumps(validation, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+        raise ValueError('Normalized catalog does not satisfy the ETL contract')
     files={
         'readiness_report.json': readiness_report(catalog,catalog.get('_raw_run')),
         'quality_report.json': sizing_quality_report(catalog),
         'sources.json':catalog['integrations'],
+        'unique_source_values.json':catalog['unique_source_values'],
+        'schema_validation.json': validation,
         'sizing_profiles.json':catalog['sizing_profiles'],
         'system_requirements.json':catalog['system_requirements'],
         'coverage.json':catalog['coverage'],
@@ -356,7 +397,7 @@ def write_catalog(catalog: dict, out_dir: Path) -> dict:
         'unread_source_catalog_documents.json':catalog['unread_source_catalog_documents'],
     }
     for name, data in files.items():
-        payload = data if name in ('quality_report.json', 'readiness_report.json') else {
+        payload = data if name in ('quality_report.json', 'readiness_report.json', 'unique_source_values.json', 'schema_validation.json') else {
             'schema_version': SCHEMA, 'source_run_at': catalog['source_run_at'], 'items': data,
         }
         (out_dir/name).write_text(json.dumps(payload, ensure_ascii=False, indent=2)+'\n',encoding='utf-8')

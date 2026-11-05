@@ -11,7 +11,17 @@ def sizing_quality_report(catalog: dict) -> dict:
     requirements = catalog.get('system_requirements', [])
 
     def add(siem_id, code, severity, detail, idx=None):
-        row = {'siem_id': siem_id, 'code': code, 'severity': severity, 'detail': detail}
+        category = ('verification' if code == 'version_unverified' else
+                    'extraction_error' if severity == 'error' or code.endswith('_incomplete')
+                    or code == 'system_document_not_normalized' else 'data_gap')
+        existing = next((row for row in issues if row['siem_id'] == siem_id
+                         and row['code'] == code and row['detail'] == detail), None)
+        if existing is not None:
+            if idx is not None:
+                existing.setdefault('profile_indices', [existing['profile_index']]).append(idx)
+            return
+        row = {'siem_id': siem_id, 'code': code, 'severity': severity,
+               'category': category, 'detail': detail}
         if idx is not None:
             row['profile_index'] = idx
         issues.append(row)
@@ -24,7 +34,7 @@ def sizing_quality_report(catalog: dict) -> dict:
             add(siem_id, 'no_nodes', 'error', 'Отсутствуют роли и ресурсы узлов', i)
         if p.get('eps_from') is None and p.get('eps_to') is None:
             add(siem_id, 'eps_scope_missing', 'warning', 'Не указан диапазон EPS', i)
-        if p.get('network_gbps') is None:
+        if p.get('network_gbps') is None and not p.get('network_links'):
             add(siem_id, 'network_unspecified', 'warning', 'Сеть не указана в профиле', i)
         if p.get('edition') == 'all-in-one' and siem_id == 'p04':
             limits = p.get('limits') or {}
@@ -56,6 +66,7 @@ def sizing_quality_report(catalog: dict) -> dict:
             'system_requirements': len(requirements),
             'issues': len(issues),
             'issues_by_severity': dict(Counter(x['severity'] for x in issues)),
+            'issues_by_category': dict(Counter(x['category'] for x in issues)),
         },
         'issues': issues,
         'scope': 'Проверка структуры и очевидных пропусков; не верифицирует факты документации',

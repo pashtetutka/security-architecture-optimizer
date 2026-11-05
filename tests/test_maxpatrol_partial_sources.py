@@ -27,6 +27,8 @@ class MaxPatrolPartialSourcesTests(unittest.TestCase):
             doc = raw['vendors'][0]['source_results'][0]
             self.assertTrue(doc['snapshot_path'].endswith('.json'))
             self.assertEqual(doc['content_sha256'], digest)
+            self.assertEqual(doc['status'], 'ok')
+            self.assertTrue(doc['targeted_normalization_required'])
             catalog = build_catalog(raw, Path(temp)/'raw.json')
         rows = catalog['integrations']
         self.assertEqual(len(rows), 228)

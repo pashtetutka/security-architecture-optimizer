@@ -3,12 +3,42 @@ import re
 
 # Small curated ontology; each alias requires an explicit editorial decision.
 ALIAS = {
+    # Explicit editorial aliases observed in saved official catalog rows.
+    # Do not add broad families, versions, or neighbouring components here.
     '1с зуп': '1с зуп',
     '1с зарплата и управление персоналом': '1с зуп',
     '1с предприятие 8 3': '1с предприятие 8 3',
     '1с 8 3': '1с предприятие 8 3',
     'kaspersky security center': 'kaspersky security center',
     'ksc': 'kaspersky security center',
+    'kaspersky kaspesky security center ksc': 'kaspersky security center',
+    'fortigate': 'fortinet fortigate',
+    'fortianalyzer': 'fortinet fortianalyzer',
+    'fortisoar': 'fortinet fortisoar',
+    'redcheck': 'саз redcheck',
+    'rt solar solar dozor': 'solar dozor',
+    'positive technologies nad': 'positive technologies network attack discovery nad',
+    'positive technologies network attack discovery': 'positive technologies network attack discovery nad',
+    'positive technologies isim': 'positive technologies industrial security incident manager pt isim',
+    'pt industrial security incident manager': 'positive technologies industrial security incident manager pt isim',
+    'vmware vcenter': 'vmware vcenter server',
+    'hyper v': 'microsoft hyper v',
+    'microsoft sccm': 'microsoft system center configuration manager sccm',
+    'microsoft configuration manager': 'microsoft system center configuration manager sccm',
+    'microsoft iis': 'microsoft iis server',
+    'microsoft network policy server nps': 'microsoft network policy server',
+    'microsoft sql': 'microsoft sql server',
+    'microsoft 365': 'microsoft office 365',
+    'microsoft skype for business': 'skype for business',
+    'exchange server': 'microsoft exchange server',
+    'ideco ideco utm': 'ideco utm',
+    'dionis nx': 'factor ts dionis nx',
+    'ffr yarai': 'ffri ffr yarai',
+    'new security safeinspect': 'new security technologies safeinspect',
+    'veeam software veeam backup replication': 'veeam backup replication',
+    'kaspersky kaspersky web traffic security kwts': 'kaspersky web traffic security kwts',
+    'kaspersky kaspersky secure mail gateway ksmg': 'kaspersky secure mail gateway ksmg',
+    'kaspersky anti targeted attack kata': 'kaspersky anti targeted attack platform kata',
 }
 
 

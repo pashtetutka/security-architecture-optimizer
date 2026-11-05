@@ -20,6 +20,8 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
    url=source['url'];sid=source['id']
    report={'source_id':sid,'url':url,'status':'pending','product_version_hint':source.get('product_version_hint'),
            'acquisition_method':getattr(fetch,'acquisition_method','unknown')}
+   if source.get('redistribution'):
+    report['redistribution']=source['redistribution']
    product['source_results'].append(report)
    stage='download'
    try:
@@ -41,7 +43,11 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
      report['snapshot_status']='saved'
     stage='extraction'
     payload=extract_content(data,source['mode'],encoding)
-    report.update(status=('ok' if payload['facts'] else 'empty_review_required'),content_sha256=digest,extracted_facts=len(payload['facts']),title=payload.get('title'),warnings=payload.get('warnings',[]))
+    targeted=bool(payload.get('targeted_normalization_required'))
+    report.update(status=('ok' if payload['facts'] or targeted else 'empty_review_required'),
+                  content_sha256=digest,extracted_facts=len(payload['facts']),
+                  targeted_normalization_required=targeted,
+                  title=payload.get('title'),warnings=payload.get('warnings',[]))
     for x in payload['facts']:
      evidence=x.copy()
      evidence.update({'siem_id':vendor['id'],'siem_name':vendor['name'],'source_id':sid,

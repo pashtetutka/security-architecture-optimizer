@@ -393,7 +393,7 @@
         {
           "source_id": "supported_sources_api",
           "url": "https://help.ptsecurity.com/api/v2/documents/document/ru-RU/siem/8.6/help/1083652747",
-          "status": "empty_review_required",
+          "status": "ok",
           "product_version_hint": "8.6; documentation version, product not independently verified",
           "acquisition_method": "automatic_https",
           "snapshot_path": "data/etl/repro/raw/p06/supported_sources_api_a7df480fe76184.json",
@@ -402,6 +402,7 @@
           "http_content_type": "application/json; charset=utf-8",
           "content_sha256": "a7df480fe76184cedb6ca032522086d4f293fbae0e8ceb3a852450ea131743d5",
           "extracted_facts": 0,
+          "targeted_normalization_required": true,
           "title": "Поддерживаемые источники и профили для сбора событий",
           "warnings": [
             "Requires targeted source normalization"
@@ -601,6 +602,25 @@
       "id": "p12",
       "name": "Kaspersky KUMA",
       "source_results": [
+        {
+          "source_id": "hardware_requirements",
+          "url": "https://support.kaspersky.ru/kuma/4.0/217889",
+          "status": "ok",
+          "product_version_hint": "4.0 documentation; not verified",
+          "acquisition_method": "automatic_https",
+          "resolved_url": "https://support.kaspersky.ru/kuma/4.0/217889",
+          "http_charset": "utf-8",
+          "http_content_type": "text/html; charset=utf-8",
+          "content_sha256": "8c9f1c436ef727d62044fc24949b0ad655151d52b0c1a28850a601ed81df81cf",
+          "retrieved_at": "2026-11-05T15:04:45.055765+00:00",
+          "snapshot_status": "saved",
+          "snapshot_path": "data/etl/repro/raw/p12/hardware_requirements_8c9f1c436ef727.html",
+          "extracted_facts": 0,
+          "targeted_normalization_required": true,
+          "title": "Аппаратные и программные требования",
+          "warnings": [],
+          "extraction_mode": "kuma_requirements"
+        },
         {
           "source_id": "source_catalog",
           "url": "https://support.kaspersky.ru/kuma/4.0/255782",
@@ -40601,8 +40621,8 @@
   ],
   "totals": {
     "vendors": 13,
-    "sources": 38,
-    "ok_sources": 28,
+    "sources": 39,
+    "ok_sources": 29,
     "facts": 1478,
     "errors": 2
   }

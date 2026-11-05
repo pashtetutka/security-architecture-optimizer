@@ -10,6 +10,7 @@ def provenance(item: dict) -> dict:
         'document_sha256': item.get('source_sha256'),
         'document_version_hint': item.get('document_version_hint'),
         'retrieved_at': item.get('collected_at'),
+        'acquisition_method': item.get('acquisition_method', 'unknown'),
         'excerpt': item.get('evidence_excerpt'),
         'page': item.get('page'),
         'extraction_method': item.get('evidence_status'),

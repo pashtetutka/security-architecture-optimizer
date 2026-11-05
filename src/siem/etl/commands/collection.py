@@ -1,10 +1,11 @@
 """Document collection, status and existing applicability commands."""
-import argparse,json
+import argparse,json,hashlib
 from collections import Counter
 from pathlib import Path
 from ..pipeline import collect
 from ..fetcher import PublicFetcher
 from ..applicability import evaluate
+from ..catalog import locate_snapshot
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def write(path,data):
@@ -17,7 +18,10 @@ def main(argv=None):
  crawl=sub.add_parser('crawl',help='Скачать официальные источники (robots, HTTPS, без обхода всего домена)')
  crawl.add_argument('--registry',default='data/etl/vendors.json');crawl.add_argument('--output')
  crawl.add_argument('--only',nargs='*',help='Ограничить p01 p03 ...; без аргумента все 13')
+ crawl.add_argument('--source-ids', nargs='+', help='Собирать только указанные идентификаторы документов')
  crawl.add_argument('--dry-run',action='store_true',help='Показать URL, ничего не скачивать')
+ crawl.add_argument('--exclude-restricted-documents', action='store_true',
+                    help='Исключить документы с явным ограничением перепубликации (для публичных артефактов CI)')
  crawl.add_argument('--fixture-dir',type=Path,help='Офлайн-проверка на локальных тестовых файлах')
  crawl.add_argument('--manual-dir',type=Path,help='Офлайн-импорт HTML/PDF, вручную сохранённых с оригинальных страниц. Формат p03__source_catalog.html')
  crawl.add_argument('--snapshot-dir',type=Path,help='Сохранять HTML/PDF для повторного аудита')
@@ -38,6 +42,13 @@ def main(argv=None):
  if args.cmd=='crawl':
   registry=read(args.registry)
   if args.only: registry['vendors']=[v for v in registry['vendors'] if v['id'] in args.only]
+  if args.source_ids:
+   for vendor in registry['vendors']:
+    vendor['sources']=[s for s in vendor['sources'] if s['id'] in args.source_ids]
+  if args.exclude_restricted_documents:
+   for vendor in registry['vendors']:
+    vendor['sources']=[s for s in vendor['sources']
+                       if s.get('redistribution') != 'permission_required_do_not_publish_snapshot']
   if args.dry_run:
    for v in registry['vendors']:
     print(v['id'],v['name'])
@@ -57,7 +68,12 @@ def main(argv=None):
     def fetch(self,url):
      if url not in mapping: raise FileNotFoundError('Снимок отсутствует: '+url)
      record=mapping[url]
-     return (Path(record['snapshot_path']).read_bytes(),record.get('http_charset'),record.get('http_content_type',''))
+     path=locate_snapshot(record['snapshot_path'],args.replay_from.parent)
+     if path is None: raise FileNotFoundError('Снимок отсутствует: '+url)
+     data=path.read_bytes()
+     if not record.get('content_sha256') or hashlib.sha256(data).hexdigest()!=record['content_sha256']:
+      raise ValueError('snapshot_hash_mismatch: '+url)
+     return (data,record.get('http_charset'),record.get('http_content_type',''))
    fetcher=SnapshotFetcher()
   if args.fixture_dir:
    paths={src['url']:(args.fixture_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.json' if src['mode']=='maxpatrol_api' else '.html')))

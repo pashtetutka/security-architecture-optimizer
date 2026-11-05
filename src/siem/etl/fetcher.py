@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
 from pathlib import Path
 import ssl
+import re
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -59,6 +60,8 @@ class PublicFetcher:
                     parser = RobotFileParser()
                     parser.parse([])
                 elif resp.status_code == 200:
+                    if re.search(r'<(?:!doctype\s+html|html|head|body)\b', resp.text, re.I):
+                        raise RobotsPolicyUnavailable('robots.txt returned HTML: ' + robots_url)
                     parser = RobotFileParser()
                     parser.parse(resp.text.splitlines())
                 else:
