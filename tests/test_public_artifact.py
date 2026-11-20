@@ -66,4 +66,21 @@ class PublicArtifactTests(unittest.TestCase):
    unconfirmed=[x for x in result['records'] if x['reason']=='redistribution_not_confirmed']
    self.assertTrue(unconfirmed)
    self.assertTrue(all(not x['included'] and x['path'] is None for x in unconfirmed))
+
+ def test_approved_shared_snapshot_is_written_once(self):
+  source=ROOT/'data/etl/repro/vendors.json'
+  vendor=next(v for v in json.loads(source.read_text('utf-8'))['vendors'] if v['id']=='p06')
+  document=next(row for row in vendor['source_results'] if row['source_id']=='sources')
+  digest=document['content_sha256']
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory)
+   permissions=root/'permissions.json'
+   permissions.write_text(json.dumps({'observations':[
+    {'document_sha256':digest,'owner_permission':'approved'},
+   ]}),'utf-8')
+   output=root/'artifact'
+   included=[row for row in build(source,output,permissions)['records'] if row['included']]
+   self.assertEqual({'sources','supported_sources','deployment'},{row['source_id'] for row in included})
+   path,={row['path'] for row in included}
+   self.assertEqual(digest,hashlib.sha256((output/path).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

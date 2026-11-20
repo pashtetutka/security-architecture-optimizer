@@ -1,4 +1,3 @@
-from pathlib import Path
 import unittest
 
 from siem.domain.identity import IdentityDictionary, load_default_dictionary, normalize_identity
@@ -6,13 +5,10 @@ from siem.domain.versions import compare_versions
 from siem.etl.claims import conflicting_claim_diagnostics, normalize_claims, unknown_version
 
 
-ROOT=Path(__file__).resolve().parents[1]
-
-
 class ClaimNormalizationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dictionary=IdentityDictionary.load(ROOT/'tests/fixtures/identity_dictionary.v2.json')
+        cls.dictionary=load_default_dictionary()
 
     def normalize(self, rows):
         return normalize_claims(rows,siem_product_ref='product:siem-test',

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from siem.domain.identity import IdentityDictionary, load_default_dictionary
+from siem.domain.identity import load_default_dictionary
 from siem.domain.validation import validate_bundle
 from siem.etl.migration import _claim_subject_names, build_migration_bundle
 
@@ -53,7 +53,7 @@ class MigrationBundleTests(unittest.TestCase):
     def setUpClass(cls):
         path=ROOT/'data/etl/repro/vendors.json'
         raw=json.loads(path.read_text('utf-8'))
-        dictionary=IdentityDictionary.load(ROOT/'src/siem/domain/ontology/identity_dictionary.v4.json')
+        dictionary=load_default_dictionary()
         cls.bundle=build_migration_bundle(raw,path,dictionary)
 
     def test_real_legacy_catalog_produces_valid_v2_bundle(self):
@@ -91,7 +91,7 @@ class MigrationBundleTests(unittest.TestCase):
 
     def test_replay_ignores_legacy_cache_and_manifest_record_order(self):
         path=ROOT/'data/etl/repro/vendors.json';raw=json.loads(path.read_text('utf-8'))
-        dictionary=IdentityDictionary.load(ROOT/'src/siem/domain/ontology/identity_dictionary.v4.json')
+        dictionary=load_default_dictionary()
         raw['facts']=[{'field':'source_integration','value':'Injected false product',
                        'siem_id':'p01','evidence_status':'vendor_table'}]
         raw['vendors'].reverse()

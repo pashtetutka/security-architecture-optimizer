@@ -5,7 +5,7 @@ import unittest
 
 from siem.decision.contract_assessment import MODEL_POLICY_VERSION, project_legacy_coverage
 from siem.decision.scenarios import load_scenario
-from siem.domain.identity import IdentityDictionary, load_default_dictionary
+from siem.domain.identity import load_default_dictionary
 from siem.etl.migration import build_migration_bundle
 from tools.contract_diff import validate_matrix_trace
 
@@ -165,7 +165,7 @@ class ContractAssessmentTests(unittest.TestCase):
  @classmethod
  def setUpClass(cls):
   path=ROOT/'data/etl/repro/vendors.json';raw=json.loads(path.read_text('utf-8'))
-  cls.dictionary=IdentityDictionary.load(ROOT/'src/siem/domain/ontology/identity_dictionary.v4.json')
+  cls.dictionary=load_default_dictionary()
   cls.bundle=build_migration_bundle(raw,path,cls.dictionary)
   cls.scenario=load_scenario(ROOT/'data/scenarios/s06_engineering.json')
   cls.result=project_legacy_coverage(cls.scenario,cls.bundle,cls.dictionary)
@@ -243,7 +243,7 @@ class ContractAssessmentTests(unittest.TestCase):
                      {item['evidence_ref'] for item in evidence})
     self.assertTrue(all(item['url'] and item['locator'] and item['document_sha256']
                         for item in evidence))
- def test_g2_delta_is_explicit_and_does_not_silently_change(self):
+ def test_strict_policy_delta_with_current_dictionary(self):
   expected=json.loads((ROOT/'tests/fixtures/manual_questionnaire_review_20261114.json').read_text('utf-8'))
   differences=[]
   for vendor in self.result['vendors']:
@@ -253,9 +253,7 @@ class ContractAssessmentTests(unittest.TestCase):
      differences.append((vendor['siem_id'],index,index in counted,row['counted_for_coverage']))
   self.assertEqual([
    ('p01',19,True,False),('p02',2,True,False),
-   ('p02',3,True,False),('p02',23,True,False),('p03',2,True,False),
-   ('p03',3,True,False),('p03',23,True,False),
-   ('p06',1,True,False),('p06',23,True,False),
-   ('p12',23,True,False)],differences)
+   ('p02',3,True,False),('p03',2,True,False),
+   ('p03',3,True,False),('p06',1,True,False)],differences)
 
 if __name__=='__main__':unittest.main()

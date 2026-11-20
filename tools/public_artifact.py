@@ -56,8 +56,10 @@ def _stage(raw,root,output,source_manifest_sha,permission_observations):
     relative=Path('snapshots')/vendor['id']/Path(path).name;target=output/relative
     if not target.resolve().is_relative_to(output.resolve()):
      raise ValueError('unsafe publication path')
-    if target.exists():raise ValueError('duplicate publication path: '+str(relative))
-    target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+    if target.exists():
+     if target.read_bytes()!=data:raise ValueError('conflicting publication path: '+str(relative))
+    else:
+     target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
     item.update(included=True,path=relative.as_posix())
    records.append(item)
  output.mkdir(parents=True,exist_ok=True)

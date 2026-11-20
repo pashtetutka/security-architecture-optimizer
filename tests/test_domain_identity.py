@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class IdentityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dictionary = IdentityDictionary.load(ROOT / 'tests/fixtures/identity_dictionary.v2.json')
+        cls.dictionary = load_default_dictionary()
 
     def test_normalization_is_idempotent_and_unicode_aware(self):
         samples = ['  1C:Предприятие  ', 'КИБЕР‑БЭКАП', 'Ежик и Ёлка', 'C', 'C++', 'C#']
@@ -46,21 +46,22 @@ class IdentityTests(unittest.TestCase):
         self.assertEqual(1, len(unresolved_queue([unknown])))
 
     def test_dictionary_validation_rejects_cycles_by_reference_or_bad_key(self):
-        raw = json.loads((ROOT / 'tests/fixtures/identity_dictionary.v2.json').read_text('utf-8'))
+        raw = json.loads((ROOT / 'src/siem/domain/ontology/identity_dictionary.v6.json').read_text('utf-8'))
         raw['aliases'][0]['normalized_key'] = 'wrong'
         with self.assertRaisesRegex(ValueError, 'normalized_key mismatch'):
             IdentityDictionary.from_dict(raw)
 
     def test_display_name_update_does_not_change_explicit_id(self):
-        raw = json.loads((ROOT / 'tests/fixtures/identity_dictionary.v2.json').read_text('utf-8'))
-        raw['entities'][1]['display_name'] = 'Cyber Backup (renamed display)'
+        raw = json.loads((ROOT / 'src/siem/domain/ontology/identity_dictionary.v6.json').read_text('utf-8'))
+        next(entity for entity in raw['entities']
+             if entity['id'] == 'product:cyberprotect-cyber-backup')['display_name'] = 'Cyber Backup (renamed display)'
         changed = IdentityDictionary.from_dict(raw)
         self.assertEqual('product:cyberprotect-cyber-backup',
                          resolve_name('Кибербэкап', None, changed).entity_ref)
 
     def test_every_legacy_alias_has_an_explicit_migration_decision(self):
         from siem.etl.coverage import ALIAS
-        raw = json.loads((ROOT / 'tests/fixtures/identity_dictionary.v2.json').read_text('utf-8'))
+        raw = json.loads((ROOT / 'src/siem/domain/ontology/identity_dictionary.v6.json').read_text('utf-8'))
         decisions = {row['legacy_surface']: row for row in raw['legacy_migration']['decisions']}
         self.assertEqual(set(ALIAS), set(decisions))
         for surface in ALIAS:
