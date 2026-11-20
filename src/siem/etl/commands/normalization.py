@@ -97,7 +97,7 @@ def main(argv=None):
         print(f"Непрочитанные документы: {summary['unread_system_documents'] + summary['unread_source_catalog_documents']}; "
               f"неразобранные: {summary['unparsed_system_documents']}")
         if tests: print('Тесты:',tests['summary'])
-        print('Данные извлечены автоматически и требуют проверки по первоисточникам.')
+        print('Нормализованные данные требуют проверки по первоисточникам; способ получения сохранён в происхождении.')
         return 1 if tests and tests['status']=='failed' else 0
     if args.command=='report':
         path=args.focused_dir/'readiness_report.json'

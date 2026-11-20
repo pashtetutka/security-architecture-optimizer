@@ -4,8 +4,13 @@ from pathlib import Path
 import streamlit as st
 import pandas as pd
 from siem.core import analyze,sensitivity
+from siem.decision.ui import organizations_page
 st.set_page_config(page_title='SIEM Decision Support',layout='wide')
 st.title('Поддержка выбора SIEM')
+page=st.sidebar.radio('Раздел', ['Организации', 'Исторический расчёт'])
+if page == 'Организации':
+    organizations_page(Path(__file__).resolve().parent)
+    st.stop()
 st.caption('Исследовательский прототип. Исторические оценки не равны текущим характеристикам продуктов.')
 catalog=json.loads(Path('data/reference_metrics.json').read_text(encoding='utf8'))
 with st.sidebar:

@@ -31,26 +31,45 @@ def present_or_none(text):
 def make_claim(field, value, excerpt, status='review_candidate', **more):
  return {'field':field,'value':str(value)[:200], 'evidence_excerpt':clean(excerpt)[:LIMIT], 'evidence_status':status, **more}
 
-def structured_tables(html, mode):
+def structured_tables(html, mode, *, coverage=None):
+ if mode not in ('rvision','kuma'):return []
  soup=BeautifulSoup(html,'html.parser')
  facts=[]
- for table in soup.find_all('table'):
+ for table_number,table in enumerate(soup.find_all('table'), 1):
+  if table.find_parent('table') is not None:
+   continue
   rows=[]
   for tr in table.find_all('tr'):
-   vals=[clean(x.get_text(' ',strip=True)) for x in tr.find_all(['th','td'],recursive=False)]
-   if vals:rows.append(vals)
-  if len(rows)<2:continue
-  head=' '.join(rows[0]).casefold()
-  if mode=='rvision' and not ('продукт' in head and 'нормализац' in head and 'версия' in head):continue
-  if mode=='kuma' and not ('систем' in head and 'нормализатор' in head):continue
-  if mode not in ('rvision','kuma'):continue
-  for vals in rows[1:]:
+   if tr.find_parent('table') is not table:
+    continue
+   cells=tr.find_all(['th','td'],recursive=False)
+   vals=[clean(x.get_text(' ',strip=True)) for x in cells]
+   if vals:
+    rows.append((vals,cells))
+  head=' '.join(rows[0][0]).casefold() if rows else ''
+  required=('продукт','нормализац','версия') if mode=='rvision' else ('систем','нормализатор')
+  if not all(fragment in head for fragment in required):
+   if coverage is not None:
+    coverage.append({'section':f'table:{table_number}', 'status':'not_extracted',
+                     'record_count':0,'reason':'not a recognized source catalog table'})
+   continue
+  if table.find('table') is not None or table.select_one('td[rowspan], th[rowspan], td[colspan], th[colspan]'):
+   if coverage is not None:
+    coverage.append({'section':f'table:{table_number}', 'status':'not_extracted',
+                     'record_count':0,'reason':'nested tables or merged cells are unsupported'})
+   continue
+  initial_count=len(facts)
+  for vals,cells in rows[1:]:
    if mode=='rvision':
     if len(vals)<5:continue
     vendor,product,version,connection,normalizer=vals[:5]
     if not product or product.casefold()=='продукт':continue
+    entries=[present_or_none(item.get_text(' ',strip=True))
+             for item in cells[3].find_all(['p','li'])]
+    entries=list(dict.fromkeys(entry for entry in entries if entry))
     facts.append(make_claim('source_integration',product,' | '.join(vals), 'vendor_table',
        source_vendor=vendor, source_version=present_or_none(version), collection_method=present_or_none(connection),
+       **({'published_connection_entries':entries} if entries else {}),
        normalizer_id=present_or_none(normalizer), supported_version_scope='published_doc_version_only'))
    else:
     if len(vals)<2:continue
@@ -61,10 +80,20 @@ def structured_tables(html, mode):
        normalizer_format=(vals[2] if len(vals)>2 else None),
        normalizer_description=(vals[3] if len(vals)>3 else None),
        supported_version_scope='published_doc_version_only'))
+  if coverage is not None:
+   extracted=len(facts)-initial_count
+   skipped=len(rows)-1-extracted
+   coverage.append({'section':f'table:{table_number}',
+                    'status':'partial' if skipped and extracted else 'extracted' if extracted else 'empty',
+                    'record_count':extracted,
+                    'reason':(f'{skipped} body rows did not match the catalog structure' if skipped
+                              else None if extracted else 'table has no body rows')})
  return facts
 
 def extract_html(html, mode):
  soup=BeautifulSoup(html,'html.parser')
+ has_script=bool(soup.find('script',src=True))
+ body=soup.body
  for bad in soup(['script','style','nav','footer','header','form']):bad.decompose()
  title=clean(soup.title.get_text(' ',strip=True)) if soup.title else ''
  if mode=='rusiem':
@@ -88,14 +117,15 @@ def extract_html(html, mode):
                  collection_method=None,normalizer_id=None,source_version=None,
                  supported_version_scope='not_specified'))
   return {'title':title,'facts':facts,'warnings':result['warnings']}
- table_facts=structured_tables(html,mode)
+ table_coverage=[]
+ table_facts=structured_tables(html,mode,coverage=table_coverage)
  facts=list(table_facts)
  # Critical: a vendor's *source integration catalog* is not installation guidance.
  # The same KUMA description can mention EPS, QEMU, PostgreSQL etc. without
  # asserting the SIEM's own EPS/sizing, virtualization or PostgreSQL dependency.
  # Preserve the entire table description in the structured fact instead.
  if mode in ('rvision', 'kuma'):
-  return {'title':title,'facts':facts,'warnings':[]}
+  return {'title':title,'facts':facts,'warnings':[],'table_coverage':table_coverage}
  # Candidate-only sentences/paragraphs: never used as verified deployment dependencies.
  seen=set()
  for node in soup.find_all(['p','li','h2','h3','h4','td']):
@@ -106,7 +136,9 @@ def extract_html(html, mode):
    if re.search(pattern,txt,re.I):
     facts.append(make_claim(category,txt[:110],txt))
     break
- return {'title':title,'facts':facts[:4000], 'warnings':(['Достигнут лимит фрагментов 4000'] if len(facts)>4000 else [])}
+ return {'title':title,'facts':facts[:4000],
+         'client_rendered_shell':bool(has_script and body and not soup.get_text(' ',strip=True)),
+         'warnings':(['Достигнут лимит фрагментов 4000'] if len(facts)>4000 else [])}
 
 def extract_pdf(data:bytes):
  try:
@@ -115,8 +147,13 @@ def extract_pdf(data:bytes):
   raise RuntimeError('Для PDF установите: pip install pypdf') from exc
  reader=PdfReader(BytesIO(data),strict=False)
  facts=[]
+ pages_without_text=[]
+ page_count=len(reader.pages)
  for i,page in enumerate(reader.pages[:150]):
   text=page.extract_text() or ''
+  if not text.strip():
+   pages_without_text.append(i+1)
+   continue
   for line in text.splitlines():
    line=clean(line)
    if len(line)<25 or len(line)>450: continue
@@ -124,8 +161,20 @@ def extract_pdf(data:bytes):
     if re.search(pattern,line,re.I):
      facts.append(make_claim(category,line[:110],line,page=i+1))
      break
+ coverage=[]
+ if pages_without_text:
+  coverage.append({'section':'pages:'+','.join(map(str,pages_without_text)),
+                   'status':'not_extracted','record_count':0,
+                   'reason':'no extractable text'})
+ if page_count>150:
+  coverage.append({'section':f'pages:151-{page_count}','status':'not_extracted','record_count':0,
+                   'reason':'page limit reached'})
+ if len(facts)>3500:
+  coverage.append({'section':'candidate_export','status':'partial','record_count':3500,
+                   'reason':f'{len(facts)-3500} candidates omitted by output limit'})
  return {'title':str(reader.metadata.title) if reader.metadata and reader.metadata.title else '',
-         'facts':facts[:3500], 'warnings':(['PDF ограничен 150 страницами'] if len(reader.pages)>150 else [])}
+         'facts':facts[:3500], 'coverage_gaps':coverage,
+         'warnings':(['PDF ограничен 150 страницами'] if page_count>150 else [])}
 
 def extract_content(data:bytes,mode:str,charset='utf-8'):
  if mode=='maxpatrol_api':

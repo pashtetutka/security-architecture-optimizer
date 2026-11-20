@@ -9,14 +9,14 @@ class DeploymentContextTests(unittest.TestCase):
     def test_recommendations_and_listed_databases_are_distinct(self):
         root = Path(__file__).parent / 'fixtures'
         specs = (
-            ('p03', 'R-Vision SIEM', 'deployment', 'rvision_deployment.html',
+            ('p03', 'R-Vision SIEM', 'deployment', 'data/etl/repro/raw/p03/deployment_46e160f4d5cc7a.html',
              '46e160f4d5cc7ade90a57788c59a11823368b328422da5990cfd855cb62dfc11'),
-            ('p13', 'KOMRAD Enterprise SIEM', 'architecture', 'komrad_architecture.html',
+            ('p13', 'KOMRAD Enterprise SIEM', 'architecture', 'data/etl/repro/raw/p13/architecture_43442158a8ba63.html',
              '43442158a8ba63927339a27ae1b22d5617acc86823483698a54273efac55e627'),
         )
         vendors = []
         for vid, name, source_id, filename, digest in specs:
-            path = root / filename
+            path = root.parents[1] / filename
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
             vendors.append({'id': vid, 'name': name, 'source_results': [{
                 'source_id': source_id, 'url': 'https://example.test/' + filename,

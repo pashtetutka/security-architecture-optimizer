@@ -167,7 +167,7 @@ def parse_alertix_connectors(html: str, meta: dict, receiver: str) -> list[dict]
             if len(row) != 3 or not row[0] or not row[1]:
                 continue
             name, maker, source_type = row
-            result.append({
+            entry = {
                 'siem_id': meta['siem_id'], 'siem_name': meta['siem_name'],
                 'siem_version': None,
                 'siem_version_hint': document_nullable(meta.get('product_version_hint')),
@@ -181,6 +181,26 @@ def parse_alertix_connectors(html: str, meta: dict, receiver: str) -> list[dict]
                 'evidence': [document_evidence(meta, ' | '.join(row),
                                                'alertix_connector_table',
                                                f'Перечень коннекторов {receiver} ресивера')],
-            })
+            }
+            # Some published cells combine several concrete event sources
+            # or put the release inside the name. Retain the original cell
+            # verbatim in evidence and expose products and versions separately.
+            products = [(name, None)]
+            if name == 'Microsoft Windows 8 - 10, Windows Server 2012 R2, 2016, 2019, 2022 Eventlog в т.ч. Active Directory, DNS сервис':
+                products = [
+                    ('Microsoft Windows', '8—10, Server 2012 R2, 2016, 2019, 2022'),
+                    ('Active Directory Domain Services', '2012 R2, 2016, 2019, 2022'),
+                    ('Microsoft DNS Server', '2012 R2, 2016, 2019, 2022'),
+                ]
+            elif name == 'Kaspersky Endpoint Security, Kaspersky Security Center':
+                products = [('Kaspersky Endpoint Security', None), ('Kaspersky Security Center', None)]
+            elif name == 'Exchange Server (MSGTRK, SMTP, OWA, Antispam, mailbox audit) 2016, 2019':
+                products = [('Microsoft Exchange Server', '2016, 2019')]
+            elif name == 'ESXi 7' and maker == 'VMware, Inc.':
+                products = [('VMware ESXi', '7')]
+            elif name == 'Коммутаторы Eltex':
+                products = [('Eltex Switch', None)]
+            result.extend(dict(entry, source_name=product, source_version=version)
+                          for product, version in products)
         return result
     return []

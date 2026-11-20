@@ -1,0 +1,21 @@
+# Tested direct dependency set for deterministic developer/CI installs.
+beautifulsoup4==4.15.0
+attrs==25.3.0
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+jsonschema==4.25.1
+jsonschema-specifications==2025.9.1
+markdownify==1.2.3
+pypdf==6.21.2
+referencing==0.37.0
+requests==2.32.3
+rpds-py==0.30.0
+six==1.17.0
+soupsieve==2.9.2
+typing-extensions==4.14.1
+urllib3==2.2.3
+
+# Optional preview dependencies verified on Windows with Python 3.10.
+pandas==2.3.3
+streamlit==1.65.0

@@ -1,0 +1,357 @@
+{
+  "schema_version": "siem-decision-scenario/1.0",
+  "scenario_id": "s06_engineering",
+  "name": "Инженерная организация (опросный лист)",
+  "synthetic": false,
+  "inventory_provenance": {
+    "type": "user_supplied_image",
+    "transcription_status": "needs_user_confirmation",
+    "document_sha256": null,
+    "note": "Опросный лист расшифрован с изображения пользователя; требуется сверка оригинала."
+  },
+  "organization_size": {
+    "class": "unknown",
+    "employees": null,
+    "sites": null
+  },
+  "assumptions": [
+    "На снимке не указаны численность сотрудников, площадки и EPS.",
+    "Количество относится к строке опросного листа; строки ролей одного сервера могут описывать одно устройство.",
+    "Составные модели и версии переписаны без распределения количества между компонентами.",
+    "Важность и обязательность источников на фото не указаны."
+  ],
+  "source_defaults": {
+    "criticality": null,
+    "requirement": "unknown",
+    "eps_status": "unknown",
+    "eps_basis": "На фотографии опросного листа EPS не указан; требуется замер."
+  },
+  "event_sources": [
+    {
+      "source_type": "Межсетевой экран",
+      "manufacturer_model": "D-LINK/DFL-1660",
+      "raw_name": "D-link Firewall",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "network",
+      "kind": "firewall",
+      "asset_group_id": "dlink_firewall",
+      "log_stream": "firewall",
+      "inventory_note": "В каталоге указан класс D-link Firewall без модели DFL-1660 и без диапазона версий."
+    },
+    {
+      "source_type": "Межсетевой экран",
+      "manufacturer_model": "Континент-4/R550",
+      "raw_name": "Континент-4",
+      "version": "4",
+      "quantity": 1,
+      "asset_class": "network",
+      "kind": "firewall",
+      "asset_group_id": "continent_r550",
+      "log_stream": "firewall"
+    },
+    {
+      "source_type": "Система обнаружения вторжений",
+      "manufacturer_model": "СОВ Континент-4/R550",
+      "raw_name": "Континент-4",
+      "version": "4",
+      "quantity": 1,
+      "asset_class": "network",
+      "kind": "intrusion_detection",
+      "asset_group_id": "continent_r550",
+      "log_stream": "intrusion_detection",
+      "inventory_note": "СОВ размещена на том же устройстве R550, что и межсетевой экран; журнал СОВ учитывается отдельно.",
+      "product_family": "КОД Безопасности"
+    },
+    {
+      "source_type": "Антивирусные средства защиты",
+      "manufacturer_model": "Kaspersky Security Center",
+      "raw_name": "Kaspersky Security Center",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "endpoint_security",
+      "asset_group_id": "edr_optimum_deployment",
+      "log_stream": "endpoint_security",
+      "inventory_note": "В исходном листе было Kaspersky EDR Optimum 15.1.0.20748. По уточнению владельца в качестве источника событий указан Kaspersky Security Center; его версия, состав управляемых продуктов и число агентов неизвестны."
+    },
+    {
+      "source_type": "Почтовый сервер",
+      "manufacturer_model": "Microsoft Exchange 2010",
+      "raw_name": "Exchange Server",
+      "version": "2010",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "mail",
+      "asset_group_id": "exchange",
+      "log_stream": "mail"
+    },
+    {
+      "source_type": "Почтовый антивирус/антиспам",
+      "manufacturer_model": "Kaspersky SMG",
+      "raw_name": "Kaspersky SMG",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "mail_security",
+      "asset_group_id": "ksmg",
+      "log_stream": "mail_security"
+    },
+    {
+      "source_type": "СКУД",
+      "manufacturer_model": "RusGuard",
+      "raw_name": "СКУД RusGuard",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "physical_security",
+      "asset_group_id": "rusguard",
+      "log_stream": "access_control"
+    },
+    {
+      "source_type": "DLP",
+      "manufacturer_model": "Staffcop 5.7.3-3 (Postgres)",
+      "raw_name": "Staffcop",
+      "version": "5.7.3-3",
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "dlp",
+      "asset_group_id": "staffcop",
+      "log_stream": "dlp",
+      "product_family": "Staffcop"
+    },
+    {
+      "source_type": "EDR/XDR",
+      "manufacturer_model": "KEDR 15.4.266",
+      "raw_name": "KEDR",
+      "version": "15.4.266",
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "endpoint_security",
+      "asset_group_id": "kedr",
+      "log_stream": "edr",
+      "inventory_note": "В исходном листе указано KEDR 15.4.266. Редакция решения (EDR Optimum, Expert/KATA или иная), соответствие версии продукту и путь экспорта событий не подтверждены; число агентов неизвестно.",
+      "scope_review_required": true
+    },
+    {
+      "source_type": "Коммутаторы",
+      "manufacturer_model": "Eltex MES2448B/MES5332A",
+      "raw_name": "Eltex Switch",
+      "version": null,
+      "quantity": 9,
+      "asset_class": "network",
+      "kind": "switch",
+      "asset_group_id": "eltex_mes",
+      "product_family": "Eltex",
+      "log_stream": "switch_syslog",
+      "inventory_note": "Всего 9 коммутаторов двух моделей; разбивка по моделям не указана."
+    },
+    {
+      "source_type": "DHCP-сервер",
+      "manufacturer_model": "Windows Server 2008 R2 Standard на AD",
+      "raw_name": "Microsoft DHCP Server",
+      "version": "2008 R2",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "dhcp",
+      "asset_group_id": "ad_2008",
+      "log_stream": "dhcp"
+    },
+    {
+      "source_type": "DNS-сервер",
+      "manufacturer_model": "Windows Server 2008 R2 Standard на AD",
+      "raw_name": "Microsoft DNS Server",
+      "version": "2008 R2",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "dns",
+      "asset_group_id": "ad_2008",
+      "log_stream": "dns"
+    },
+    {
+      "source_type": "Резервное копирование и архивирование",
+      "manufacturer_model": "Кибербекап",
+      "raw_name": "Кибербекап",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "backup",
+      "asset_group_id": "cyberbackup",
+      "log_stream": "backup_audit",
+      "inventory_note": "В опросном листе указано Кибербекап; версия не указана.",
+      "product_family": "Киберпротект"
+    },
+    {
+      "source_type": "Средства виртуализации",
+      "manufacturer_model": "ROSA Virtualization 2.02 25 VM",
+      "raw_name": "ROSA Virtualization",
+      "version": "2.02",
+      "quantity": 2,
+      "asset_class": "server",
+      "kind": "virtualization",
+      "asset_group_id": "rosa_virtualization",
+      "log_stream": "hypervisor",
+      "inventory_note": "РОСА Виртуализация версии 2.02; в опросном листе указано 25 VM, отношение к двум экземплярам не уточнено."
+    },
+    {
+      "source_type": "Гипервизор",
+      "manufacturer_model": "VMware ESXi 6.5.0",
+      "raw_name": "VMware ESXi",
+      "version": "6.5.0",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "hypervisor",
+      "asset_group_id": "vmware_esxi",
+      "log_stream": "hypervisor"
+    },
+    {
+      "source_type": "Система бухгалтерского учёта",
+      "manufacturer_model": "1С-Бухгалтерия, 1С-Комплексная автоматизация",
+      "raw_name": "1С-Бухгалтерия, 1С-Комплексная автоматизация",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "business_application",
+      "asset_group_id": "1c_accounting",
+      "log_stream": "business_application",
+      "inventory_note": "Два приложения в одной строке с общим количеством 1; число экземпляров каждого не указано.",
+      "products": [
+        {
+          "name": "1С Бухгалтерия",
+          "version": null
+        },
+        {
+          "name": "1С Комплексная автоматизация",
+          "version": null
+        }
+      ],
+      "product_family": "1С:Предприятие"
+    },
+    {
+      "source_type": "Средства защиты информации",
+      "manufacturer_model": "Dallas Lock 8.0-К",
+      "raw_name": "Dallas Lock",
+      "version": "8.0-К",
+      "quantity": 11,
+      "asset_class": "host",
+      "kind": "host_security",
+      "asset_group_id": "dallas_lock",
+      "log_stream": "host_security"
+    },
+    {
+      "source_type": "СУБД",
+      "manufacturer_model": "Postgres Pro Enterprise 16",
+      "raw_name": "Postgres Pro Enterprise",
+      "version": "16",
+      "quantity": 2,
+      "asset_class": "server",
+      "kind": "database",
+      "asset_group_id": "postgres_pro",
+      "log_stream": "database_audit",
+      "product_family": "PostgreSQL",
+      "inventory_note": "Postgres Pro Enterprise — редакция СУБД, 16 — версия продукта. Наличие парсера PostgreSQL само по себе не подтверждает поддержку этой редакции."
+    },
+    {
+      "source_type": "Контроллер домена",
+      "manufacturer_model": "Windows Server 2019 Datacenter",
+      "raw_name": "Microsoft Active Directory Domain Services",
+      "version": "2019",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "directory",
+      "asset_group_id": "ad_2019",
+      "log_stream": "directory_security",
+      "products": [
+        {
+          "name": "Microsoft Windows Server 2019",
+          "version": "2019"
+        },
+        {
+          "name": "Microsoft Active Directory Domain Services",
+          "version": "2019"
+        }
+      ],
+      "products_match": "any"
+    },
+    {
+      "source_type": "Контроллер домена",
+      "manufacturer_model": "Windows Server 2008 R2 Standard",
+      "raw_name": "Microsoft Active Directory Domain Services",
+      "version": "2008 R2",
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "directory",
+      "asset_group_id": "ad_2008",
+      "log_stream": "directory_security",
+      "products": [
+        {
+          "name": "Microsoft Windows Server 2008 R2",
+          "version": "2008 R2"
+        },
+        {
+          "name": "Microsoft Active Directory Domain Services",
+          "version": "2008 R2"
+        }
+      ],
+      "products_match": "any"
+    },
+    {
+      "source_type": "Файловый сервер",
+      "manufacturer_model": "QNAP NAS",
+      "raw_name": "QNAP NAS",
+      "version": null,
+      "quantity": 1,
+      "asset_class": "server",
+      "kind": "file_server",
+      "asset_group_id": "qnap_nas",
+      "log_stream": "file_audit",
+      "inventory_note": "Модель и версия QNAP NAS не указаны; наличие записи в каталоге не подтверждает совместимость конкретной модели."
+    },
+    {
+      "source_type": "Рабочие станции",
+      "manufacturer_model": "Windows 7, Windows 10",
+      "raw_name": "Windows 7, Windows 10",
+      "version": "7, 10",
+      "quantity": 93,
+      "asset_class": "host",
+      "kind": "workstation",
+      "asset_group_id": "workstations",
+      "log_stream": "windows_security",
+      "inventory_note": "93 станции суммарно; разбивка между Windows 7 и Windows 10 не указана. Сопоставляются явный каталог ОС Microsoft Windows или журнал Windows Security; версия каждой ОС требует проверки.",
+      "products": [
+        {"name": "Windows 7, Windows 10", "version": "7, 10"},
+        {"name": "Windows Security", "version": "7, 10"},
+        {"name": "Microsoft Windows", "version": "7, 10"}
+      ],
+      "products_match": "any"
+    },
+    {
+      "source_type": "ЭДО",
+      "manufacturer_model": "1С:Предприятие 8.3 (конфигурация ЭДО не указана)",
+      "raw_name": "1С:Предприятие",
+      "version": "8.3",
+      "quantity": 1,
+      "asset_class": "service",
+      "kind": "document_workflow",
+      "eps_basis": "Количество уточнено пользователем: 1; EPS требуется оценить.",
+      "asset_group_id": "1c_edo",
+      "log_stream": "document_workflow",
+      "scope_review_required": true,
+      "inventory_note": "В исходном листе было 1С:Предприятие 8.3 КОРП. КОРП — уровень поставки/лицензий платформы; конкретная конфигурация ЭДО и её журналы не указаны. Совпадение платформы не подтверждает отдельную интеграцию ЭДО.",
+      "product_family": "1C 8.3"
+    }
+  ],
+  "deployment": {
+    "sites": null,
+    "network": null,
+    "high_availability": null
+  },
+  "capacity": {
+    "servers_available": null,
+    "workstations": 93
+  },
+  "selection_constraints": {
+    "cloud_allowed": null,
+    "other_constraints": "не указаны в опросном листе"
+  }
+}

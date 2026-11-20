@@ -13,13 +13,16 @@ def maxpatrol_api_document(data: bytes) -> dict:
     doc = json.loads(data)
     if not isinstance(doc, dict) or doc.get('project') != 'siem' or doc.get('type') != 'help':
         raise ValueError('unexpected_maxpatrol_document_scope')
-    if doc.get('title') != 'Поддерживаемые источники и профили для сбора событий' or not isinstance(doc.get('content'), str):
+    if doc.get('title') not in ('Поддерживаемые источники и профили для сбора событий',
+                                'Источники с частичной поддержкой') or not isinstance(doc.get('content'), str):
         raise ValueError('unexpected_maxpatrol_document_title_or_content')
     return doc
 
 
 def parse_maxpatrol_supported_api(data: bytes, meta: dict) -> list[dict]:
     doc = maxpatrol_api_document(data)
+    if doc['title'] != 'Поддерживаемые источники и профили для сбора событий':
+        raise ValueError('unexpected_maxpatrol_supported_document')
     soup = BeautifulSoup(doc['content'], 'html.parser')
     tables = soup.select('table')
     if len(tables) != 1:
@@ -52,6 +55,16 @@ def parse_maxpatrol_supported_api(data: bytes, meta: dict) -> list[dict]:
     return output
 
 
+def parse_maxpatrol_partial_api(data: bytes, meta: dict) -> list[dict]:
+    doc = maxpatrol_api_document(data)
+    if doc['title'] != 'Источники с частичной поддержкой':
+        raise ValueError('unexpected_maxpatrol_partial_document')
+    rows = parse_maxpatrol_partial_sources(doc['content'], meta)
+    if not rows:
+        raise ValueError('empty_partial_source_table')
+    return rows
+
+
 def _visible(value: str) -> str:
     # The saved portal HTML contains discretionary hyphens inside Russian words.
     return clean(value.replace('\u00ad', ''))
@@ -64,11 +77,15 @@ def parse_maxpatrol_partial_sources(html: str, meta: dict) -> list[dict]:
         rows = table_rows(table)
         if not rows or [_visible(cell).casefold() for cell in rows[0]] != ['источник', 'версия']:
             continue
+        if table.find('table'):
+            raise ValueError('nested_table')
+        if table.select('[rowspan], [colspan]'):
+            raise ValueError('unsupported_rowspan_or_colspan')
         output = []
         seen = set()
         for row in rows[1:]:
             if len(row) != 2:
-                continue
+                raise ValueError('ambiguous_cells')
             label, version = (_visible(cell) for cell in row)
             if not label or (label, version) in seen:
                 continue

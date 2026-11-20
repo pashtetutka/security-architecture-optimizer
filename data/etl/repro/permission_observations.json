@@ -1,0 +1,14 @@
+{
+  "schema_version": "baseline-permission-observations/1.0",
+  "observations": [
+    {
+      "document_sha256": "b04c140ae5df7cfdc0d40e36035fd36a810f22f4f55d855f9cdfb070b8f1a691",
+      "restriction": "restricted",
+      "owner_permission": "unknown",
+      "basis": "На странице 2 документа указано, что копирование, распространение и передача третьим лицам возможны только с письменного разрешения владельца. Наличие такого разрешения не установлено.",
+      "source_url": "https://www.itb.spb.ru/upload/docs/Security_Capsule_SIEM/Security_Capsule_SIEM_Opisanie_primeneniya.pdf",
+      "locator": {"page": 2},
+      "observed_at": "2026-11-16"
+    }
+  ]
+}

@@ -89,7 +89,7 @@ class CLITests(unittest.TestCase):
         self.assertIn('Не найден входной JSON', result.stderr)
 
     def test_normalize_real_komrad_snapshot_and_report(self):
-        snapshot = Path(__file__).parent / 'fixtures/komrad_prerequisites_4_6.html'
+        snapshot = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p13/hardware_requirements_49bf901b512592.html'
         raw = {'run_at': '2026-10-28T10:00:00Z', 'facts': [], 'vendors': [{
             'id': 'p13', 'name': 'KOMRAD', 'source_results': [{
                 'source_id': 'hardware_requirements', 'status': 'ok',
@@ -108,7 +108,8 @@ class CLITests(unittest.TestCase):
             profiles = json.loads((output / 'sizing_profiles.json').read_text(encoding='utf-8'))
             self.assertEqual(profiles['items'], expected['sizing_profiles'])
             self.assertEqual(len(profiles['items']), 4)
-            self.assertEqual(len(list(output.glob('*.json'))), 12)
+            self.assertEqual(len(list(output.glob('*.json'))), 13)
+            self.assertTrue((output / 'source_classes.json').is_file())
             self.assertIsNone(profiles['items'][0]['nodes'][0]['storage_devices'][0]['quantity'])
             with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 main(['normalize', '--etl', str(source), '--output-dir', str(output)])
@@ -117,7 +118,7 @@ class CLITests(unittest.TestCase):
             self.assertIn('KOMRAD', report.getvalue())
 
     def test_check_creates_html_from_real_snapshot(self):
-        snapshot = Path(__file__).parent / 'fixtures/komrad_prerequisites_4_6.html'
+        snapshot = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p13/hardware_requirements_49bf901b512592.html'
         with TemporaryDirectory() as temp:
             source = Path(temp) / 'vendors.json'
             output = Path(temp) / 'check'
@@ -140,7 +141,8 @@ class CLITests(unittest.TestCase):
             self.assertIn('Условия использования данных в расчётах', page)
             self.assertNotIn('Замечания к структуре:', page)
             self.assertNotIn('source_integrations_not_reviewed', page)
-            self.assertEqual(len(list(output.glob('*.json'))),12)
+            self.assertEqual(len(list(output.glob('*.json'))),13)
+            self.assertTrue((output / 'source_classes.json').is_file())
             with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 main(['check','--etl',str(source),'--output-dir',str(output),'--no-tests'])
 

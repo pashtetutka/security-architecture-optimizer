@@ -1,0 +1,530 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:siem-catalog:2.0:entities",
+  "$defs": {
+    "vendor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "display_name"
+      ],
+      "additionalProperties": false
+    },
+    "product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "vendor_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "product",
+            "family"
+          ]
+        },
+        "class_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "vendor_id",
+        "display_name",
+        "kind",
+        "class_ids"
+      ],
+      "additionalProperties": false
+    },
+    "alias": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normalized_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "vendor_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "language": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "vendor_ref",
+            "language"
+          ],
+          "additionalProperties": false
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "review_state": {
+          "enum": [
+            "extracted",
+            "reviewed",
+            "experiment_verified"
+          ]
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "id",
+        "surface",
+        "normalized_key",
+        "entity_ref",
+        "context",
+        "evidence_refs",
+        "review_state"
+      ],
+      "additionalProperties": false
+    },
+    "relation": {
+      "type": "object",
+      "properties": {
+        "from_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "relation": {
+          "enum": [
+            "edition_of",
+            "member_of",
+            "renamed_from",
+            "component_of"
+          ]
+        },
+        "to_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "review_state": {
+          "enum": [
+            "extracted",
+            "reviewed",
+            "experiment_verified"
+          ]
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "from_ref",
+        "relation",
+        "to_ref",
+        "evidence_refs",
+        "review_state"
+      ],
+      "additionalProperties": false
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_url": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/https_url"
+        },
+        "resolved_url": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/https_url"
+        },
+        "acquired_at": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/timestamp"
+        },
+        "acquisition_method": {
+          "enum": [
+            "automatic_https",
+            "manual_import"
+          ]
+        },
+        "snapshot_path": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "media_type": {
+          "enum": [
+            "text/html",
+            "application/pdf",
+            "application/json",
+            "text/plain"
+          ]
+        },
+        "release_scope": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/version_scope"
+        },
+        "redistribution": {
+          "enum": [
+            "allowed",
+            "restricted",
+            "unknown"
+          ]
+        },
+        "snapshot_omission": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "external_requirement": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "reason",
+                "external_requirement"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "document_id",
+        "sha256",
+        "source_url",
+        "resolved_url",
+        "acquired_at",
+        "acquisition_method",
+        "snapshot_path",
+        "media_type",
+        "release_scope",
+        "redistribution",
+        "snapshot_omission"
+      ],
+      "additionalProperties": false
+    },
+    "locator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "html",
+            "pdf",
+            "document"
+          ]
+        },
+        "section": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "table": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "row": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "page": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cell": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text_normalization": {
+          "enum": [
+            "exact_utf8",
+            "whitespace_collapse_v1"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "section",
+        "table",
+        "row",
+        "page",
+        "cell",
+        "text_normalization"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "document_ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "locator": {
+          "$ref": "urn:siem-catalog:2.0:entities#/$defs/locator"
+        },
+        "excerpt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "excerpt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "extraction_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extractor_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "evidence_id",
+        "document_ref",
+        "locator",
+        "excerpt",
+        "excerpt_sha256",
+        "extraction_method",
+        "extractor_version"
+      ],
+      "additionalProperties": false
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "resolution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "raw_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normalized_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "resolved",
+            "ambiguous",
+            "unresolved"
+          ]
+        },
+        "product_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "dictionary_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/extension"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "resolution_id",
+        "raw_name",
+        "normalized_key",
+        "status",
+        "product_ref",
+        "candidate_refs",
+        "reason_codes",
+        "dictionary_version"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

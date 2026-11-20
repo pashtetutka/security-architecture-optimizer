@@ -1,10 +1,23 @@
 import unittest
 
 from siem.etl.applicability import evaluate
-from siem.etl.identities import type_integrations, unique_source_values
+from siem.etl.identities import published_product_keys, type_integrations, unique_source_values
 
 
 class SourceIdentityTests(unittest.TestCase):
+    def test_catalog_product_keys_are_extracted_from_explicit_evidence(self):
+        listed = {'source_name': '1С:Предприятие (1С:Бухгалтерия, 1С:Документооборот)',
+                  'source_vendor': '1С', 'source_version': '8.3'}
+        self.assertIn('1с бухгалтерия', published_product_keys(listed))
+        self.assertIn('1с предприятие', published_product_keys(listed))
+        self.assertIn('dallas lock', published_product_keys({
+            'source_name': 'Dallas Lock 8.0', 'source_version': '8'}))
+        self.assertNotIn('dallas lock', published_product_keys({
+            'source_name': 'Dallas Lock 8.0', 'source_version': None}))
+        self.assertNotIn('txt logs', published_product_keys({
+            'source_name': 'MS Exchange (Txt logs, Management event log)',
+            'source_vendor': 'Microsoft', 'source_version': None}))
+
     def test_generic_variants_keep_vendor_family_identity(self):
         rows = [{'siem_id': 'p01', 'source_name': name, 'source_variant': 'Switch'}
                 for name in ('Cisco Switch', 'Huawei Switch')]
@@ -21,10 +34,22 @@ class SourceIdentityTests(unittest.TestCase):
             ('RedCheck', 'САЗ RedCheck'),
             ('VMware vCenter', 'VMware vCenter Server'),
             ('1С:ЗУП', '1С Зарплата и управление персоналом'),
+            ('Microsoft DHCP Server', 'MS Windows MS DHCP Server'),
+            ('Microsoft DNS Server', 'MS Windows MS DNS Server'),
+            ('Exchange Server', 'MS Windows MS Exchange (Txt logs, Management event log, RCA client logs)'),
+            ('Континент-4', 'КОД Безопасности АПКШ “Континент” 3.9, 4'),
+            ('Windows 7, Windows 10', 'MS Windows MS Windows 7/8/10/11'),
+            ('Dallas Lock', 'Confident Dallaslock'),
+            ('VMware ESXi', 'VMware vSphere Hypervisor (ESXi)'),
+            ('Киберпротект', 'Cyberprotect'),
         )
         for left, right in pairs:
             with self.subTest(left=left):
                 self.assertEqual(canonical(left), canonical(right))
+
+        self.assertNotEqual(canonical('Кибербекап'), canonical('Cyberprotect'))
+        self.assertNotEqual(canonical('1С Комплексная автоматизация'),
+                            canonical('1С ERP Управление предприятием'))
 
     def test_presentation_variants_share_entity_but_keep_claims(self):
         rows = [

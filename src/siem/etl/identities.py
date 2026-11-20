@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import re
 
 from .coverage import ALIAS, canonical
 
@@ -17,6 +18,45 @@ def identity_name(row: dict) -> str:
 def source_entity_id(name: str) -> str:
     """Return an identity key; retain the vendor spelling separately."""
     return 'source:' + canonical(name)
+
+
+def published_product_keys(row: dict) -> list[str]:
+    """Match explicit catalog products without promoting a vendor or a log type."""
+    name = identity_name(row)
+    keys = [canonical(name)]
+    windows_server = re.fullmatch(r'(?:ms windows )?ms windows \d{4}(?: r2)? server',
+                                  re.sub(r'\s+', ' ', re.sub(r'[^\w\s]', ' ', name.casefold())).strip())
+    if windows_server or re.fullmatch(r'microsoft windows server \d{4}(?: r2)?', canonical(name)):
+        keys.append('microsoft windows server')
+    version = row.get('source_version')
+    if version and name.casefold().endswith(' ' + version.casefold()):
+        base = name[:-(len(version) + 1)].strip()
+        if base:
+            keys.append(canonical(base))
+    suffix = re.fullmatch(r'(.+?)\s+(\d+(?:[.,]\d+)*)', name)
+    if suffix and version and re.fullmatch(r'\d+(?:\.\d+)*', version):
+        embedded = suffix.group(2).replace(',', '.')
+        if embedded == version or embedded.startswith(version + '.'):
+            base = suffix.group(1)
+            if len(canonical(base).split()) >= 2:
+                keys.append(canonical(base))
+    # A catalog cell can enumerate concrete products inside parentheses.
+    # Only accept a comma-separated list whose entries explicitly start with
+    # the published manufacturer, never descriptions of log formats.
+    maker = canonical(row.get('source_vendor') or '')
+    listed = re.search(r'\(([^()]*(?:,[^()]*)+)\)', name)
+    if maker and listed:
+        explicit_products = []
+        for item in listed.group(1).split(','):
+            candidate = canonical(item)
+            if candidate.startswith(maker + ' '):
+                explicit_products.append(candidate)
+        if len(explicit_products) >= 2:
+            keys.extend(explicit_products)
+        base = canonical(name[:listed.start()].strip())
+        if base != maker:
+            keys.append(base)
+    return list(dict.fromkeys(keys))
 
 
 def source_vendor_entity_id(name: str | None) -> str | None:
@@ -47,6 +87,7 @@ def type_integrations(rows: list[dict]) -> list[dict]:
         row['source_vendor_entity_id'] = source_vendor_entity_id(row.get('source_vendor'))
         row['source_version_raw'] = row.get('source_version')
         row['source_version_kind'] = version_kind(row.get('source_version'))
+        row['source_match_keys'] = published_product_keys(row)
     return rows
 
 

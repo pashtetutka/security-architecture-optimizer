@@ -2,7 +2,8 @@
 from __future__ import annotations
 import math
 
-from .identities import identity_name, source_entity_id
+from .identities import identity_name, published_product_keys, source_entity_id
+from .source_classes import SOURCE_CLASSES
 
 
 def validate_catalog(catalog: dict) -> dict:
@@ -24,10 +25,16 @@ def validate_catalog(catalog: dict) -> dict:
             error(location, 'invalid_source_identity_basis')
         if not basis or row.get('source_entity_id') != source_entity_id(basis):
             error(location, 'source_entity_id_mismatch')
+        if row.get('source_match_keys') != published_product_keys(row):
+            error(location, 'source_match_keys_mismatch')
         if row.get('source_version_kind') not in ('unknown', 'published_value', 'listed_values', 'range_or_open_ended'):
             error(location, 'invalid_source_version_kind')
         if row.get('support_scope') not in (None, 'supported', 'partial'):
             error(location, 'invalid_support_scope')
+        if row.get('source_class_id') not in SOURCE_CLASSES:
+            error(location, 'invalid_source_class')
+        if not row.get('source_class_basis'):
+            error(location, 'missing_source_class_basis')
 
     for profile_index, profile in enumerate(catalog.get('sizing_profiles', [])):
         for node_index, node in enumerate(profile.get('nodes', [])):

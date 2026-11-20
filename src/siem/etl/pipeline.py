@@ -4,6 +4,7 @@ import hashlib,json
 from pathlib import Path
 from datetime import datetime,timezone
 from .extractors import extract_content
+from .adapters import DocumentContext, extract
 from .fetcher import PublicFetcher
 
 def utcnow(): return datetime.now(timezone.utc).isoformat()
@@ -18,8 +19,11 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
   for source in vendor['sources']:
    if not source.get('enabled',True):continue
    url=source['url'];sid=source['id']
+   source_meta=getattr(fetch,'metadata_by_url',{}).get(url,{})
+   acquisition_method=source_meta.get('acquisition_method') or getattr(fetch,'acquisition_method','unknown')
+   acquired_at=source_meta.get('acquired_at') or timestamp
    report={'source_id':sid,'url':url,'status':'pending','product_version_hint':source.get('product_version_hint'),
-           'acquisition_method':getattr(fetch,'acquisition_method','unknown')}
+           'acquisition_method':acquisition_method}
    if source.get('redistribution'):
     report['redistribution']=source['redistribution']
    product['source_results'].append(report)
@@ -30,7 +34,8 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
     digest=hashlib.sha256(data).hexdigest()
     final_url=getattr(fetch,'resolved_urls',{}).get(url,url)
     report.update(resolved_url=final_url,http_charset=encoding,http_content_type=mime,
-                  content_sha256=digest,retrieved_at=timestamp,snapshot_status='not_requested')
+                  content_sha256=digest,retrieved_at=acquired_at,extracted_at=timestamp,
+                  snapshot_status='not_requested')
     stage='snapshot'
     if snapshot_dir:
      suffix='.pdf' if source['mode']=='pdf' else '.json' if source['mode']=='maxpatrol_api' else '.html'
@@ -42,7 +47,15 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
      report['snapshot_path']=str(saved)
      report['snapshot_status']='saved'
     stage='extraction'
-    payload=extract_content(data,source['mode'],encoding)
+    if guide := source.get('route_guide'):
+     context=DocumentContext(f"{vendor['id']}:{sid}",vendor['id'],sid,sid,source['mode'],
+                             final_url,mime or 'text/html',encoding,{'route_guide':guide})
+     result=extract(context,data)
+     errors=[item.code for item in result.diagnostics if item.severity=='error']
+     if errors:raise ValueError(', '.join(errors))
+     payload={'facts':result.records,'title':result.title}
+    else:
+     payload=extract_content(data,source['mode'],encoding)
     targeted=bool(payload.get('targeted_normalization_required'))
     report.update(status=('ok' if payload['facts'] or targeted else 'empty_review_required'),
                   content_sha256=digest,extracted_facts=len(payload['facts']),
@@ -51,8 +64,8 @@ def collect(registry, fetch=None, observed_at=None, snapshot_dir=None):
     for x in payload['facts']:
      evidence=x.copy()
      evidence.update({'siem_id':vendor['id'],'siem_name':vendor['name'],'source_id':sid,
-       'source_url':final_url,'manifest_url':url,'source_type':source.get('source_type'),'collected_at':timestamp,
-       'acquisition_method':getattr(fetch,'acquisition_method','unknown'),
+       'source_url':final_url,'manifest_url':url,'source_type':source.get('source_type'),'collected_at':acquired_at,
+       'extracted_at':timestamp,'acquisition_method':acquisition_method,
        'origin_independently_verified':False,
        'source_sha256':digest,'product_version_hint':source.get('product_version_hint'),
        'product_version_verified':None,'document_version_hint':source.get('product_version_hint'),

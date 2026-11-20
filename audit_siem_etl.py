@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Audit SIEM ETL v0.4 JSON snapshot. No external dependencies or HTTP access.
 
-Usage: python audit_siem_etl.py --etl results/vendors.json --fit results/fit.json
-Produces results/etl_audit/report.html, facts_for_review.csv, summary.json.
+Usage: python audit_siem_etl.py --etl results/vendors_focus_raw.json
+Produces a separate results/history/raw_audit_*/report.html, facts_for_review.csv, summary.json.
 """
 import argparse
 import collections
@@ -11,8 +11,10 @@ import hashlib
 import html
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
+from uuid import uuid4
 
 
 def h(value):
@@ -209,10 +211,12 @@ for(const el of [vendor,status,search])el.addEventListener('input',filter);filte
 
 def main():
     p=argparse.ArgumentParser(description='Аудит сохранённых данных ETL v0.4 без интернета')
-    p.add_argument('--etl',required=True,type=Path,help='results/vendors.json')
-    p.add_argument('--fit',type=Path,help='results/fit.json (необязательно)')
-    p.add_argument('--output-dir',type=Path,default=Path('results/etl_audit'))
+    p.add_argument('--etl',required=True,type=Path,help='results/vendors_focus_raw.json')
+    p.add_argument('--fit',type=Path,help='исторический fit.json (необязательно)')
+    p.add_argument('--output-dir',type=Path,default=None)
     args=p.parse_args()
+    if args.output_dir is None:
+        args.output_dir=Path('results/history')/('raw_audit_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid4().hex[:8])
     audit=analyze(load(args.etl),load(args.fit) if args.fit else None)
     save(args.output_dir,audit)
     print('Аудит завершён. Отчёты:')

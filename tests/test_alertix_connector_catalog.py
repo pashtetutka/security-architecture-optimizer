@@ -7,8 +7,8 @@ from siem.etl.catalog import build_catalog
 
 
 SPECS = (
-    ('syslog', 44, '70ba12b42284f9e8aca70be5afc383ab5012c2cec833e330cb36d5a7d4caa488'),
-    ('beats', 12, 'ade67cac47c5de303bcdd362f31ef6436bc3bd7ccf4405d62b6d60157c760fb5'),
+    ('syslog', 45, '70ba12b42284f9e8aca70be5afc383ab5012c2cec833e330cb36d5a7d4caa488'),
+    ('beats', 14, 'ade67cac47c5de303bcdd362f31ef6436bc3bd7ccf4405d62b6d60157c760fb5'),
     ('jdbc', 11, '06a8846a8a385149b7ee77fb1429f3841af12f851d74389bbfd7d6796b9cf0dc'),
     ('snmp', 2, 'ea2e099d1148c443a8117ea837e53febfa06a569b1238dac6d2746e5bc5a0782'),
 )
@@ -18,8 +18,8 @@ class AlertixConnectorCatalogTests(unittest.TestCase):
     def test_four_real_receiver_tables(self):
         docs = []
         for receiver, count, digest in SPECS:
-            path = next((Path(__file__).parent / 'fixtures').glob(
-                f'alertix_connectors_{receiver}_*.html'))
+            path = next((Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p04').glob(
+                f'connectors_{receiver}_*.html'))
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
             docs.append({'source_id': f'connectors_{receiver}', 'status': 'ok',
                          'url': f'https://help.ngrsoftlab.ru/alertix/3.9.1/connectors-list/connectors/{receiver}/',
@@ -38,7 +38,11 @@ class AlertixConnectorCatalogTests(unittest.TestCase):
                                      else r['collection_method'] == receiver.title()
                                      for r in rows), expected)
         self.assertTrue(all(r['integration_evidence'] == 'published_connector_table' for r in rows))
-        self.assertTrue(all(r['siem_version'] is None and r['source_version'] is None for r in rows))
+        self.assertTrue(all(r['siem_version'] is None for r in rows))
+        windows = next(r for r in rows if r['source_name'] == 'Microsoft Windows')
+        self.assertEqual(windows['source_version'], '8—10, Server 2012 R2, 2016, 2019, 2022')
+        self.assertTrue({'Active Directory Domain Services', 'Microsoft DNS Server', 'VMware ESXi',
+                         'Eltex Switch'} <= {r['source_name'] for r in rows})
         self.assertTrue(all(r['evidence'][0]['retrieved_at'] == '2026-10-28T12:00:00Z'
                             for r in rows))
         self.assertEqual({r['source_vendor'] for r in rows if r['source_name'] == 'FreeRADIUS'},

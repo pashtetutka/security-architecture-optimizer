@@ -1,0 +1,30 @@
+{
+  "schema_version": "siem-decision-scenario/1.0",
+  "scenario_id": "s02_saas_platform",
+  "name": "Разработчик SaaS-сервиса",
+  "synthetic": true,
+  "organization_size": {"class": "small", "employees": 95, "sites": 1},
+  "assumptions": ["Полностью вымышленная организация.", "EPS — сценарная оценка.", "Облачные сервисы рассматриваются как источники событий заказчика."],
+  "source_defaults": {"criticality": 3, "requirement": "required", "eps_status": "estimated", "eps_basis": "Синтетическая оценка на экземпляр; требуется измерение."},
+  "event_sources": [
+    {"source_type": "Контейнерная платформа", "manufacturer_model": "Kubernetes", "raw_name": "Kubernetes", "version": "1.x", "quantity": 3, "asset_class": "server", "kind": "orchestrator", "eps_per_unit_avg": 18, "eps_per_unit_peak": 45, "criticality": 5},
+    {"source_type": "Серверная ОС", "manufacturer_model": "Linux", "raw_name": "Linux", "version": null, "quantity": 28, "asset_class": "server", "kind": "operating_system", "eps_per_unit_avg": 2, "eps_per_unit_peak": 6},
+    {"source_type": "Контроллер домена", "manufacturer_model": "Microsoft AD DS", "raw_name": "Active Directory Domain Services (AD DS)", "version": "2019", "quantity": 1, "asset_class": "server", "kind": "directory", "eps_per_unit_avg": 8, "eps_per_unit_peak": 20},
+    {"source_type": "СУБД", "manufacturer_model": "PostgreSQL", "raw_name": "PostgreSQL", "version": "16", "quantity": 3, "asset_class": "server", "kind": "database", "eps_per_unit_avg": 9, "eps_per_unit_peak": 25, "criticality": 5},
+    {"source_type": "Кэш", "manufacturer_model": "Redis", "raw_name": "Redis", "version": null, "quantity": 2, "asset_class": "service", "kind": "cache", "eps_per_unit_avg": 4, "eps_per_unit_peak": 12},
+    {"source_type": "Брокер сообщений", "manufacturer_model": "Apache Kafka", "raw_name": "Apache Kafka", "version": null, "quantity": 3, "asset_class": "service", "kind": "message_broker", "eps_per_unit_avg": 6, "eps_per_unit_peak": 18},
+    {"source_type": "API-шлюз", "manufacturer_model": "API Gateway X (условный)", "raw_name": "API Gateway X", "version": null, "quantity": 2, "asset_class": "service", "kind": "api_gateway", "eps_per_unit_avg": 15, "eps_per_unit_peak": 50, "criticality": 5},
+    {"source_type": "WAF", "manufacturer_model": "Гарда WAF", "raw_name": "Гарда WAF", "version": null, "quantity": 1, "asset_class": "network", "kind": "waf", "eps_per_unit_avg": 12, "eps_per_unit_peak": 40},
+    {"source_type": "Межсетевой экран", "manufacturer_model": "Fortinet FortiGate", "raw_name": "FortiGate", "version": "7.x", "quantity": 2, "asset_class": "network", "kind": "firewall", "eps_per_unit_avg": 18, "eps_per_unit_peak": 55},
+    {"source_type": "Балансировщик", "manufacturer_model": "NGINX", "raw_name": "NGINX", "version": null, "quantity": 2, "asset_class": "network", "kind": "load_balancer", "eps_per_unit_avg": 10, "eps_per_unit_peak": 30},
+    {"source_type": "Веб-сервер", "manufacturer_model": "Apache HTTP Server", "raw_name": "Apache HTTP Server", "version": "2.4", "quantity": 4, "asset_class": "server", "kind": "web", "eps_per_unit_avg": 8, "eps_per_unit_peak": 25},
+    {"source_type": "CI/CD", "manufacturer_model": "GitLab", "raw_name": "GitLab", "version": null, "quantity": 1, "asset_class": "service", "kind": "cicd", "eps_per_unit_avg": 4, "eps_per_unit_peak": 15},
+    {"source_type": "Антивирус и управление", "manufacturer_model": "Kaspersky Security Center", "raw_name": "Kaspersky Security Center", "version": null, "quantity": 1, "asset_class": "server", "kind": "endpoint_security", "eps_per_unit_avg": 5, "eps_per_unit_peak": 14},
+    {"source_type": "Рабочие станции", "manufacturer_model": "Microsoft Windows 11", "raw_name": "Windows event logs", "version": "11", "quantity": 30, "asset_class": "host", "kind": "workstation", "eps_per_unit_avg": 0.3, "eps_per_unit_peak": 0.9},
+    {"source_type": "VPN", "manufacturer_model": "OpenVPN", "raw_name": "OpenVPN", "version": null, "quantity": 1, "asset_class": "network", "kind": "vpn", "eps_per_unit_avg": 4, "eps_per_unit_peak": 12},
+    {"source_type": "Облачный аудит", "manufacturer_model": "Microsoft 365", "raw_name": "Microsoft 365", "version": null, "quantity": 1, "asset_class": "service", "kind": "cloud_audit", "eps_status": "unknown", "eps_basis": "Частота экспорта аудита не установлена.", "requirement": "desired"}
+  ],
+  "deployment": {"sites": 1, "orchestrator": "Kubernetes", "high_availability": "две зоны"},
+  "capacity": {"servers_available": 6, "workstations": 30},
+  "selection_constraints": {"cloud_allowed": true, "kubernetes_available": true}
+}

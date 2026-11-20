@@ -28,8 +28,8 @@ def parse_searchinform_overview(html: str, meta: dict) -> list[dict]:
     named_sources = {
         'WinEventConnector': ('Windows event logs', None),
         'MSSQLConnector': ('Microsoft SQL', 'Microsoft'),
-        'ExchangeConnector': ('Microsoft Exchange', 'Microsoft'),
-        '1CConnector': ('1C', None),
+        'ExchangeConnector': ('Microsoft Exchange Server', 'Microsoft'),
+        '1CConnector': ('1С:Предприятие', '1С'),
         'Kaspersky Anti-Virus Connector': ('Kaspersky Anti-Virus', 'Kaspersky'),
         'VMwareConnector': ('Vmware', None),
         'FortigateConnector': ('Fortigate', None),
@@ -45,6 +45,38 @@ def parse_searchinform_overview(html: str, meta: dict) -> list[dict]:
         source_name, maker = named_sources[match.group(2)]
         rows.append(_source(meta, source_name, statement,
                             'searchinform_published_connector', match.group(2), source_vendor=maker))
+    # The same official page has an explicit monitored-systems list in
+    # addition to its abbreviated connector names. Keep those concrete
+    # products rather than treating a broad controller label as the product.
+    explicit = {
+        'Контроллеры домена Active Directory, ALD Pro, RED ADM.': [
+            ('Active Directory Domain Services', 'Microsoft', None),
+            ('ALD Pro', None, None), ('RED ADM', None, None)],
+        'Почтовые серверы (Microsoft Exchange, Postfix, RuPost).': [
+            ('Microsoft Exchange Server', 'Microsoft', None),
+            ('Postfix', None, None), ('RuPost', None, None)],
+        'СУБД (Microsoft SQL, Microsoft Azure, Oracle, PostgreSQL, MongoDB).': [
+            ('Microsoft SQL', 'Microsoft', None), ('Microsoft Azure', 'Microsoft', None),
+            ('Oracle', None, None), ('PostgreSQL', None, None), ('MongoDB', None, None)],
+        'Базы данных СКУД RusGuard.': [('СКУД RusGuard', None, None)],
+        'Среды виртуализации VMware ESXi.': [('VMware ESXi', 'VMware', None)],
+        'Сетевые устройства Cisco, VipNet, Континент 3 / 4.': [('Континент', 'Код Безопасности', '3, 4')],
+        'События журналов Windows.': [('Windows event logs', 'Microsoft', None)],
+        'События журналов 1С:Предприятие (технологические и регистрации).': [('1С:Предприятие', '1С', None)],
+    }
+    for node in soup.select('li, p, span'):
+        statement = clean(node.get_text(' ', strip=True))
+        for name, maker, version in explicit.get(statement, []):
+            existing = next((row for row in rows if row['source_name'] == name), None)
+            if existing is not None:
+                evidence = document_evidence(meta, statement, 'searchinform_monitored_systems_list')
+                if evidence not in existing['evidence']:
+                    existing['evidence'].append(evidence)
+                continue
+            row = _source(meta, name, statement, 'searchinform_monitored_systems_list',
+                          source_vendor=maker, integration_evidence='published_collection_list')
+            row['source_version'] = version
+            rows.append(row)
     return rows
 
 
@@ -92,6 +124,10 @@ def parse_security_capsule_product(html: str, meta: dict) -> list[dict]:
             rows.append(_source(meta, 'Microsoft Sysmon', sentence,
                                 'security_capsule_published_case',
                                 integration_evidence='published_collection_case', source_vendor='Microsoft'))
+        if text.startswith('К системе подключаются рабочие станции и серверы Windows и Linux, Active Directory,'):
+            rows.append(_source(meta, 'Active Directory Domain Services', text,
+                                'security_capsule_connected_sources',
+                                integration_evidence='published_collection_list', source_vendor='Microsoft'))
     return rows
 
 
@@ -112,6 +148,27 @@ def parse_savrus_product(html: str, meta: dict) -> list[dict]:
             'evidence': document_evidence(meta, match.group(0), 'savrus_product_os'),
         }]
     return []
+
+
+def parse_savrus_news(html: str, meta: dict) -> list[dict]:
+    """Collect only explicitly named products in the Dallas Lock integration news."""
+    soup = BeautifulSoup(html, 'html.parser')
+    sentences = [clean(node) for node in soup.stripped_strings]
+    collection = next((text for text in sentences if text.startswith(
+        'Интеграция позволяет централизованно собирать, анализировать и реагировать на инциденты')), None)
+    compatibility = next((text for text in sentences if all(term in text for term in (
+        'Специалисты ООО «Саврус» и ООО «Конфидент»', '«САВРУС» SIEM',
+        'Dallas Lock 8.0 редакций «К» и «С»', 'Единого центра управления (ЕЦУ) Dallas Lock'))), None)
+    if not collection or not compatibility:
+        return []
+    rows = []
+    for name, version in [('Dallas Lock', '8.0-К, 8.0-С'), ('ЕЦУ Dallas Lock', None)]:
+        row = _source(meta, name, compatibility + ' ' + collection,
+                      'savrus_explicit_collection_compatibility_news',
+                      source_vendor='Конфидент', integration_evidence='published_collection_compatibility_news')
+        row['source_version'] = version
+        rows.append(row)
+    return rows
 
 
 def parse_security_capsule_pdf(data: bytes, meta: dict) -> list[dict]:
