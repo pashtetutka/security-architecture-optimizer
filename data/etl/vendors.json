@@ -441,6 +441,7 @@
           "url": "https://www.itb.spb.ru/upload/docs/Security_Capsule_SIEM/Security_Capsule_SIEM_Opisanie_primeneniya.pdf",
           "mode": "pdf",
           "product_version_hint": "document revision 12 / 2025-03-24",
+          "redistribution": "permission_required_do_not_publish_snapshot",
           "source_type": "vendor_documentation",
           "enabled": true
         },

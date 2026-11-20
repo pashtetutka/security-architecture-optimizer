@@ -207,13 +207,15 @@ def extract(context: DocumentContext, content: bytes,
 def replay_facts_from_snapshots(raw: Mapping[str, Any], manifest_path: Path,
                                 registry_path: Path, *,
                                 published_results: dict[tuple[str, str], ExtractionResult] | None = None,
-                                verified_hashes: dict[tuple[str, str], str] | None = None
+                                verified_hashes: dict[tuple[str, str], str] | None = None,
+                                snapshot_root: Path | None = None
                                 ) -> list[dict[str, Any]]:
     """Re-extract legacy-shaped cache records; never reads ``raw['facts']``."""
     validate_manifest_source_keys(raw)
     registry_data=json.loads(registry_path.read_text('utf-8'))
     registered={(v['id'],s['id']):s for v in registry_data['vendors'] for s in v['sources']}
-    root=manifest_path.resolve().parents[3];facts=[]
+    root = snapshot_root or manifest_path.resolve().parents[3]
+    facts=[]
     for vendor in raw.get('vendors',[]):
         for document in vendor.get('source_results',[]):
             if document.get('status') not in ('ok','empty_review_required') or not document.get('snapshot_path'):

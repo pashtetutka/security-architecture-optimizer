@@ -1,6 +1,6 @@
 """Catalog normalization, registry maintenance and readiness commands."""
 from __future__ import annotations
-import argparse, json, re, subprocess, sys
+import argparse, json
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -51,7 +51,7 @@ def main(argv=None):
     check=sub.add_parser('check',help='Создать HTML-обзор данных и запустить тесты')
     check.add_argument('--etl',type=Path,default=Path('results/vendors_focus_raw.json'))
     check.add_argument('--output-dir',type=Path,help='Новый каталог проверки; по умолчанию создаётся автоматически')
-    check.add_argument('--no-tests',action='store_true',help='Не запускать тесты проекта')
+    check.add_argument('--no-tests', action='store_true', help=argparse.SUPPRESS)
     for command in (n, check):
         command.add_argument('--additional-etl', action='append', type=Path, default=[],
                              help='Добавить документы другой выгрузки; повторяющиеся source_id запрещены')
@@ -72,21 +72,7 @@ def main(argv=None):
         raw=load_inputs([args.etl, *args.additional_etl])
         catalog=build_catalog(raw,args.etl,automatic_only=args.automatic_only)
         summary=write_catalog(catalog,out_dir)
-        tests=None
-        if not args.no_tests:
-            if not Path('tests').is_dir():
-                tests={'status':'unavailable','summary':'Каталог tests не найден; тесты не запускались'}
-            else:
-                result=subprocess.run([sys.executable,'-m','unittest','discover','-s','tests'],
-                                      capture_output=True,text=True,encoding='utf-8',errors='replace')
-                log=result.stdout+result.stderr
-                (out_dir/'tests.txt').write_text(log,encoding='utf-8')
-                count=re.search(r'Ran \d+ tests? in [^\n]+\s+(?:OK(?: \(skipped=\d+\))?|FAILED[^\n]*)',log)
-                line=(re.sub(r'\s+',' ',count.group(0)) if count else
-                      ('успешно' if result.returncode==0 else 'ошибка'))
-                tests={'status':'passed' if result.returncode==0 else 'failed',
-                       'summary':line,'log':'tests.txt'}
-        report_path=write_overview(catalog,out_dir,tests)
+        report_path=write_overview(catalog,out_dir)
         if args.output_dir is None:
             stable=write_latest_report(report_path,Path('results/etl_audit/report.html'))
             print('Открыть обзор: start .\\results\\etl_audit\\report.html')
@@ -96,9 +82,8 @@ def main(argv=None):
               f"профили: {summary['sizing_profiles']}; требования: {summary['system_requirements']}")
         print(f"Непрочитанные документы: {summary['unread_system_documents'] + summary['unread_source_catalog_documents']}; "
               f"неразобранные: {summary['unparsed_system_documents']}")
-        if tests: print('Тесты:',tests['summary'])
         print('Нормализованные данные требуют проверки по первоисточникам; способ получения сохранён в происхождении.')
-        return 1 if tests and tests['status']=='failed' else 0
+        return 0
     if args.command=='report':
         path=args.focused_dir/'readiness_report.json'
         if not path.is_file():

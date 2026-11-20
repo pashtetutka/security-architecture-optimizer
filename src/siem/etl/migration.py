@@ -84,7 +84,7 @@ def _claim_subject_names(row: dict, dictionary: IdentityDictionary,
 def build_migration_bundle(raw_manifest: dict, manifest_path: Path,
                            dictionary: IdentityDictionary,
                            include_snapshot_paths: bool=False, *,
-                           automatic_only: bool=False) -> dict[str, Any]:
+                           automatic_only: bool=False, registry_path: Path | None=None) -> dict[str, Any]:
     validate_manifest_source_keys(raw_manifest)
     # The compatibility catalog assigns hardware positions in traversal order.
     # Canonicalize unordered manifest records before replay and migration.
@@ -96,13 +96,17 @@ def build_migration_bundle(raw_manifest: dict, manifest_path: Path,
         )}
         for vendor in sorted(raw_manifest['vendors'], key=lambda vendor: vendor['id'])
     ]}
-    registry_path=manifest_path.resolve().parents[2]/'etl/vendors.json'
+    if raw_manifest.get('snapshot_path_base') == 'manifest':
+        root = manifest_path.resolve().parent
+        registry_path = registry_path or Path('data/etl/vendors.json').resolve()
+    else:
+        root = manifest_path.resolve().parents[3]
+        registry_path = registry_path or root / 'data/etl/vendors.json'
     published_results: dict[tuple[str, str], ExtractionResult] = {}
     verified_hashes: dict[tuple[str, str], str] = {}
     replayed={**raw_manifest,'facts':replay_facts_from_snapshots(
         raw_manifest,manifest_path,registry_path,published_results=published_results,
-        verified_hashes=verified_hashes)}
-    root=manifest_path.resolve().parents[3]
+        verified_hashes=verified_hashes,snapshot_root=root)}
     # The compatibility catalog accepts absolute paths. Anchor them to the
     # replay root so its CWD fallback cannot select a different file.
     legacy_inputs=deepcopy(replayed)

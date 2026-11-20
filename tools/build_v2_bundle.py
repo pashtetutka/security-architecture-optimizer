@@ -1,4 +1,4 @@
-"""Build a new portable v2 catalog directory from frozen legacy inputs."""
+"""Build a new portable v2 catalog directory from a saved collection run."""
 from __future__ import annotations
 import argparse,hashlib,json
 from importlib.resources import files
@@ -23,7 +23,8 @@ def working_source_digest(root: Path) -> str:
 
 
 def main(argv=None):
-    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,default=Path('data/etl/repro/vendors.json'))
+    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True)
+    p.add_argument('--registry',type=Path,default=ROOT/'data/etl/vendors.json')
     p.add_argument('--dictionary',type=Path,help='Override the packaged identity dictionary')
     p.add_argument('--automatic-only',action='store_true',help='Exclude manually imported documents')
     p.add_argument('--source-revision',help='Revision of the builder source; defaults to a source digest')
@@ -33,7 +34,7 @@ def main(argv=None):
     dictionary_path = args.dictionary or files('siem.domain').joinpath(DEFAULT_DICTIONARY_RESOURCE)
     dictionary_bytes = dictionary_path.read_bytes()
     dictionary = IdentityDictionary.from_dict(json.loads(dictionary_bytes))
-    registry = args.manifest.resolve().parents[2]/'etl/vendors.json'
+    registry = args.registry
     permissions = args.manifest.parent/'permission_observations.json'
     inputs = [('repro/'+args.manifest.name, manifest_bytes),
               ('registry/'+registry.name, registry.read_bytes()),
@@ -41,8 +42,9 @@ def main(argv=None):
     if permissions.is_file():
         inputs.append(('repro/'+permissions.name, permissions.read_bytes()))
     bundle=build_migration_bundle(raw,args.manifest,dictionary,include_snapshot_paths=True,
-                                  automatic_only=args.automatic_only)
-    root=args.manifest.resolve().parents[3]
+                                  automatic_only=args.automatic_only,registry_path=registry)
+    root=(args.manifest.resolve().parent if raw.get('snapshot_path_base')=='manifest'
+          else args.manifest.resolve().parents[3])
     by_sha={row.get('content_sha256'):root/row['snapshot_path'] for vendor in raw['vendors']
             for row in vendor.get('source_results',[]) if row.get('content_sha256') and row.get('snapshot_path')}
     snapshot_sources={doc['document_id']:by_sha[doc['sha256']] for doc in bundle['documents']

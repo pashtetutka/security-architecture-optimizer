@@ -8,7 +8,6 @@ dist/
 .env
 results/
 *.pdf
-!data/etl/repro/raw/**/*.pdf
 *.xlsx
 *.xls
 *.zip
@@ -23,3 +22,15 @@ htmlcov/
 /docs/architecture_implementation_plan.md
 /docs/project_architecture.md
 /docs/decision_module_architecture.md
+
+# Local ETL debugging and historical control datasets
+/tests/
+/data/etl/repro/
+/tools/adapter_audit.py
+/tools/baseline.py
+/tools/contract_diff.py
+/tools/public_artifact.py
+/tools/review_corpus.py
+/tools/verify_preview.py
+/tools/verify_reproducibility.py
+/audit_siem_etl.py

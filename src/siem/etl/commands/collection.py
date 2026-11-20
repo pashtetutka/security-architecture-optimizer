@@ -73,7 +73,7 @@ def main(argv=None):
    # load_snapshot itself never searches or falls back to the current CWD.
    manifest_root=args.replay_from.parent
    sample=next((r.get('snapshot_path','') for r in mapping.values()),'')
-   if sample.startswith('data/'):
+   if older.get('snapshot_path_base') != 'manifest' and sample.startswith('data/'):
     manifest_root=Path(args.registry).resolve().parents[2]
    fetcher=ManifestSnapshotFetcher(mapping,manifest_root)
   if args.fixture_dir:
@@ -107,7 +107,15 @@ def main(argv=None):
     fetcher=PublicFetcher(timeout=args.timeout,retries=args.retries,host_ca_bundles=host_ca_bundles)
    except (ValueError,OSError) as ex:
     p.error(str(ex))
-  result=collect(registry,fetch=fetcher,snapshot_dir=args.snapshot_dir);write(args.output,result)
+  result=collect(registry,fetch=fetcher,snapshot_dir=args.snapshot_dir)
+  manifest_directory=Path(args.output).resolve().parent
+  if args.snapshot_dir and args.snapshot_dir.resolve().is_relative_to(manifest_directory):
+   result['snapshot_path_base']='manifest'
+   for vendor in result['vendors']:
+    for document in vendor['source_results']:
+     if document.get('snapshot_path'):
+      document['snapshot_path']=Path(document['snapshot_path']).resolve().relative_to(manifest_directory).as_posix()
+  write(args.output,result)
  elif args.cmd=='assess':
   result={'schema_version':'0.1','assessment':evaluate(read(args.registry)['vendors'],read(args.etl),read(args.infra),read(args.reviewed_rules)['rules'] if args.reviewed_rules else None)};write(args.output,result)
  elif args.cmd=='quality':

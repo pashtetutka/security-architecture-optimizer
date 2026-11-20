@@ -47,12 +47,6 @@ CAPACITY_LABELS = {
 }
 
 
-@st.cache_data(show_spinner='Проверяем сохранённые документы ETL…')
-def _catalog(path: str):
-    from .assessment import load_bundled_catalog
-    return load_bundled_catalog(path)
-
-
 @st.cache_data(show_spinner=False)
 def _project_bundle(selected: dict, dataset_digest: str, policy_version: str, _bundle: dict):
     return project_legacy_coverage(selected, _bundle, load_default_dictionary(), policy_version)
@@ -226,62 +220,14 @@ def organizations_page(root: Path) -> None:
     by_name = {item['name']: item for item in scenarios}
     selected_name = st.selectbox('Организация', list(by_name))
     selected = by_name[selected_name]
-    bundle_path = Path(os.environ.get('SIEM_CATALOG_BUNDLE', root / 'results/catalog-v2'))
-    if bundle_path.exists() or 'SIEM_CATALOG_BUNDLE' in os.environ:
-        _bundle_preview(selected, bundle_path)
+    if configured_path := os.environ.get('SIEM_CATALOG_BUNDLE'):
+        _bundle_preview(selected, Path(configured_path))
         return
-    st.info('Открыто прежнее представление. Для просмотра на контракте v2 '
-            'соберите каталог в results/catalog-v2 или задайте SIEM_CATALOG_BUNDLE.')
-    try:
-        catalog = _catalog(str(root / 'data/etl/repro/vendors.json'))
-    except (OSError, ValueError, KeyError) as exc:
-        st.error(f'Не удалось проверить каталог ETL: {exc}')
+    latest = max((root / 'results/runs').glob('*/catalog/manifest.json'), default=None)
+    if latest is not None:
+        _bundle_preview(selected, latest.parent)
         return
-    st.info('Сопоставление выполняется по единому формату готового опросного листа. '
-            'Совпадение названия продукта с каталогом SIEM требует проверки версии.')
-    try:
-        from .assessment import assess_organization
-        result = assess_organization(selected, catalog)
-    except (OSError, ValueError, KeyError) as exc:
-        st.error(f'Не удалось построить отчёт: {exc}')
-        return
-    summary = result['scenario']
-    if 'manual_import' in result['document_acquisition_methods']:
-        st.caption('В проверке используется также сохранённый официальный документ, '
-                   'импортированный вручную; способ получения указан у основания совпадения.')
-    size = selected['organization_size']
-    headcount = f"{size['employees']} сотрудников" if size['employees'] is not None else 'численность неизвестна'
-    sites = f"{size['sites']} площадок" if size['sites'] is not None else 'число площадок неизвестно'
-    st.caption(f"{headcount} · {sites} · {len(selected['event_sources'])} строк опросного листа")
-    left, middle, right = st.columns(3)
-    any_known = len(summary['unknown_eps_sources']) < len(selected['event_sources'])
-    left.metric('Средний известный поток',
-                f"{summary['known_eps_lower_bound']['average_eps']:g} EPS" if any_known else 'Нет данных')
-    middle.metric('Пиковый известный поток',
-                  f"{summary['known_eps_lower_bound']['peak_eps']:g} EPS" if any_known else 'Нет данных')
-    right.metric('Источники без оценки EPS', len(summary['unknown_eps_sources']))
-    if summary['unknown_eps_sources']:
-        st.warning('Общий EPS может быть выше указанной нижней границы: часть источников ещё не измерена.')
-    model = result.get('integrator_eps_model')
-    if model:
-        st.subheader('Предварительная оценка EPS интегратора')
-        low, working, stress, planning = st.columns(4)
-        low.metric('Низкий сценарий', f"≈{round(model['totals']['low_eps'] / 10) * 10:g} EPS")
-        working.metric('Рабочая оценка', f"≈{round(model['totals']['working_eps'] / 10) * 10:g} EPS")
-        stress.metric('Стресс-сценарий', f"≈{round(model['totals']['stress_eps'] / 10) * 10:g} EPS")
-        planning.metric('Для начального sizing, +25%',
-                        f"{model['planning_eps_with_25pct_reserve']:g} EPS")
-        st.caption('Это инженерные допущения по типам журналов, не замер и не верхний предел нагрузки.')
-        with st.expander('Как рассчитан EPS по каждой строке'):
-            st.dataframe(pd.DataFrame(model['rows']), hide_index=True, width='stretch')
-            if model['unresolved']:
-                st.warning('Не включены из-за возможного перекрытия или отсутствия данных:')
-                st.dataframe(pd.DataFrame(model['unresolved']), hide_index=True, width='stretch')
-            for assumption in model['assumptions']:
-                st.write('• ' + assumption)
-    _inventory(selected)
-    st.subheader('Проверка каждого источника')
-    _legacy_matches(selected, result)
+    st.info('Каталог пока не собран. Выполните сетевой сбор и сборку каталога по README.')
 
 
 def _inventory(selected: dict) -> None:
@@ -303,91 +249,3 @@ def _inventory(selected: dict) -> None:
         st.json({'deployment': selected['deployment'], 'capacity': selected['capacity'],
                  'selection_constraints': selected['selection_constraints'],
                  'assumptions': selected['assumptions']})
-
-
-def _legacy_matches(selected: dict, result: dict) -> None:
-    st.caption('Показаны только совпадения по идентификатору источника и явные расхождения версий.')
-    st.dataframe(pd.DataFrame([{
-        '№': row['row'], 'Тип': row['source_type'], 'Модель': row['manufacturer_model'],
-        'Кол-во': row['quantity'], 'Прямое название': ', '.join(row['published_name_in']),
-        'Другая версия, засчитано': ', '.join(row['version_candidate_in']),
-        'Частичная поддержка, засчитано': ', '.join(row['partial_in']),
-        'Часть продуктов': ', '.join(row['component_candidate_in']),
-        'Семейство': ', '.join(row['family_candidate_in']),
-    } for row in result['inventory_audit']]), hide_index=True, width='stretch')
-    st.subheader('Предварительный ответ по SIEM')
-    st.caption('Совпадения по идентификатору источника показаны отдельно от отсутствующих записей. '
-               'Версия, конкретная модель и работа парсера требуют проверки; нет записи ≠ нет поддержки.')
-    st.dataframe(pd.DataFrame([{
-        'SIEM': row['siem_name'],
-        'Записей в каталоге': row['catalog_integration_count'],
-        'Засчитано строк': f"{row['required_counted']}/{row['required_total']}",
-        'Из них другая версия': row['source_counts']['version_candidate'],
-        'Проверить версии': row['version_review_count'],
-        'Требуют уточнения': row['candidate_matches'],
-        'Частичных записей': row['source_counts']['partial'],
-        'Профилей с диапазоном EPS': len(row['candidate_eps_profiles']),
-        'Статус инфраструктуры': CAPACITY_LABELS.get(row['capacity_status'], row['capacity_status']),
-        'Допуск к окончательному выбору': 'Да' if row['calculation_ready'] else 'Нет',
-    } for row in result['vendors']]), hide_index=True, width='stretch')
-    st.subheader('Из чего складывается результат')
-    vendor_names = [row['siem_name'] for row in result['vendors']]
-    default_vendor = vendor_names.index('RuSIEM') if 'RuSIEM' in vendor_names else 0
-    audit_vendor_name = st.selectbox('Проверить строки для SIEM', vendor_names, index=default_vendor)
-    audit_vendor = next(row for row in result['vendors'] if row['siem_name'] == audit_vendor_name)
-    st.caption(f"Засчитано {audit_vendor['required_counted']} из {audit_vendor['required_total']} строк: "
-               'совпадения продукта любой указанной версии, включая частичную поддержку. '
-               'Расхождение версий помечено для проверки; семейство и часть составной строки не засчитываются.')
-    st.dataframe(pd.DataFrame([{
-        '№': index, 'Тип': item['source_type'], 'Источник в опроснике': item['manufacturer_model'],
-        'Сопоставлено как': ', '.join(product['name'] for product in item['products']),
-        'Найдены компоненты': ', '.join(component['name'] for component in item['component_assessments']
-                                      if component['listed']),
-        'Условие': 'Любой' if item['products_match'] == 'any' else 'Все',
-        'Засчитано': 'Да' if item['counted_for_coverage'] else 'Нет',
-        'Почему': MATCH_LABELS.get(item['status'], item['status']),
-        'Частичная поддержка': 'Да' if item['partial_support'] else 'Нет',
-        'Ограничения': ' '.join(item['support_limitations']),
-        'Поток журнала': item['log_stream'],
-        'Раздельный сбор проверить': 'Да' if item['collection_scope_review_required'] else 'Нет',
-        'Версия в опроснике': item['requested_version'],
-        'Версию проверить': 'Да' if item['version_review_required'] else 'Нет',
-        'Версия в каталоге': ', '.join(dict.fromkeys(
-            str(evidence['source_version']) for evidence in item['evidence']
-            if evidence['source_version'])),
-        'Найдено в каталоге': ', '.join(dict.fromkeys(
-            evidence['source_name'] for evidence in item['evidence'])),
-        'Основание': item['evidence'][0]['excerpt'] if item['evidence'] else None,
-        'Документ': item['evidence'][0]['url'] if item['evidence'] else None,
-        'Получение документа': item['evidence'][0]['acquisition_method'] if item['evidence'] else None,
-    } for index, item in enumerate(audit_vendor['source_matches'], start=1)]),
-        hide_index=True, width='stretch')
-    st.warning('Ни одна SIEM пока не допущена к окончательной рекомендации: версии и факты ETL требуют проверки, '
-               'а диапазон EPS не подтверждает архитектуру и доступные ресурсы.')
-    for vendor in result['vendors']:
-        with st.expander(f"{vendor['siem_name']} — строки опросного листа {vendor['required_counted']}/{vendor['required_total']}"):
-            st.dataframe(pd.DataFrame([{
-                'Тип': item['source_type'], 'Модель': item['manufacturer_model'],
-                'Версия организации': item['requested_version'],
-                'Состав': ', '.join(p['name'] for p in item['products']),
-                'Условие состава': 'Любой' if item['products_match'] == 'any' else 'Все',
-                'Требование': item['requirement'],
-                'Статус': MATCH_LABELS.get(item['status'], item['status']),
-                'Засчитано': 'Да' if item['counted_for_coverage'] else 'Нет',
-                'Проверка версии': (', '.join(str(value) for value in item['version_scope'])
-                                    if isinstance(item['version_scope'], list) else item['version_scope']),
-                'Основание совпадения': item['match_basis'],
-                'Группа устройства': item['asset_group_id'],
-                'Поток журнала': item['log_stream'],
-                'Документ': item['evidence'][0]['url'] if item['evidence'] else None,
-                'Фрагмент': item['evidence'][0]['excerpt'] if item['evidence'] else None,
-            } for item in vendor['source_matches']]), hide_index=True, width='stretch')
-            if vendor['candidate_eps_profiles']:
-                st.write('Опубликованные профили, диапазон которых включает известный пиковый EPS:')
-                st.dataframe(pd.DataFrame(vendor['candidate_eps_profiles']), hide_index=True, width='stretch')
-            st.write('Что уточнить:')
-            for question in vendor['review_questions']:
-                st.write('• ' + question)
-    st.download_button('Скачать предварительный ответ JSON',
-                       json.dumps(result, ensure_ascii=False, indent=2),
-                       file_name=f"{selected['scenario_id']}_assessment.json", mime='application/json')
