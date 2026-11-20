@@ -69,7 +69,8 @@ def _git(root: Path, *args: str) -> str:
 def _tree(root: Path, excluded: list[str]) -> dict:
     names = set(_git(root, 'ls-files', '-z', '--cached', '--others',
                      '--exclude-standard').split('\0')) - {''}
-    names.add('AGENTS.md')  # Always required, even when ignored by Git.
+    if (root / 'AGENTS.md').is_file():
+        names.add('AGENTS.md')  # Optional local instructions are part of a local baseline.
     files = []
     for name in sorted(names):
         relative = Path(name).as_posix()
@@ -87,8 +88,6 @@ def _tree(root: Path, excluded: list[str]) -> dict:
                           'sha256': _digest(path.read_bytes())})
         else:
             raise BaselineError('Unsupported source tree entry: ' + relative)
-    if not (root / 'AGENTS.md').is_file():
-        raise BaselineError('Required instruction file is missing: AGENTS.md')
     return {'sha256': _digest(_json_bytes(files)), 'files': files,
             'excluded_generated_paths': excluded}
 

@@ -16,3 +16,10 @@ data/private/
 local_archive/
 .coverage
 htmlcov/
+
+# Local working documents
+/AGENTS.md
+/docs/architecture_review_rfc.md
+/docs/architecture_implementation_plan.md
+/docs/project_architecture.md
+/docs/decision_module_architecture.md
