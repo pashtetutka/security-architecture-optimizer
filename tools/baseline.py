@@ -47,6 +47,7 @@ def _write(path: Path, value) -> None:
 
 def _local(root: Path, value: str) -> Path:
     """Reject external paths and traversal before reading a declared input."""
+    root = root.resolve()
     path = Path(value.replace('\\', '/'))
     resolved = (path if path.is_absolute() else root / path).resolve()
     if not resolved.is_relative_to(root):
@@ -55,7 +56,7 @@ def _local(root: Path, value: str) -> Path:
 
 
 def _relative(root: Path, path: Path) -> str:
-    return path.resolve().relative_to(root).as_posix()
+    return path.resolve().relative_to(root.resolve()).as_posix()
 
 
 def _git(root: Path, *args: str) -> str:
