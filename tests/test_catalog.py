@@ -1,4 +1,5 @@
 import unittest
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from siem.etl.sources import normalize_sources
@@ -7,6 +8,7 @@ from siem.etl.requirements import parse_nodes
 from siem.etl.requirements import parse_hardware_tables
 from siem.etl.requirements import parse_explicit_requirements
 from siem.etl.catalog import build_catalog
+from siem.etl.catalog import locate_snapshot
 from siem.etl.catalog import write_catalog
 
 
@@ -34,6 +36,32 @@ class FocusedCatalogTests(unittest.TestCase):
         self.assertEqual(rows[0]['source_name'],'Cisco ASA')
         self.assertIsNone(rows[0]['siem_version'])
 
+
+    def test_same_product_only_merges_rows_with_equal_claim_fields(self):
+        base = {'siem_id': 'p03', 'field': 'source_integration',
+                'value': 'Example source', 'evidence_status': 'vendor_table',
+                'source_version': '1', 'collection_method': 'Syslog'}
+        full = {**base, 'normalizer_format': 'JSON', 'source_sha256': 'a'}
+        second = {**full, 'source_sha256': 'b'}
+        limited = {**base, 'normalizer_format': 'CEF', 'source_sha256': 'c',
+                   'normalizer_description': 'Поддерживается только часть событий.'}
+        for facts in ([full, second, limited], [limited, second, full]):
+            rows = {row['normalizer_format']: row for row in normalize_sources({'facts': facts})}
+            self.assertEqual({'JSON', 'CEF'}, set(rows))
+            self.assertEqual({'a', 'b'}, {ev['document_sha256'] for ev in rows['JSON']['evidence']})
+            self.assertEqual('partial', rows['CEF']['support_scope'])
+            self.assertEqual(['c'], [ev['document_sha256'] for ev in rows['CEF']['evidence']])
+
+    def test_source_normalization_keeps_explicit_support_polarity_and_capability(self):
+        listed = {'siem_id': 'p03', 'field': 'source_integration',
+                  'value': 'Example source', 'evidence_status': 'vendor_table'}
+        negative = {**listed, 'support_assertion': 'unsupported',
+                    'support_capability': 'respond'}
+        rows = normalize_sources({'facts': [listed, negative]})
+        self.assertEqual(2, len(rows))
+        explicit = next(row for row in rows if 'support_assertion' in row)
+        self.assertEqual(('unsupported', 'respond'),
+                         (explicit['support_assertion'], explicit['support_capability']))
 
     def test_eps_range(self):
         self.assertEqual(parse_eps_bound('До 1000'),(None,1000))
@@ -111,9 +139,45 @@ class AdditionalAdaptersTests(unittest.TestCase):
 
 
 class SnapshotRegressionTests(unittest.TestCase):
+    def test_relative_snapshot_next_to_manifest_has_priority_over_working_directory(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest_source = root/'manifest'
+            invocation = root/'invocation'
+            for folder in (manifest_source, invocation):
+                folder.mkdir()
+                (folder/'source.html').write_text(folder.name, encoding='utf-8')
+            previous = Path.cwd()
+            try:
+                os.chdir(invocation)
+                self.assertEqual(manifest_source/'source.html',
+                                 locate_snapshot('source.html', manifest_source))
+                self.assertEqual(Path('source.html'),
+                                 locate_snapshot('source.html', root/'legacy'))
+            finally:
+                os.chdir(previous)
+
+    def test_source_and_hardware_documents_require_a_hash(self):
+        root = Path(__file__).resolve().parents[1]
+        p04 = next((root/'data/etl/repro/raw/p04').glob('hardware_requirements_*.html'))
+        p13 = root/'data/etl/repro/raw/p13/sources_catalog_87e67b58339816.html'
+        raw = {'facts': [], 'vendors': [
+            {'id': 'p04', 'name': 'Alertix', 'source_results': [
+                {'source_id': 'hardware_requirements', 'status': 'ok',
+                 'snapshot_path': str(p04)}]},
+            {'id': 'p13', 'name': 'KOMRAD', 'source_results': [
+                {'source_id': 'sources_catalog', 'status': 'ok', 'snapshot_path': str(p13)}]},
+        ]}
+        catalog = build_catalog(raw, root/'input.json')
+        self.assertEqual([], catalog['sizing_profiles'])
+        self.assertEqual([], catalog['integrations'])
+        for key in ('unread_system_documents', 'unread_source_catalog_documents'):
+            issue, = catalog[key]
+            self.assertEqual('document_hash_missing', issue['reason'])
+
     def test_komrad_source_catalog_with_matching_hash(self):
         import hashlib
-        snapshot=Path(__file__).parent/'fixtures'/'komrad_sources_catalog.html'
+        snapshot=Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p13/sources_catalog_87e67b58339816.html'
         digest='87e67b5833981691b5dc8584b720f995e2ef6044c3bffef0e9d70f814ec0cd65'
         self.assertEqual(hashlib.sha256(snapshot.read_bytes()).hexdigest(),digest)
         raw={'vendors':[{'id':'p13','name':'KOMRAD', 'source_results':[
@@ -121,7 +185,7 @@ class SnapshotRegressionTests(unittest.TestCase):
               'url':'https://docs.etecs.ru/komrad/docs/next/collect/sources/',
               'content_sha256':digest}]}], 'facts':[]}
         catalog=build_catalog(raw,snapshot.parent/'input.json')
-        self.assertEqual(len(catalog['integrations']),41)
+        self.assertEqual(len(catalog['integrations']),44)
         names=[row['source_name'] for row in catalog['integrations']]
         self.assertIn('Auditbeat',names)
         self.assertFalse(any('📄' in name for name in names))

@@ -1,12 +1,16 @@
 """Document collection, status and existing applicability commands."""
-import argparse,json,hashlib
+import argparse,json
 from collections import Counter
 from pathlib import Path
 from ..pipeline import collect
 from ..fetcher import PublicFetcher
 from ..applicability import evaluate
-from ..catalog import locate_snapshot
+from ..snapshots import ManifestSnapshotFetcher
 from ..console import configure_console
+
+EXIT_COMPLETE=0
+EXIT_COMPLETE_WITH_UNAVAILABLE=3
+EXIT_NO_DATA=4
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def write(path,data):
@@ -55,7 +59,7 @@ def main(argv=None):
    for v in registry['vendors']:
     print(v['id'],v['name'])
     for src in v['sources']: print('  ',src['mode'],src['url'])
-   return
+   return EXIT_COMPLETE
   if not args.output:
    p.error('Для crawl требуется --output (кроме --dry-run)')
   if sum(bool(x) for x in (args.fixture_dir,args.manual_dir,args.replay_from)) > 1:
@@ -64,19 +68,14 @@ def main(argv=None):
   if args.replay_from:
    older=read(args.replay_from)
    mapping={r['url']:r for v in older['vendors'] for r in v['source_results'] if r.get('snapshot_path')}
-   class SnapshotFetcher:
-    acquisition_method='snapshot_replay'
-    def __init__(self): self.resolved_urls={url:r.get('resolved_url',url) for url,r in mapping.items()}
-    def fetch(self,url):
-     if url not in mapping: raise FileNotFoundError('Снимок отсутствует: '+url)
-     record=mapping[url]
-     path=locate_snapshot(record['snapshot_path'],args.replay_from.parent)
-     if path is None: raise FileNotFoundError('Снимок отсутствует: '+url)
-     data=path.read_bytes()
-     if not record.get('content_sha256') or hashlib.sha256(data).hexdigest()!=record['content_sha256']:
-      raise ValueError('snapshot_hash_mismatch: '+url)
-     return (data,record.get('http_charset'),record.get('http_content_type',''))
-   fetcher=SnapshotFetcher()
+   # Legacy manifests store repository-relative paths while replay_from lives
+   # below data/etl/repro. Resolve the one explicit compatibility root here;
+   # load_snapshot itself never searches or falls back to the current CWD.
+   manifest_root=args.replay_from.parent
+   sample=next((r.get('snapshot_path','') for r in mapping.values()),'')
+   if sample.startswith('data/'):
+    manifest_root=Path(args.registry).resolve().parents[2]
+   fetcher=ManifestSnapshotFetcher(mapping,manifest_root)
   if args.fixture_dir:
    paths={src['url']:(args.fixture_dir / (v['id']+'__'+src['id']+('.pdf' if src['mode']=='pdf' else '.json' if src['mode']=='maxpatrol_api' else '.html')))
           for v in registry['vendors'] for src in v['sources']}
@@ -128,7 +127,7 @@ def main(argv=None):
   for v in d['vendors']:
    relevant=[f for f in facts if f.get('siem_id')==v['id']]
    print(' ',v['id'],v['name'], 'факты',len(relevant),'интеграции',sum(f.get('field')=='source_integration' for f in relevant))
-  return
+  return EXIT_COMPLETE
  else:
   d=read(args.etl)
   for v in d['vendors']:
@@ -138,5 +137,13 @@ def main(argv=None):
  if args.cmd!='status':
   summary=result['totals'] if 'totals' in result else {'assessments':len(result['assessment'])}
   print(json.dumps(summary,ensure_ascii=False))
+ if args.cmd=='crawl':
+  facts=result.get('totals',{}).get('facts',len(result.get('facts',[])))
+  errors=result.get('totals',{}).get('errors',len(result.get('errors',[])))
+  if facts==0:return EXIT_NO_DATA
+  if errors or any(s.get('status') not in ('ok','empty_review_required')
+      for vendor in result['vendors'] for s in vendor['source_results']):
+   return EXIT_COMPLETE_WITH_UNAVAILABLE
+ return EXIT_COMPLETE
 
 if __name__=='__main__':main()

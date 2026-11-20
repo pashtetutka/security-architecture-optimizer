@@ -2,38 +2,24 @@
 from __future__ import annotations
 import argparse
 from pathlib import Path
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
-from urllib.robotparser import RobotFileParser
 import json
 
 from ..coverage import match_inventory
 from ..vendors.rusiem import parse_html, URL
 from ..pdf_docs import find_candidates
 from ..console import configure_console
+from ..fetcher import PublicFetcher
 
-AGENT = 'SIEMResearchETL/0.3 (non-commercial academic prototype)'
 
-
-def download_vendor_page() -> str:
-    """One allowlisted source, obey published robots instructions. No crawling."""
-    u = urlparse(URL)
-    robots_url = f'{u.scheme}://{u.netloc}/robots.txt'
-    robots = RobotFileParser()
-    try:
-        with urlopen(Request(robots_url, headers={'User-Agent': AGENT}), timeout=12) as response:
-            robot_text = response.read(500_000).decode('utf-8',errors='replace')
-        robots.parse(robot_text.splitlines())
-    except Exception as exc:
-        raise RuntimeError('Не удалось проверить robots.txt; онлайн-загрузка отменена') from exc
-    if not robots.can_fetch(AGENT, URL):
-        raise RuntimeError('robots.txt не разрешает получение страницы этим клиентом')
-    with urlopen(Request(URL,headers={'User-Agent': AGENT,'Accept':'text/html'}),timeout=20) as response:
-        content = response.read(3_000_001)
-        if len(content) > 3_000_000:
-            raise ValueError('Размер исходной страницы превышает лимит 3 МБ')
-        charset = response.headers.get_content_charset() or 'utf-8'
-        return content.decode(charset,errors='replace')
+def download_vendor_page(fetcher=None) -> str:
+    """Use the same TLS/robots/redirect boundary as every network command."""
+    content,charset,_ = (fetcher or PublicFetcher()).fetch(URL)
+    try:return content.decode(charset or 'utf-8')
+    except (UnicodeError,LookupError):
+        from bs4 import UnicodeDammit
+        decoded=UnicodeDammit(content,is_html=True).unicode_markup
+        if decoded is None:raise UnicodeError('Не удалось определить кодировку HTML')
+        return decoded
 
 
 def main(argv=None):

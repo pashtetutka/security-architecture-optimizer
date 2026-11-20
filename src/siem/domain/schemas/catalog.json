@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:siem-catalog:2.0:catalog",
+  "$defs": {
+    "payload": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "siem-catalog/2.0"
+        },
+        "dataset_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "input_document_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "dictionary_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normalizer_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extractor_versions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "build_options": {
+          "type": "object",
+          "properties": {
+            "automatic_only": {
+              "type": "boolean"
+            },
+            "public_bundle": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "automatic_only",
+            "public_bundle"
+          ],
+          "additionalProperties": false
+        },
+        "payloads": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:catalog#/$defs/payload"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schema_version",
+        "dataset_id",
+        "content_digest",
+        "input_document_ids",
+        "dictionary_version",
+        "normalizer_version",
+        "extractor_versions",
+        "build_options",
+        "payloads"
+      ],
+      "additionalProperties": false
+    },
+    "build": {
+      "type": "object",
+      "properties": {
+        "build_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "built_at": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/timestamp"
+        },
+        "source_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_manifests": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:catalog#/$defs/payload"
+          },
+          "minItems": 0
+        },
+        "dependency_lock_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "build_id",
+        "built_at",
+        "source_revision",
+        "input_manifests",
+        "dependency_lock_digest"
+      ],
+      "additionalProperties": false
+    },
+    "bundle": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "siem-catalog/2.0"
+        },
+        "status": {
+          "enum": [
+            "data",
+            "no_data"
+          ]
+        },
+        "manifest": {
+          "$ref": "urn:siem-catalog:2.0:catalog#/$defs/manifest"
+        },
+        "build": {
+          "$ref": "urn:siem-catalog:2.0:catalog#/$defs/build"
+        },
+        "extension_registry": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/extension_registry"
+        },
+        "vendors": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/vendor"
+          },
+          "minItems": 0
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/product"
+          },
+          "minItems": 0
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/alias"
+          },
+          "minItems": 0
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/relation"
+          },
+          "minItems": 0
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/document"
+          },
+          "minItems": 0
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/evidence"
+          },
+          "minItems": 0
+        },
+        "resolutions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:entities#/$defs/resolution"
+          },
+          "minItems": 0
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:claims#/$defs/claim"
+          },
+          "minItems": 0
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:claims#/$defs/route"
+          },
+          "minItems": 0
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:claims#/$defs/review"
+          },
+          "minItems": 0
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:claims#/$defs/diagnostic"
+          },
+          "minItems": 0
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:resources#/$defs/profile"
+          },
+          "minItems": 0
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:resources#/$defs/requirement"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schema_version",
+        "status",
+        "manifest",
+        "build",
+        "extension_registry",
+        "vendors",
+        "products",
+        "aliases",
+        "relations",
+        "documents",
+        "evidence",
+        "resolutions",
+        "claims",
+        "routes",
+        "reviews",
+        "diagnostics",
+        "profiles",
+        "requirements"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/bundle"
+}

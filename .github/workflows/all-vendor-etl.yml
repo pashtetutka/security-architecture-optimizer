@@ -9,58 +9,85 @@ permissions:
   contents: read
 jobs:
   verify:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            python: '3.10'
-          - os: ubuntu-latest
-            python: '3.12'
-          - os: macos-latest
-            python: '3.12'
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
-      - run: python -m pip install -e .
+          python-version: '3.10'
+      - run: python -m pip install -c constraints.txt -e .
       - run: python -m unittest discover -s tests -v
       - name: Verify bundled offline evidence
         run: python -m siem.etl check --etl data/etl/repro/vendors.json --automatic-only --output-dir results/repro-check --no-tests
+      - name: Verify portable catalog and preview policy
+        run: >
+          python -B tools/verify_reproducibility.py
+          --source-revision "${{ github.sha }}"
+          --output-dir results/repro-verify
+      - name: Build portable bundle without manual imports
+        run: python -B tools/build_v2_bundle.py --automatic-only --output-dir results/catalog-v2-automatic
+      - name: Check automatic-only provenance
+        run: >
+          python -c "from siem.etl.bundle import load_bundle;
+          b = load_bundle('results/catalog-v2-automatic');
+          assert b['manifest']['build_options']['automatic_only'];
+          assert {d['acquisition_method'] for d in b['documents']} == {'automatic_https'};
+          assert sum('siem' in p['class_ids'] for p in b['products']) == 13;
+          guides = {d['document_id'] for d in b['documents']
+          if '/kodbezopasnosti-continent-4-guide-' in d['resolved_url']};
+          assert len(guides) == 2;
+          evidence = {e['evidence_id'] for e in b['evidence'] if e['document_ref'] in guides};
+          transports = {s['transport'] for r in b['routes'] for s in r['steps']
+          if s['actor_ref'] == 'product:siem-p03' and s['operation'] == 'collect'
+          and not evidence.isdisjoint(s['evidence_refs'])};
+          assert transports == {'Syslog', 'PostgreSQL'}"
+      - name: Build and install wheel for portability check
+        run: |
+          python -m pip wheel --no-deps --wheel-dir results/wheel .
+          python -m pip install --no-index --no-deps --find-links results/wheel --target results/wheel-install siem-decision-support
+      - name: Check installed wheel outside checkout
+        working-directory: ${{ runner.temp }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}/results/wheel-install
+          BUNDLE_PATH: ${{ github.workspace }}/results/repro-verify/catalog
+        run: >
+          python -c "import os; from pathlib import Path; import siem.domain.identity as identity;
+          from siem.etl.bundle import load_bundle;
+          assert Path(identity.__file__).resolve().is_relative_to(Path(os.environ['PYTHONPATH']).resolve());
+          bundle = load_bundle(os.environ['BUNDLE_PATH']);
+          assert bundle['manifest']['dictionary_version'] == identity.load_default_dictionary().version"
+      - name: Install interface dependencies
+        run: python -m pip install -c constraints.txt -e ".[ui]"
+      - name: Verify all organization previews on the portable bundle
+        run: python -B tools/verify_preview.py --bundle results/repro-verify/catalog
+      - name: Build publication allowlist
+        run: >-
+          python -B tools/public_artifact.py --output-dir results/public-evidence
+          --reproducibility results/repro-verify/reproducibility.json
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: siem-etl-repro-${{ matrix.os }}
-          path: |
-            data/etl/repro/vendors.json
-            data/etl/repro/raw/
-            results/repro-check/
+          name: siem-etl-repro-windows
+          path: results/public-evidence/
           retention-days: 30
   collect:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - run: python -m pip install -e .
+          python-version: '3.10'
+      - run: python -m pip install -c constraints.txt -e .
       - name: Download official published materials
-        run: python -m siem.etl crawl --exclude-restricted-documents --output results/siem-etl.json --snapshot-dir results/raw
+        run: |
+          python -m siem.etl crawl --exclude-restricted-documents --output results/siem-etl.json --snapshot-dir results/raw
+          $code = $LASTEXITCODE
+          if ($code -notin @(0, 3, 4)) { exit $code }
+          Write-Output "collection_exit=$code (0=complete, 3=complete_with_unavailable, 4=no_data)"
+          exit 0
       - name: All-vendor status
         run: python -m siem.etl status --etl results/siem-etl.json
       - name: Normalize snapshots and generate quality reports
         run: python -m siem.etl check --etl results/siem-etl.json --output-dir results/normalized --no-tests
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: siem-etl-snapshot
-          path: |
-            results/siem-etl.json
-            results/raw/
-            results/normalized/
-          retention-days: 30

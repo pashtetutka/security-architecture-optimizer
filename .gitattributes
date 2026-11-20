@@ -1,3 +1,11 @@
 # Preserve evidence snapshots byte-for-byte, including their SHA-256.
 tests/fixtures/** -text -whitespace
 data/etl/repro/raw/** -text -whitespace
+
+# Build inputs identified by a byte hash must be identical across checkouts.
+/data/etl/vendors.json text eol=lf
+/data/etl/repro/*.json text eol=lf
+/data/ontology/*.json text eol=lf
+/data/scenarios/*.json text eol=lf
+/src/siem/domain/ontology/*.json text eol=lf
+/constraints.txt text eol=lf

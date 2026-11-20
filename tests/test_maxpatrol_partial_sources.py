@@ -5,14 +5,22 @@ import unittest
 from pathlib import Path
 
 from siem.etl.catalog import build_catalog
-from siem.etl.vendors.maxpatrol import parse_maxpatrol_supported_api
+from siem.etl.vendors.maxpatrol import parse_maxpatrol_partial_api, parse_maxpatrol_supported_api
 from siem.etl.pipeline import collect
 
 
 class MaxPatrolPartialSourcesTests(unittest.TestCase):
+    def test_partial_api_envelope_with_real_saved_html(self):
+        # Real table bytes inside a model API envelope; live partial API fetch
+        # was blocked by TLS and is not claimed as a successful acquisition.
+        html = (Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p06/partial_sources_3ce98d29d804e9.html').read_text(encoding='utf-8')
+        doc = {'project': 'siem', 'type': 'help', 'title': 'Источники с частичной поддержкой', 'content': html}
+        rows = parse_maxpatrol_partial_api(json.dumps(doc).encode(), {'siem_id': 'p06', 'siem_name': 'MaxPatrol SIEM'})
+        self.assertEqual(len(rows), 179)
+        self.assertEqual(next(row for row in rows if row['source_name'] == 'D-Link DFL-1660')['source_version'], '2.27.30')
     def test_supported_api_real_snapshot_and_collection(self):
         from tempfile import TemporaryDirectory
-        path = Path(__file__).parent / 'fixtures' / 'maxpatrol_supported_sources.json'
+        path = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p06/supported_sources_api_a7df480fe76184.json'
         data = path.read_bytes()
         digest = 'a7df480fe76184cedb6ca032522086d4f293fbae0e8ceb3a852450ea131743d5'
         self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
@@ -43,7 +51,7 @@ class MaxPatrolPartialSourcesTests(unittest.TestCase):
         self.assertEqual(catalog['unread_source_catalog_documents'], [])
 
     def test_supported_api_rejects_other_product_and_ambiguous_markup(self):
-        doc = json.loads((Path(__file__).parent/'fixtures'/'maxpatrol_supported_sources.json').read_text(encoding='utf-8'))
+        doc = json.loads((Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p06/supported_sources_api_a7df480fe76184.json').read_text(encoding='utf-8'))
         meta = {'siem_id': 'p06', 'siem_name': 'MaxPatrol SIEM'}
         with self.assertRaisesRegex(ValueError, 'scope'):
             parse_maxpatrol_supported_api(json.dumps(dict(doc, project='mp10')).encode(), meta)
@@ -66,7 +74,7 @@ class MaxPatrolPartialSourcesTests(unittest.TestCase):
         self.assertEqual(catalog['unread_source_catalog_documents'][0]['reason'], 'json_source_extraction_failed')
 
     def test_real_table_keeps_partial_scope_and_published_versions(self):
-        path = Path(__file__).parent / 'fixtures' / 'maxpatrol_partial_sources.html'
+        path = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p06/partial_sources_3ce98d29d804e9.html'
         digest = '3ce98d29d804e94a7b99a4a2b58abf18676d81ce9e57370bcafaa413dd343228'
         self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
         source = {'source_id': 'partial_sources', 'status': 'ok',
@@ -93,7 +101,7 @@ class MaxPatrolPartialSourcesTests(unittest.TestCase):
         self.assertEqual(catalog['unread_source_catalog_documents'], [])
 
     def test_hash_mismatch_yields_diagnostic_not_rows(self):
-        path = Path(__file__).parent / 'fixtures' / 'maxpatrol_partial_sources.html'
+        path = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p06/partial_sources_3ce98d29d804e9.html'
         raw = {'facts': [], 'vendors': [{'id': 'p06', 'name': 'MaxPatrol SIEM',
                 'source_results': [{'source_id': 'partial_sources', 'status': 'ok',
                                     'url': 'https://example.test/partial',

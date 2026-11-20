@@ -1,0 +1,13 @@
+{
+  "policy_version": "preview-coverage/1.1-candidate",
+  "reviewer_role": "project_owner",
+  "review_date": "2026-11-20",
+  "decisions": {
+    "p01:19": "sha256:d53afafe3e373e30efd8cddd4633f69d09eba76e5bf3225ed70a75dfe6fb0c62",
+    "p02:2": "sha256:5bf5d3eaa9ed9dd46224613895c69eef069566f2cf44cc97ed1171942345a5c9",
+    "p02:3": "sha256:f79e59f962021aa749e699f38bfa550d4ed9ea52968e9ac36c406af99ca266d8",
+    "p03:2": "sha256:657bbdcce3434245d0f4e5351b3a18af3a295805c2dbb9609d5f2ded3fe63786",
+    "p03:3": "sha256:328c6297f3aef548893aa1a9ac4d2a339126ec831e05ce43503746cb9b13fb24",
+    "p06:1": "sha256:cd049a80cb4d7c602efc8563f78e2019d65e59f9d548a7a005f0ff50205dcd12"
+  }
+}

@@ -1,0 +1,821 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:siem-catalog:2.0:common",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*:[A-Za-z0-9][A-Za-z0-9._/-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "https_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "lower_inclusive": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "upper_inclusive": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "lower_inclusive",
+        "upper_inclusive"
+      ],
+      "additionalProperties": false
+    },
+    "interval": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "interval"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bounds": {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/bounds"
+        }
+      },
+      "required": [
+        "kind",
+        "lower",
+        "upper",
+        "bounds"
+      ],
+      "additionalProperties": false
+    },
+    "quantity": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "$ref": "urn:siem-catalog:2.0:common#/$defs/interval"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "physical_cores",
+            "vCPU",
+            "logical_threads",
+            "cores_unspecified",
+            "B",
+            "KB",
+            "MB",
+            "GB",
+            "TB",
+            "KiB",
+            "MiB",
+            "GiB",
+            "TiB",
+            "Gb",
+            "Mbit/s",
+            "Gbit/s",
+            "EPS",
+            "count",
+            "days",
+            "hours",
+            "seconds",
+            "bytes",
+            "events",
+            "percent",
+            "GHz",
+            "MHz"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "total",
+            "per_node",
+            "per_device",
+            "physical",
+            "logical",
+            "unspecified"
+          ]
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "basis",
+        "raw"
+      ],
+      "additionalProperties": false
+    },
+    "version_scope": {
+      "type": "object",
+      "properties": {
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "enum": [
+            "unknown",
+            "exact",
+            "set",
+            "range",
+            "open"
+          ]
+        },
+        "scheme": {
+          "enum": [
+            "opaque",
+            "dotted_numeric",
+            "windows_release"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bounds": {
+          "anyOf": [
+            {
+              "$ref": "urn:siem-catalog:2.0:common#/$defs/bounds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "parsed",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "raw",
+        "kind",
+        "scheme",
+        "values",
+        "lower",
+        "upper",
+        "bounds",
+        "status"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "unknown"
+              },
+              "scheme": {
+                "const": "opaque"
+              },
+              "values": {
+                "maxItems": 0
+              },
+              "lower": {
+                "type": "null"
+              },
+              "upper": {
+                "type": "null"
+              },
+              "bounds": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "exact"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "parsed"
+              },
+              "raw": {
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "lower": {
+                "type": "null"
+              },
+              "upper": {
+                "type": "null"
+              },
+              "bounds": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "set"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "parsed"
+              },
+              "raw": {
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "minItems": 2
+              },
+              "lower": {
+                "type": "null"
+              },
+              "upper": {
+                "type": "null"
+              },
+              "bounds": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "range",
+                  "open"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "parsed"
+              },
+              "raw": {
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "maxItems": 0
+              },
+              "bounds": {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/bounds"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "range"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "lower": {
+                "type": "string",
+                "minLength": 1
+              },
+              "upper": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "open"
+              }
+            }
+          },
+          "then": {
+            "oneOf": [
+              {
+                "properties": {
+                  "lower": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "upper": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "lower": {
+                    "type": "null"
+                  },
+                  "upper": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "scalar": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "boolean"
+            },
+            "value": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "string",
+                "enum"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "set_value": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "set"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/quantity"
+              },
+              {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/version_scope"
+              },
+              {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/scalar"
+              }
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "type",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "typed_value": {
+      "oneOf": [
+        {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/quantity"
+        },
+        {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/version_scope"
+        },
+        {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/scalar"
+        },
+        {
+          "$ref": "urn:siem-catalog:2.0:common#/$defs/set_value"
+        }
+      ]
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "const": "all_of"
+            },
+            "operands": {
+              "type": "array",
+              "items": {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/condition"
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "operator",
+            "operands"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "const": "any_of"
+            },
+            "operands": {
+              "type": "array",
+              "items": {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/condition"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "operator",
+            "operands"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "enum": [
+                "eq",
+                "in",
+                "gte",
+                "lte",
+                "range"
+              ]
+            },
+            "operands": {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "subject_ref": {
+                  "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+                },
+                "value": {
+                  "$ref": "urn:siem-catalog:2.0:common#/$defs/typed_value"
+                }
+              },
+              "required": [
+                "metric",
+                "subject_ref",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "operator",
+            "operands"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "extension": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "boolean",
+            "enum",
+            "string",
+            "quantity",
+            "version_scope"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "$ref": "urn:siem-catalog:2.0:common#/$defs/quantity"
+            },
+            {
+              "$ref": "urn:siem-catalog:2.0:common#/$defs/version_scope"
+            }
+          ]
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:siem-catalog:2.0:common#/$defs/id"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "key",
+        "type",
+        "value",
+        "unit",
+        "evidence_refs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "boolean"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "enum"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "string"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "quantity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/quantity"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "version_scope"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "urn:siem-catalog:2.0:common#/$defs/version_scope"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "extension_registry": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "enum": [
+                  "boolean",
+                  "enum",
+                  "string",
+                  "quantity",
+                  "version_scope"
+                ]
+              },
+              "unit": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "allowed_values": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "key",
+              "type",
+              "unit",
+              "allowed_values"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "version",
+        "entries"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

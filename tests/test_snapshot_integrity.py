@@ -52,7 +52,7 @@ class SnapshotIntegrityTests(unittest.TestCase):
         raw = json.loads(manifest.read_text(encoding='utf-8'))
         result = build_catalog(raw, manifest)
         self.assertEqual((len(result['integrations']), len(result['sizing_profiles']),
-                          len(result['system_requirements'])), (1630, 25, 67))
+                          len(result['system_requirements'])), (1652, 25, 66))
         self.assertEqual(result['unread_source_catalog_documents'], [])
         self.assertEqual(result['unread_system_documents'], [])
         self.assertEqual(result['unparsed_system_documents'], [])
@@ -60,16 +60,16 @@ class SnapshotIntegrityTests(unittest.TestCase):
                          ['additional_infrastructure_sections_not_normalized',
                           'published_node_count_conflicts_with_listed_roles'])
         automatic = build_catalog(raw, manifest, automatic_only=True)
-        self.assertEqual(len(automatic['integrations']), 1451)
-        self.assertFalse(any(row.get('support_scope') == 'partial'
-                             for row in automatic['integrations']))
+        self.assertEqual(len(automatic['integrations']), 1473)
+        self.assertTrue(any(row.get('support_scope') == 'partial'
+                            for row in automatic['integrations']))
         self.assertTrue(automatic['schema_validation']['valid'])
         self.assertTrue(all(e['acquisition_method'] == 'automatic_https'
                             for row in automatic['integrations'] for e in row['evidence']))
         komrad = next(row for row in automatic['integrations'] if row['siem_id'] == 'p13')
         self.assertNotEqual(komrad['integration_guide_url'], komrad['evidence'][0]['url'])
         self.assertTrue(komrad['evidence'][0]['url'].endswith('/collect/sources/'))
-        self.assertEqual(len(result['integrations']), 1630)  # input/history unchanged
+        self.assertEqual(len(result['integrations']), 1652)  # automatic filtering does not mutate the catalog
 
     def test_parser_failure_retains_original_hash_url_and_timestamp(self):
         with TemporaryDirectory() as temp:

@@ -8,7 +8,7 @@ from siem.etl.catalog import build_catalog
 
 class AnkeyTests(unittest.TestCase):
     def test_low_load_profile_keeps_disk_total_and_alternative_os(self):
-        path = Path(__file__).parent / 'fixtures' / 'ankey_product.html'
+        path = Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p10/product_docs_9685e1e1afbed8.html'
         digest = '9685e1e1afbed883c92c79f5704eab8c9446a1ac7e031ccd19c65b983123d5d5'
         self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
         raw = {'vendors': [{'id': 'p10', 'name': 'Ankey SIEM NG', 'source_results': [{

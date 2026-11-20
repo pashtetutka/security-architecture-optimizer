@@ -1,5 +1,7 @@
 """Normalize published event-source facts without inferring support."""
 from __future__ import annotations
+import json
+import re
 
 from .common import nullable, ELIGIBLE_SOURCE_STATUSES
 
@@ -41,6 +43,7 @@ def normalize_sources(raw: dict) -> list[dict]:
             'source_family': family,
             'source_variant': variant,
             'source_version': nullable(f.get('source_version_verified') or f.get('source_version')),
+            'normalizer_description': nullable(f.get('normalizer_description')),
             'collection_method': nullable(f.get('collection_method')),
             'normalizer_id': nullable(f.get('normalizer_id')),
             'normalizer_format': nullable(f.get('normalizer_format')),
@@ -49,8 +52,24 @@ def normalize_sources(raw: dict) -> list[dict]:
             'review_status': 'extracted_unverified',
             'evidence': [provenance(f)],
         }
-        key = tuple(entry.get(k) for k in ('siem_id', 'source_name', 'source_vendor', 'source_family',
-                       'source_version', 'collection_method', 'normalizer_id'))
+        for field in ('support_assertion', 'support_capability'):
+            if field in f:
+                entry[field] = f[field]
+        description = f.get('normalizer_description') or ''
+        if f.get('published_connection_entries'):
+            entry['published_connection_entries'] = f['published_connection_entries']
+        if re.search(r'IPS/IDS|обнаружения вторжений', description, re.I):
+            entry['source_event_kinds'] = ['intrusion_detection']
+        if name == 'PostgreSQL pgAudit':
+            entry['source_family'] = 'PostgreSQL'
+        limitations = [sentence.strip() for sentence in re.split(r'(?<=[.!?])\s+', description)
+                      if re.search(r'част[ьи]\s+событий|ограниченного\s+количества\s+событий|не поддерживает',
+                                   sentence, re.I)]
+        if limitations:
+            entry['support_scope'] = 'partial'
+            entry['support_limitations'] = limitations
+        key = json.dumps({field: value for field, value in entry.items() if field != 'evidence'},
+                         sort_keys=True, ensure_ascii=False)
         if key in seen:
             if entry['evidence'][0] not in seen[key]['evidence']:
                 seen[key]['evidence'].append(entry['evidence'][0])

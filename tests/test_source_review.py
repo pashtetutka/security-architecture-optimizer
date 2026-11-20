@@ -5,6 +5,7 @@ import unittest
 from siem.etl.vendors.rusiem import parse_html
 from siem.etl.coverage import match_inventory,canonical
 from siem.etl.pdf_docs import find_candidates
+from siem.etl.commands.review import download_vendor_page
 
 HTML = Path(__file__).parent/'fixtures'/'rusiem_excerpt.html'
 
@@ -41,13 +42,20 @@ class TestRusiem(unittest.TestCase):
     def test_no_inferred_cost(self):
         self.assertFalse(any('price' in r or 'cost' in r for r in self.data['records']))
 
+    def test_live_review_uses_shared_fetcher_boundary(self):
+        class FakeFetcher:
+            def __init__(self):self.urls=[]
+            def fetch(self,url):self.urls.append(url);return b'<html>ok</html>','utf-8','text/html'
+        fetcher=FakeFetcher();self.assertEqual('<html>ok</html>',download_vendor_page(fetcher))
+        self.assertEqual(1,len(fetcher.urls))
+
     def test_offline_pdf_candidates_are_not_facts(self):
         try:
-            import fitz
+            import pymupdf
         except ImportError: self.skipTest('PyMuPDF not installed')
         import tempfile
         with tempfile.TemporaryDirectory() as p:
-            f=Path(p)/'manual.pdf'; doc=fitz.open(); page=doc.new_page();
+            f=Path(p)/'manual.pdf'; doc=pymupdf.open(); page=doc.new_page();
             page.insert_text((72,72),'Kubernetes requirements: see deployment guide')
             doc.save(f);doc.close()
             result=find_candidates(f,['Kubernetes','Docker'],'https://vendor.example/manual.pdf','8.0')

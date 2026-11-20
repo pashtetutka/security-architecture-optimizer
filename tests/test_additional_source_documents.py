@@ -12,7 +12,7 @@ FIXTURES = Path(__file__).parent / 'fixtures'
 
 class AdditionalSourceDocumentsTests(unittest.TestCase):
     def raw(self, vendor, source_id, filename, digest):
-        path = FIXTURES / filename
+        path = FIXTURES.parents[1] / filename
         self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
         return {'run_at': '2026-10-30T14:13:51+00:00', 'facts': [], 'vendors': [{
             'id': vendor, 'name': vendor, 'source_results': [{
@@ -22,7 +22,7 @@ class AdditionalSourceDocumentsTests(unittest.TestCase):
             }]}]}
 
     def solar(self):
-        return self.raw('p11', 'source_whitepaper', 'solar_whitepaper.pdf',
+        return self.raw('p11', 'source_whitepaper', 'data/etl/repro/raw/p11/source_whitepaper_9e4d4648aff7aa.pdf',
                         '9e4d4648aff7aa5107540f6fc41b3cb80a537e086e6fbecfff7045fb0b1a1a2c')
 
     def test_solar_real_pdf_named_sources_page_and_unknown_versions(self):
@@ -44,7 +44,7 @@ class AdditionalSourceDocumentsTests(unittest.TestCase):
 
     def test_solar_video_and_whitepaper_are_not_double_counted(self):
         raw = self.solar()
-        path = FIXTURES / 'solar_architecture.html'
+        path = FIXTURES.parents[1] / 'data/etl/repro/raw/p11/architecture_ba8be340ddf936.html'
         raw['vendors'][0]['source_results'].insert(0, {
             'source_id': 'architecture', 'status': 'ok', 'url': 'https://example.test/videos',
             'snapshot_path': str(path), 'content_sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
@@ -70,12 +70,13 @@ class AdditionalSourceDocumentsTests(unittest.TestCase):
         self.assertEqual(catalog['unread_source_catalog_documents'][0]['reason'], 'pdf_source_extraction_failed')
 
     def test_security_capsule_only_explicit_collection_claims(self):
-        raw = self.raw('p05', 'source_product', 'security_capsule_product.html',
+        raw = self.raw('p05', 'source_product', 'data/etl/repro/raw/p05/source_product_92319cf58d8dfa.html',
                        '92319cf58d8dfa3b23ad8d525f0dec90f3cff92918f744715c5448908622250e')
         rows = build_catalog(raw, FIXTURES / 'input.json')['integrations']
         self.assertEqual({r['source_name'] for r in rows},
-                         {'Windows event logs', 'Linux event logs', 'Microsoft Sysmon'})
-        self.assertEqual(len(rows), 3)
+                         {'Windows event logs', 'Linux event logs', 'Microsoft Sysmon',
+                          'Active Directory Domain Services'})
+        self.assertEqual(len(rows), 4)
         self.assertTrue(all(r['source_version'] is None for r in rows))
         self.assertEqual(parse_security_capsule_product('<p>Совместимость: Astra Linux, Postgres Pro, NGFW</p>',
                                                        {'siem_id': 'p05', 'siem_name': 'SC'}), [])

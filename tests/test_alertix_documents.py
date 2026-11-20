@@ -15,10 +15,10 @@ class AlertixDocumentTests(unittest.TestCase):
     def _raw(self):
         documents = []
         for source_id, filename, digest in (
-            ('configuration', 'alertix_faq.html', FAQ_HASH),
-            ('platform_architecture', 'alertix_architecture.html', ARCH_HASH),
+            ('configuration', 'data/etl/repro/raw/p04/configuration_f35a857513e8ae.html', FAQ_HASH),
+            ('platform_architecture', 'data/etl/repro/raw/p04/platform_architecture_3f3347f0bacf96.html', ARCH_HASH),
         ):
-            path = FIXTURES / filename
+            path = FIXTURES.parents[1] / filename
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
             documents.append({'source_id': source_id, 'status': 'ok',
                               'url': 'https://help.ngrsoftlab.ru/' + filename,

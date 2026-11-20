@@ -7,6 +7,7 @@ from __future__ import annotations
 import re
 from bs4 import BeautifulSoup, NavigableString, Comment
 from ..common import clean, document_evidence, nullable
+from .published_claims import _source
 
 
 def _table_rows(table):
@@ -152,8 +153,12 @@ def parse_komrad_catalog(html: str, meta: dict) -> list[dict]:
         href=link.get('href','')
         # Don't include navigation, sibling docs or unrelated cross-links.
         if '/collect/sources/' not in href:continue
-        # Docusaurus prepends a document icon to each link's visible text.
-        name=re.sub(r'^[\s📄\ufe0f]+', '', clean(link.get_text(' ',strip=True)))
+        # A Docusaurus card includes both its heading and a description.
+        # The description is evidence context, never part of the product name.
+        heading=link.select_one('.theme-doc-card-heading') or link.select_one('h2')
+        title=heading.get('title') if heading else None
+        label=title or (heading.get_text(' ',strip=True) if heading else link.get_text(' ',strip=True))
+        name=re.sub(r'^[\s📄\ufe0f]+', '', clean(label))
         if len(name)<3 or len(name)>100 or name.casefold() in ('источники событий','назад','далее'):continue
         absolute=urljoin(meta['url'],href)
         key=(name.casefold(),absolute)
@@ -163,10 +168,57 @@ def parse_komrad_catalog(html: str, meta: dict) -> list[dict]:
             'siem_id':meta['siem_id'],'siem_name':meta['siem_name'],
             'siem_version':None,'siem_version_hint':nullable(meta.get('product_version_hint')),
             'source_name':name,'source_vendor':None,'source_family':None,'source_variant':None,
-            'source_version':None,'collection_method':None,'normalizer_id':None,
+            'source_version':(name.rsplit(' ',1)[1] if re.fullmatch(
+                r'(?:Microsoft Exchange Server|Dallas Lock) \d+(?:\.\d+)*(?:-[А-ЯA-Z])?', name) else None),
+            'collection_method':None,'normalizer_id':None,
             'normalizer_format':None,'integration_evidence':'published_integration_guide_index',
             'functional_integration_verified':False,'review_status':'extracted_unverified',
             'integration_guide_url': absolute,
             'evidence':[document_evidence(meta, name, 'komrad_document_link')],
         })
     return found
+
+
+def parse_komrad_windows_source(html: str, meta: dict) -> list[dict]:
+    """Only the explicit Winlogbeat Windows event-log guide, not its sidebar."""
+    soup=BeautifulSoup(html,'html.parser')
+    article=soup.select_one('article .markdown') or soup.select_one('article')
+    if article is None:
+        raise ValueError('komrad_source_article_missing')
+    text=clean(article.get_text(' ',strip=True))
+    marker='отправляет журналы событий Windows в Elasticsearch или Logstash.'
+    if not all(token in text for token in
+               (marker, 'winlogbeat.event_logs', 'Security', 'HTTP', 'output.elasticsearch')):
+        raise ValueError('komrad_winlogbeat_scope_not_found')
+    row=_source(meta,'Windows event logs', marker,
+                'komrad_winlogbeat_explicit_windows_logs',
+                collection_method='Winlogbeat / HTTP collector',source_vendor='Microsoft')
+    row['collection_intermediary']='Winlogbeat'
+    row['intermediary_transport']='HTTP'
+    row['event_channels']=['Application','System','Security','Windows PowerShell','ForwardedEvents']
+    row['collection_limitations']=['Winlogbeat and the KOMRAD HTTP collector must be configured',
+                                   'Supported Windows OS versions are not stated in this guide']
+    return [row]
+
+
+def parse_komrad_cyberbackup_scope(html: str, meta: dict) -> list[dict]:
+    """Retain the guide's restriction to backup-plan events in Application."""
+    soup=BeautifulSoup(html,'html.parser')
+    article=soup.select_one('article .markdown') or soup.select_one('article')
+    if article is None:
+        raise ValueError('komrad_source_article_missing')
+    text=clean(article.get_text(' ',strip=True))
+    if ('Кибер Резервное копирование' not in text or 'только к плану резервного копирования' not in text
+            or 'Application' not in text or 'WMI' not in text):
+        raise ValueError('komrad_cyberbackup_scope_not_found')
+    start=text.index('Настройка Журнал событий Windows относится только') if 'Настройка Журнал событий Windows относится только' in text else -1
+    excerpt=(text[start:text.find('.',start)+1] if start>=0 else
+             'Настройка Журнал событий Windows относится только к плану резервного копирования')
+    row=_source(meta,'Кибер Резервное копирование',excerpt,
+                'komrad_cyberbackup_explicit_limited_scope',
+                collection_method='Windows Application event log / WMI',source_vendor='Киберпротект')
+    row['support_scope']='partial'
+    row['event_channels']=['Application']
+    row['collection_limitations']=['Only backup-plan execution events written to Windows Application are collected',
+                                  'Other actions from the product monitoring panel are not included']
+    return [row]

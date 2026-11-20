@@ -68,6 +68,288 @@
           "product_version_hint": "latest; release must be validated",
           "source_type": "vendor_documentation",
           "enabled": true
+        },
+        {
+          "id": "continent4_guide_database",
+          "url": "https://docs.rvision.ru/sources/ru/latest/NGFW/kodbezopasnosti-continent-4-guide-db.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "континент",
+            "source_version": "4",
+            "transport": "PostgreSQL",
+            "intermediary": "PostgreSQL",
+            "heading": "Код Безопасности Континент 4: настройка источника (PostgreSQL)",
+            "required_text_markers": [
+              "в R-Vision SIEM посредством PostgreSQL",
+              "Драйвер базы данных: выберите вариант PostgreSQL.",
+              "внешняя БД PostgreSQL"
+            ]
+          }
+        },
+        {
+          "id": "continent4_guide_syslog",
+          "url": "https://docs.rvision.ru/sources/ru/latest/NGFW/kodbezopasnosti-continent-4-guide-syslog.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "континент",
+            "source_version": "4",
+            "transport": "Syslog",
+            "heading": "Код Безопасности Континент 4: настройка источника (Syslog)",
+            "required_text_markers": [
+              "в R-Vision SIEM посредством Syslog",
+              "Тип точки входа: выберите вариант Syslog"
+            ]
+          }
+        },
+        {
+          "id": "wmi_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/OperationSystems/microsoft-windows-wmi-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "windows management instrumentation wmi",
+            "source_version": null,
+            "transport": "WMI",
+            "heading": "Microsoft Windows Management Instrumentation (WMI): настройка источника",
+            "required_text_markers": [
+              "RV-N-353",
+              "Microsoft Windows Management Instrumentation (WMI)"
+            ]
+          }
+        },
+        {
+          "id": "apache_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/WebServers/apache-http-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "apache http server",
+            "source_version": "2",
+            "transport": "Syslog",
+            "intermediary": "rsyslog",
+            "heading": "Apache HTTP Server: настройка источника",
+            "event_channels": [
+              "access",
+              "error"
+            ],
+            "required_text_markers": [
+              "RV-N-231",
+              "RV-N-232",
+              "rsyslog"
+            ]
+          }
+        },
+        {
+          "id": "secret_net_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/EndpointProtection/kodbezopasnosti-secret-net-studio-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "secret net studio",
+            "source_version": "8",
+            "transport": "Database",
+            "intermediary": "Microsoft SQL Server",
+            "heading": "Код Безопасности Secret Net Studio: настройка источника",
+            "event_channels": [
+              "audit",
+              "security"
+            ],
+            "required_text_markers": [
+              "RV-N-201",
+              "RV-N-202",
+              "MS SQL"
+            ]
+          }
+        },
+        {
+          "id": "linux_auditd_guide_rpoint",
+          "url": "https://docs.rvision.ru/sources/ru/latest/OperationSystems/linux-auditd-guide-rpoint.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "linux auditd",
+            "source_version": "2.6 и выше",
+            "transport": "R-Vision Endpoint",
+            "heading": "Linux Auditd: настройка источника (R-Vision Endpoint)",
+            "required_text_markers": [
+              "RV-N-186"
+            ]
+          }
+        },
+        {
+          "id": "linux_auditd_guide_syslog",
+          "url": "https://docs.rvision.ru/sources/ru/latest/OperationSystems/linux-auditd-guide-syslog.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "linux auditd",
+            "source_version": "2.6 и выше",
+            "transport": "Syslog",
+            "heading": "Linux Auditd: настройка источника (Syslog)",
+            "required_text_markers": [
+              "RV-N-187"
+            ],
+            "intermediary": "rsyslog"
+          }
+        },
+        {
+          "id": "oracledb_guide_database",
+          "url": "https://docs.rvision.ru/sources/ru/latest/DBMS/oracledb-guide-database.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "oracle database",
+            "source_version": "21с",
+            "transport": "Database",
+            "heading": "Oracle Database: настройка источника (Database)",
+            "required_text_markers": [
+              "RV-N-319"
+            ]
+          }
+        },
+        {
+          "id": "oracledb_guide_syslog",
+          "url": "https://docs.rvision.ru/sources/ru/latest/DBMS/oracledb-guide-syslog.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "oracle database",
+            "source_version": "21с",
+            "transport": "Syslog",
+            "heading": "Oracle Database: настройка источника (Syslog)",
+            "required_text_markers": [
+              "RV-N-210"
+            ]
+          }
+        },
+        {
+          "id": "dallas_lock_ecu_guide_postgresql",
+          "url": "https://docs.rvision.ru/sources/ru/latest/EndpointProtection/dallas-lock-ecu-guide-postgresql.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "ецу dallas lock",
+            "source_version": null,
+            "transport": "PostgreSQL",
+            "heading": "Конфидент ЕЦУ Dallas Lock: сбор событий из СУБД PostgreSQL",
+            "required_text_markers": [
+              "RV-N-289"
+            ]
+          }
+        },
+        {
+          "id": "dallas_lock_ecu_guide_syslog",
+          "url": "https://docs.rvision.ru/sources/ru/latest/EndpointProtection/dallas-lock-ecu-guide-syslog.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "ецу dallas lock",
+            "source_version": null,
+            "transport": "Syslog",
+            "heading": "Конфидент ЕЦУ Dallas Lock: сбор событий в формате CEF",
+            "required_text_markers": [
+              "RV-N-291"
+            ]
+          }
+        },
+        {
+          "id": "pt_af3_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/WAF/pt-af3-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "pt application firewall",
+            "source_version": "3",
+            "transport": "Syslog",
+            "heading": "PT Application Firewall 3: настройка источника",
+            "required_text_markers": [
+              "RV-N-199",
+              "RV-N-200"
+            ]
+          }
+        },
+        {
+          "id": "citrix_vad_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/TerminalAccessSystems/citrix-vad-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "virtual apps and desktops",
+            "source_version": null,
+            "heading": "Citrix Virtual Apps and Desktops: настройка источника",
+            "required_text_markers": [
+              "События аудита, хранящиеся в СУБД Microsoft SQL Server",
+              "регистрируются в журнале Application",
+              "RV-N-323",
+              "RV-N-324"
+            ],
+            "streams": [
+              {
+                "transport": "Database",
+                "intermediary": "Microsoft SQL Server",
+                "event_channels": [
+                  "audit"
+                ]
+              },
+              {
+                "transport": "R-Vision Endpoint",
+                "event_channels": [
+                  "Application"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "garda_ndr_collection_guide",
+          "url": "https://docs.rvision.ru/sources/ru/latest/NetworkTrafficAnalysis/garda-ndr-guide.html",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "enabled": true,
+          "route_guide": {
+            "product": "гарда ndr",
+            "source_version": "4",
+            "heading": "Гарда NDR: настройка источника",
+            "required_text_markers": [
+              "Garda NDR Traffic",
+              "Garda NDR User Actions",
+              "Garda NDR System Messages",
+              "ClickHouse",
+              "RV-N-335",
+              "RV-N-337"
+            ],
+            "streams": [
+              {
+                "transport": "Database",
+                "intermediary": "ClickHouse",
+                "event_channels": [
+                  "system message",
+                  "user action"
+                ]
+              },
+              {
+                "transport": "Syslog",
+                "event_channels": [
+                  "traffic event"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -210,6 +492,14 @@
           "enabled": true
         },
         {
+          "id": "partial_sources_api",
+          "url": "https://help.ptsecurity.com/api/v2/documents/document/ru-RU/siem/8.6/help/1194299019",
+          "mode": "maxpatrol_api",
+          "product_version_hint": "8.6; documentation version, product not independently verified",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
           "id": "supported_sources_api",
           "url": "https://help.ptsecurity.com/api/v2/documents/document/ru-RU/siem/8.6/help/1083652747",
           "mode": "maxpatrol_api",
@@ -235,6 +525,14 @@
         {
           "id": "product",
           "url": "https://savrus.ru/",
+          "mode": "generic",
+          "product_version_hint": "unknown",
+          "source_type": "vendor_documentation",
+          "enabled": true
+        },
+        {
+          "id": "compatibility_news",
+          "url": "https://savrus.ru/news",
           "mode": "generic",
           "product_version_hint": "unknown",
           "source_type": "vendor_documentation",
@@ -408,6 +706,22 @@
           "mode": "generic",
           "source_type": "vendor_documentation",
           "product_version_hint": "KOMRAD next (resolved release must be verified from document)"
+        },
+        {
+          "id": "windows_source",
+          "url": "https://docs.etecs.ru/komrad/docs/next/collect/sources/winlogbeat/",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "product_version_hint": "KOMRAD next (resolved release must be verified from document)",
+          "enabled": true
+        },
+        {
+          "id": "cyberbackup_scope",
+          "url": "https://docs.etecs.ru/komrad/docs/next/collect/sources/cyberbackup/",
+          "mode": "generic",
+          "source_type": "vendor_documentation",
+          "product_version_hint": "KOMRAD next (resolved release must be verified from document)",
+          "enabled": true
         }
       ]
     }

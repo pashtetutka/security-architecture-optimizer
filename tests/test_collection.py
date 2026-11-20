@@ -1,6 +1,6 @@
 import unittest,json
 from pathlib import Path
-from siem.etl.extractors import extract_content
+from siem.etl.extractors import extract_content, structured_tables
 from siem.etl.pipeline import collect
 from siem.etl.applicability import evaluate
 ROOT=Path(__file__).parent.parent
@@ -11,6 +11,29 @@ class FakeFetch:
   else:raise OSError('В тесте загрузка данного URL недоступна')
   return data,'utf-8','text/html'
 class CollectionTests(unittest.TestCase):
+ def test_route_guide_uses_same_heading_check_during_collection(self):
+  registry=json.loads((ROOT/'data/etl/vendors.json').read_text(encoding='utf8'))
+  vendor=next(item for item in registry['vendors'] if item['id']=='p03')
+  source=next(item for item in vendor['sources'] if item['id']=='continent4_guide_syslog')
+  filtered={'vendors':[{**vendor,'sources':[source]}]}
+  snapshot=next((ROOT/'data/etl/repro/raw/p03').glob('continent4_guide_syslog_*.html'))
+  class Fetcher:
+   def __init__(self, data): self.data=data
+   def fetch(self, url): return self.data,'utf-8','text/html'
+  collected=collect(filtered,Fetcher(snapshot.read_bytes()))
+  self.assertEqual('collection_route_guide',collected['facts'][0]['field'])
+  self.assertEqual('Syslog',collected['facts'][0]['transport'])
+  failed=collect(filtered,Fetcher(b'<article><h1>Unexpected text</h1></article>'))
+  self.assertEqual([],failed['facts'])
+  report=failed['vendors'][0]['source_results'][0]
+  self.assertEqual(('error','extraction'),(report['status'],report['failure_stage']))
+  self.assertIn('route_guide_heading_changed',report['error'])
+  heading=source['route_guide']['heading']
+  heading_only=f'<article><h1>{heading}</h1><p>Placeholder</p></article>'.encode('utf-8')
+  failed=collect(filtered,Fetcher(heading_only))
+  self.assertEqual([],failed['facts'])
+  self.assertIn('route_guide_text_changed',failed['vendors'][0]['source_results'][0]['error'])
+
  def test_rvision_table(self):
   data=(ROOT/'tests/fixtures/catalogs/rvision_sources.html').read_bytes()
   f=extract_content(data,'rvision')['facts']
@@ -20,6 +43,13 @@ class CollectionTests(unittest.TestCase):
   data=(ROOT/'tests/fixtures/catalogs/kuma_sources.html').read_bytes()
   f=extract_content(data,'kuma')['facts'];a=[x for x in f if x['field']=='source_integration']
   self.assertEqual(len(a),2);self.assertEqual(a[0]['normalizer_format'],'regexp')
+ def test_rvision_collection_cell_preserves_document_boundaries(self):
+  path=next((ROOT/'data/etl/repro/raw/p03').glob('source_catalog_*.html'))
+  rows=structured_tables(path.read_text(encoding='utf-8'),'rvision')
+  entries=[row.get('published_connection_entries') for row in rows]
+  self.assertIn(['Syslog','Database'],entries)
+  self.assertIn(['Universal CEF'],entries)
+  self.assertIn(['WMI','GPO'],entries)
  def test_generic_only_candidates(self):
   f=extract_content(b'<html><p>We require Kubernetes for event collection in this version.</p></html>','generic')['facts']
   self.assertEqual(f[0]['evidence_status'],'review_candidate')

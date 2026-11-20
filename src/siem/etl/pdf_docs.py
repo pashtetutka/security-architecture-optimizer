@@ -11,13 +11,13 @@ import re
 def find_candidates(path: Path, keywords: list[str], source_url: str, version: str,
                     max_per_keyword: int = 10) -> dict:
     try:
-        import fitz
+        import pymupdf
     except ImportError as exc:
         raise RuntimeError('Установите pymupdf: pip install pymupdf') from exc
     if not path.is_file() or path.suffix.lower() != '.pdf':
         raise ValueError('Ожидается существующий PDF')
     found = []
-    doc = fitz.open(str(path))
+    doc = pymupdf.open(str(path))
     try:
         for index in range(len(doc)):
             # Avoid OCR. Plain text PDFs only, no unsupported inference from scanned pages.

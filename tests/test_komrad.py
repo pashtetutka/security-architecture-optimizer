@@ -7,7 +7,8 @@ from tempfile import TemporaryDirectory
 
 from siem.etl.catalog import build_catalog
 from siem.etl.catalog import write_catalog
-from siem.etl.vendors.komrad import parse_komrad_requirements
+from siem.etl.vendors.komrad import (parse_komrad_catalog, parse_komrad_requirements,
+                                    parse_komrad_windows_source, parse_komrad_cyberbackup_scope)
 from siem.etl.reports.readiness import readiness_report
 
 KOMRAD = '''<!doctype html><html><body>
@@ -34,9 +35,32 @@ def meta(vid='p13'):
                 content_sha256='abc',product_version_hint='KOMRAD next')
 
 
+class KomradRealCatalogTests(unittest.TestCase):
+    def test_card_description_does_not_become_product_name(self):
+        path=Path('data/etl/repro/raw/p13/sources_catalog_87e67b58339816.html')
+        rows=parse_komrad_catalog(path.read_text(encoding='utf-8'), meta())
+        self.assertEqual(len(rows), 44)
+        names={row['source_name'] for row in rows}
+        self.assertIn('Kaspersky Security Center', names)
+        self.assertIn('Microsoft Exchange Server 2010', names)
+        self.assertNotIn('Kaspersky Security Center Подключение Kaspersky Security Center через Syslog', names)
+        self.assertEqual(next(r for r in rows if r['source_name']=='Microsoft Exchange Server 2010')['source_version'], '2010')
+        self.assertEqual(next(r for r in rows if r['source_name']=='Dallas Lock 8.0-К')['source_version'], '8.0-К')
+
+    def test_real_source_guides_preserve_channels_and_limitations(self):
+        paths=Path('data/etl/repro/raw/p13')
+        windows=parse_komrad_windows_source(next(paths.glob('windows_source_*.html')).read_text(encoding='utf8'), meta())
+        self.assertEqual(windows[0]['source_name'], 'Windows event logs')
+        self.assertIn('Security', windows[0]['event_channels'])
+        backup=parse_komrad_cyberbackup_scope(next(paths.glob('cyberbackup_scope_*.html')).read_text(encoding='utf8'), meta())
+        self.assertEqual(backup[0]['support_scope'], 'partial')
+        self.assertEqual(backup[0]['collection_method'], 'Windows Application event log / WMI')
+        self.assertIn('только к плану резервного копирования', backup[0]['evidence'][0]['excerpt'])
+
+
 class KomradTests(unittest.TestCase):
     def test_real_snapshot_and_normalization(self):
-        path=Path(__file__).parent/'fixtures'/'komrad_prerequisites_4_6.html'
+        path=Path(__file__).resolve().parents[1] / 'data/etl/repro/raw/p13/hardware_requirements_49bf901b512592.html'
         data=path.read_bytes()
         digest='49bf901b51259254bf10d15567886cd370de30f3475cf7909de6df94781d1f4b'
         self.assertEqual(hashlib.sha256(data).hexdigest(),digest)

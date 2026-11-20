@@ -8,8 +8,6 @@ dist/
 .env
 results/
 *.pdf
-!tests/fixtures/solar_whitepaper.pdf
-!tests/fixtures/security_capsule_description.pdf
 !data/etl/repro/raw/**/*.pdf
 *.xlsx
 *.xls
@@ -18,4 +16,3 @@ data/private/
 local_archive/
 .coverage
 htmlcov/
-AGENTS.md
